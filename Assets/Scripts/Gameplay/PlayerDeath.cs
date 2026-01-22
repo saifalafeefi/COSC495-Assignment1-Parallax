@@ -19,20 +19,23 @@ namespace Platformer.Gameplay
             var player = model.player;
             Debug.Log("[PlayerDeath] Execute called");
 
-            // Make sure health is actually 0
+            // make sure health is actually 0
             if (player.health.CurrentHP > 0)
             {
                 Debug.Log("[PlayerDeath] Health > 0, forcing death");
                 player.health.Die();
             }
 
-            // Reset sprite color and invincibility state
+            // reset sprite color and invincibility state
             player.ResetVisualState();
 
             model.virtualCamera.Follow = null;
             model.virtualCamera.LookAt = null;
-            // player.collider.enabled = false;
+
+            // disable collider so enemies can't hit the corpse
+            player.collider2d.enabled = false;
             player.controlEnabled = false;
+            Debug.Log("[PlayerDeath] Disabled player collider and controls");
 
             if (player.audioSource && player.ouchAudio)
                 player.audioSource.PlayOneShot(player.ouchAudio);

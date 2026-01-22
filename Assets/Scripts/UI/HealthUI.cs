@@ -60,7 +60,7 @@ namespace Platformer.UI
 
         void SetupCanvas()
         {
-            // Find or create Canvas
+            // find or create Canvas
             canvas = FindObjectOfType<Canvas>();
             if (canvas == null)
             {
@@ -75,7 +75,7 @@ namespace Platformer.UI
 
         void SetupHealthDisplay()
         {
-            // Create a container for health hearts
+            // create a container for health hearts
             healthDisplayContainer = new GameObject("HealthDisplay");
             healthDisplayContainer.transform.SetParent(canvas.transform, false);
 
@@ -93,7 +93,7 @@ namespace Platformer.UI
         {
             Debug.Log("[HealthUI] Start called");
 
-            // Find player health if not assigned
+            // find player health if not assigned
             if (playerHealth == null)
             {
                 Debug.Log("[HealthUI] playerHealth not assigned, searching...");
@@ -105,19 +105,19 @@ namespace Platformer.UI
                 }
             }
 
-            // Create placeholder sprites if none are assigned
+            // create placeholder sprites if none are assigned
             if (fullHeartSprite == null)
             {
                 Debug.Log("[HealthUI] Creating RED placeholder full heart sprite");
-                fullHeartSprite = CreatePlaceholderSprite(new Color(1f, 0f, 0f, 1f)); // Bright red
+                fullHeartSprite = CreatePlaceholderSprite(new Color(1f, 0f, 0f, 1f)); // bright red
             }
             if (emptyHeartSprite == null)
             {
                 Debug.Log("[HealthUI] Creating DARK placeholder empty heart sprite");
-                emptyHeartSprite = CreatePlaceholderSprite(new Color(0.2f, 0.2f, 0.2f, 1f)); // Dark gray
+                emptyHeartSprite = CreatePlaceholderSprite(new Color(0.2f, 0.2f, 0.2f, 1f)); // dark gray
             }
 
-            // Initial UI setup
+            // initial UI setup
             if (playerHealth != null)
             {
                 Debug.Log($"[HealthUI] Initializing hearts for maxHP: {playerHealth.maxHP}");
@@ -133,13 +133,13 @@ namespace Platformer.UI
         {
             if (playerHealth != null)
             {
-                // Rebuild hearts if max HP changed
+                // rebuild hearts if max HP changed
                 if (lastKnownMaxHP != playerHealth.maxHP)
                 {
                     InitializeHearts();
                 }
 
-                // Update heart display only when HP changes
+                // update heart display only when HP changes
                 if (lastKnownCurrentHP != playerHealth.CurrentHP)
                 {
                     lastKnownCurrentHP = playerHealth.CurrentHP;
@@ -156,7 +156,7 @@ namespace Platformer.UI
         {
             Debug.Log("[HealthUI] InitializeHearts called");
 
-            // Clear existing hearts
+            // clear existing hearts
             foreach (var heart in heartImages)
             {
                 if (heart != null)
@@ -166,7 +166,7 @@ namespace Platformer.UI
             }
             heartImages.Clear();
 
-            // Create new hearts in the container
+            // create new hearts in the container
             lastKnownMaxHP = playerHealth.maxHP;
             Debug.Log($"[HealthUI] Creating {playerHealth.maxHP} hearts in HealthDisplay container");
 
@@ -217,7 +217,7 @@ namespace Platformer.UI
             Texture2D texture = new Texture2D(64, 64);
             Color[] pixels = new Color[64 * 64];
 
-            // Create a filled square
+            // create a filled square
             for (int i = 0; i < pixels.Length; i++)
             {
                 pixels[i] = color;

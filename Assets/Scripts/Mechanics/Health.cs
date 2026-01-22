@@ -36,6 +36,16 @@ namespace Platformer.Mechanics
         }
 
         /// <summary>
+        /// Reset HP to maximum value (used on respawn).
+        /// </summary>
+        public void ResetToFull()
+        {
+            int oldHP = currentHP;
+            currentHP = maxHP;
+            Debug.Log($"[Health] {gameObject.name} - HP reset: {oldHP} -> {currentHP} (full)");
+        }
+
+        /// <summary>
         /// Decrement the HP of the entity. Will trigger a HealthIsZero event when
         /// current HP reaches 0.
         /// </summary>

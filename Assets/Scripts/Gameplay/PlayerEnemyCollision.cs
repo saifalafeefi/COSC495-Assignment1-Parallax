@@ -25,7 +25,7 @@ namespace Platformer.Gameplay
 
             if (willHurtEnemy)
             {
-                // Player is attacking from above - damage enemy
+                // player is attacking from above - damage enemy
                 var enemyHealth = enemy.GetComponent<Health>();
                 if (enemyHealth != null)
                 {
@@ -48,7 +48,7 @@ namespace Platformer.Gameplay
             }
             else
             {
-                // Player hit by enemy - take damage if not invincible
+                // player hit by enemy - take damage if not invincible
                 Debug.Log($"[PlayerEnemyCollision] Player hit! IsInvincible: {player.IsInvincible}");
                 if (!player.IsInvincible)
                 {
@@ -59,7 +59,7 @@ namespace Platformer.Gameplay
                         playerHealth.Decrement();
                         Debug.Log($"[PlayerEnemyCollision] Health now: {playerHealth.CurrentHP}");
 
-                        // Check if player died - handle death immediately without invincibility
+                        // check if player died - handle death immediately without invincibility
                         if (!playerHealth.IsAlive)
                         {
                             Debug.Log("[PlayerEnemyCollision] Player HP reached 0, scheduling death");
@@ -67,20 +67,20 @@ namespace Platformer.Gameplay
                         }
                         else
                         {
-                            // Player survived - apply hurt effects
-                            // Play hurt sound
+                            // player survived - apply hurt effects
+                            // play hurt sound
                             if (player.ouchAudio != null && player.audioSource != null)
                             {
                                 player.audioSource.PlayOneShot(player.ouchAudio);
                             }
 
-                            // Activate invincibility frames
+                            // activate invincibility frames
                             player.ActivateInvincibility();
 
-                            // Apply knockback away from enemy
+                            // apply knockback away from enemy
                             Vector2 knockbackDirection = new Vector2(
                                 player.Bounds.center.x - enemy.Bounds.center.x,
-                                1f // Slight upward force
+                                1f // slight upward force
                             );
                             player.ApplyKnockback(knockbackDirection, 5f);
                         }
@@ -88,7 +88,7 @@ namespace Platformer.Gameplay
                     else
                     {
                         Debug.LogWarning("[PlayerEnemyCollision] No health component, instant death!");
-                        // No health component, instant death (old behavior)
+                        // no health component, instant death (old behavior)
                         Schedule<PlayerDeath>();
                     }
                 }

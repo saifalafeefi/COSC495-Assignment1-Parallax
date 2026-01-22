@@ -74,7 +74,7 @@ namespace Platformer.Mechanics
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
 
-            // Store the original sprite color so we can restore it properly
+            // store the original sprite color so we can restore it properly
             originalSpriteColor = spriteRenderer.color;
 
             m_MoveAction = InputSystem.actions.FindAction("Player/Move");
@@ -109,7 +109,7 @@ namespace Platformer.Mechanics
                 move.x = 0;
             }
 
-            // Handle invincibility timer
+            // handle invincibility timer
             if (isInvincible)
             {
                 invincibilityTimer -= Time.deltaTime;
@@ -117,14 +117,14 @@ namespace Platformer.Mechanics
                 {
                     isInvincible = false;
 
-                    // Stop flash coroutine if it's still running
+                    // stop flash coroutine if it's still running
                     if (flashCoroutine != null)
                     {
                         StopCoroutine(flashCoroutine);
                         flashCoroutine = null;
                     }
 
-                    // Force sprite color reset when invincibility ends
+                    // force sprite color reset when invincibility ends
                     spriteRenderer.color = originalSpriteColor;
                     Debug.Log("[PlayerController] Invincibility ended, sprite color reset to original");
                 }
@@ -198,7 +198,7 @@ namespace Platformer.Mechanics
         {
             Debug.Log("[PlayerController] ActivateInvincibility called!");
 
-            // Stop any existing flash coroutine
+            // stop any existing flash coroutine
             if (flashCoroutine != null)
             {
                 StopCoroutine(flashCoroutine);
@@ -206,7 +206,7 @@ namespace Platformer.Mechanics
                 Debug.Log("[PlayerController] Stopped existing flash coroutine");
             }
 
-            // Always reset sprite color to original before starting
+            // always reset sprite color to original before starting
             spriteRenderer.color = originalSpriteColor;
 
             if (!isInvincible)
@@ -232,18 +232,18 @@ namespace Platformer.Mechanics
             Debug.Log("[PlayerController] FlashSprite coroutine started");
             while (isInvincible)
             {
-                // Flash bright white (more visible)
+                // flash bright white (more visible)
                 spriteRenderer.color = new Color(2f, 2f, 2f, 1f);
                 yield return new WaitForSeconds(flashInterval);
 
-                // Flash back to original color (if still invincible)
+                // flash back to original color (if still invincible)
                 if (isInvincible)
                 {
                     spriteRenderer.color = originalSpriteColor;
                     yield return new WaitForSeconds(flashInterval);
                 }
             }
-            // Ensure sprite is back to original color when invincibility ends
+            // ensure sprite is back to original color when invincibility ends
             spriteRenderer.color = originalSpriteColor;
             Debug.Log("[PlayerController] FlashSprite ended, sprite reset to original color");
         }
@@ -259,7 +259,7 @@ namespace Platformer.Mechanics
         }
 
         /// <summary>
-        /// Force reset player visual state (called on death or respawn).
+        /// force reset player visual state (called on death or respawn)
         /// </summary>
         public void ResetVisualState()
         {
@@ -270,7 +270,16 @@ namespace Platformer.Mechanics
                 flashCoroutine = null;
             }
             spriteRenderer.color = originalSpriteColor;
-            Debug.Log($"[PlayerController] Visual state reset (sprite color = {originalSpriteColor})");
+            Debug.Log($"[PlayerController] visual state reset (sprite color = {originalSpriteColor})");
+        }
+
+        /// <summary>
+        /// reset sprite to face right (default direction)
+        /// </summary>
+        public void ResetOrientation()
+        {
+            spriteRenderer.flipX = false;
+            Debug.Log("[PlayerController] orientation reset to face right");
         }
 
         public enum JumpState

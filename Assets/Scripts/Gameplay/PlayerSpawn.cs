@@ -18,13 +18,19 @@ namespace Platformer.Gameplay
             player.controlEnabled = false;
             if (player.audioSource && player.respawnAudio)
                 player.audioSource.PlayOneShot(player.respawnAudio);
-            player.health.Increment();
+
+            // reset HP to full on respawn
+            player.health.ResetToFull();
+
             player.Teleport(model.spawnPoint.transform.position);
             player.jumpState = PlayerController.JumpState.Grounded;
             player.animator.SetBool("dead", false);
 
-            // Reset visual state on respawn
+            // reset visual state on respawn (color, invincibility)
             player.ResetVisualState();
+
+            // reset sprite orientation to face right (only on respawn, not death)
+            player.ResetOrientation();
 
             model.virtualCamera.Follow = player.transform;
             model.virtualCamera.LookAt = player.transform;
