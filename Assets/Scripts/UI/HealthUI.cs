@@ -1,0 +1,232 @@
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using Platformer.Mechanics;
+
+namespace Platformer.UI
+{
+    /// <summary>
+    /// Displays player health as a row of heart icons.
+    /// AUTO-CREATES Canvas and UI if not in scene.
+    /// </summary>
+    public class HealthUI : MonoBehaviour
+    {
+        [Header("References")]
+        /// <summary>
+        /// Reference to the player's Health component (auto-found if empty).
+        /// </summary>
+        public Health playerHealth;
+
+        [Header("Heart Sprites")]
+        /// <summary>
+        /// Sprite to display for a full heart (drag and drop your custom sprite here).
+        /// </summary>
+        public Sprite fullHeartSprite;
+
+        /// <summary>
+        /// Sprite to display for an empty heart (drag and drop your custom sprite here).
+        /// </summary>
+        public Sprite emptyHeartSprite;
+
+        [Header("UI Settings")]
+        /// <summary>
+        /// Size of each heart icon in pixels.
+        /// </summary>
+        public float heartSize = 40f;
+
+        /// <summary>
+        /// Spacing between heart icons.
+        /// </summary>
+        public float heartSpacing = 10f;
+
+        [Header("UI Position")]
+        /// <summary>
+        /// Position offset from top-left corner.
+        /// </summary>
+        public Vector2 screenPosition = new Vector2(20, -20);
+
+        private List<Image> heartImages = new List<Image>();
+        private int lastKnownMaxHP = 0;
+        private int lastKnownCurrentHP = -1;
+        private Canvas canvas;
+        private GameObject healthDisplayContainer;
+
+        void Awake()
+        {
+            Debug.Log("[HealthUI] Awake - Setting up UI");
+            SetupCanvas();
+            SetupHealthDisplay();
+        }
+
+        void SetupCanvas()
+        {
+            // Find or create Canvas
+            canvas = FindObjectOfType<Canvas>();
+            if (canvas == null)
+            {
+                Debug.Log("[HealthUI] No Canvas found, creating one");
+                GameObject canvasObj = new GameObject("Canvas");
+                canvas = canvasObj.AddComponent<Canvas>();
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                canvasObj.AddComponent<CanvasScaler>();
+                canvasObj.AddComponent<GraphicRaycaster>();
+            }
+        }
+
+        void SetupHealthDisplay()
+        {
+            // Create a container for health hearts
+            healthDisplayContainer = new GameObject("HealthDisplay");
+            healthDisplayContainer.transform.SetParent(canvas.transform, false);
+
+            RectTransform rect = healthDisplayContainer.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0, 1);
+            rect.anchorMax = new Vector2(0, 1);
+            rect.pivot = new Vector2(0, 1);
+            rect.anchoredPosition = screenPosition;
+            rect.sizeDelta = new Vector2(300, 50);
+
+            Debug.Log($"[HealthUI] Created HealthDisplay at position {screenPosition}");
+        }
+
+        void Start()
+        {
+            Debug.Log("[HealthUI] Start called");
+
+            // Find player health if not assigned
+            if (playerHealth == null)
+            {
+                Debug.Log("[HealthUI] playerHealth not assigned, searching...");
+                var playerController = FindObjectOfType<PlayerController>();
+                if (playerController != null)
+                {
+                    playerHealth = playerController.health;
+                    Debug.Log($"[HealthUI] Found player via PlayerController, Health: {(playerHealth != null ? "YES" : "NO")}");
+                }
+            }
+
+            // Create placeholder sprites if none are assigned
+            if (fullHeartSprite == null)
+            {
+                Debug.Log("[HealthUI] Creating RED placeholder full heart sprite");
+                fullHeartSprite = CreatePlaceholderSprite(new Color(1f, 0f, 0f, 1f)); // Bright red
+            }
+            if (emptyHeartSprite == null)
+            {
+                Debug.Log("[HealthUI] Creating DARK placeholder empty heart sprite");
+                emptyHeartSprite = CreatePlaceholderSprite(new Color(0.2f, 0.2f, 0.2f, 1f)); // Dark gray
+            }
+
+            // Initial UI setup
+            if (playerHealth != null)
+            {
+                Debug.Log($"[HealthUI] Initializing hearts for maxHP: {playerHealth.maxHP}");
+                InitializeHearts();
+            }
+            else
+            {
+                Debug.LogError("[HealthUI] FAILED to find playerHealth! Hearts will not display!");
+            }
+        }
+
+        void Update()
+        {
+            if (playerHealth != null)
+            {
+                // Rebuild hearts if max HP changed
+                if (lastKnownMaxHP != playerHealth.maxHP)
+                {
+                    InitializeHearts();
+                }
+
+                // Update heart display only when HP changes
+                if (lastKnownCurrentHP != playerHealth.CurrentHP)
+                {
+                    lastKnownCurrentHP = playerHealth.CurrentHP;
+                    Debug.Log($"[HealthUI] HP changed to {lastKnownCurrentHP}, updating display");
+                    UpdateHearts();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates heart icons based on max HP.
+        /// </summary>
+        void InitializeHearts()
+        {
+            Debug.Log("[HealthUI] InitializeHearts called");
+
+            // Clear existing hearts
+            foreach (var heart in heartImages)
+            {
+                if (heart != null)
+                {
+                    Destroy(heart.gameObject);
+                }
+            }
+            heartImages.Clear();
+
+            // Create new hearts in the container
+            lastKnownMaxHP = playerHealth.maxHP;
+            Debug.Log($"[HealthUI] Creating {playerHealth.maxHP} hearts in HealthDisplay container");
+
+            for (int i = 0; i < playerHealth.maxHP; i++)
+            {
+                GameObject heartObj = new GameObject($"Heart_{i}");
+                heartObj.transform.SetParent(healthDisplayContainer.transform, false);
+
+                Image heartImage = heartObj.AddComponent<Image>();
+                heartImage.sprite = fullHeartSprite;
+                heartImage.preserveAspect = true;
+                heartImage.raycastTarget = false;
+
+                RectTransform rectTransform = heartObj.GetComponent<RectTransform>();
+                rectTransform.sizeDelta = new Vector2(heartSize, heartSize);
+                rectTransform.anchoredPosition = new Vector2(i * (heartSize + heartSpacing), 0);
+
+                heartImages.Add(heartImage);
+                Debug.Log($"[HealthUI] Created heart {i} at local position {rectTransform.anchoredPosition}");
+            }
+
+            Debug.Log($"[HealthUI] SUCCESS! Created {heartImages.Count} hearts. Check top-left of screen!");
+            lastKnownCurrentHP = playerHealth.CurrentHP;
+            UpdateHearts();
+        }
+
+        /// <summary>
+        /// Updates heart sprites based on current HP.
+        /// </summary>
+        void UpdateHearts()
+        {
+            int currentHP = playerHealth.CurrentHP;
+
+            for (int i = 0; i < heartImages.Count; i++)
+            {
+                if (heartImages[i] != null)
+                {
+                    heartImages[i].sprite = i < currentHP ? fullHeartSprite : emptyHeartSprite;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates a simple colored square sprite as a placeholder.
+        /// </summary>
+        Sprite CreatePlaceholderSprite(Color color)
+        {
+            Texture2D texture = new Texture2D(64, 64);
+            Color[] pixels = new Color[64 * 64];
+
+            // Create a filled square
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                pixels[i] = color;
+            }
+
+            texture.SetPixels(pixels);
+            texture.Apply();
+
+            return Sprite.Create(texture, new Rect(0, 0, 64, 64), new Vector2(0.5f, 0.5f), 100f);
+        }
+    }
+}

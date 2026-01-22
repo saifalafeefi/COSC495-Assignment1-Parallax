@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 28
-  productGUID: db3f97b94c0b03241a720633fdff62b0
+  productGUID: 3ed8b5fe05a65b5418f08e7028a63e82
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: DefaultCompany
-  productName: TESTEST
+  productName: COSC495-Assignment1
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -689,14 +689,14 @@ PlayerSettings:
   editorAssembliesCompatibilityLevel: 1
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: TESTEST
+  metroPackageName: COSC495-Assignment1
   metroPackageVersion: 
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
   metroCertificateIssuer: 
   metroCertificateNotAfter: 0000000000000000
-  metroApplicationDescription: TESTEST
+  metroApplicationDescription: COSC495-Assignment1
   wsaImages: {}
   metroTileShortName: 
   metroTileShowName: 0
@@ -768,10 +768,10 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 1
   windowsGamepadBackendHint: 0
-  cloudProjectId: 61e5c233-6524-4817-ba31-48d28c70898a
+  cloudProjectId: a06d5793-154d-4f39-a725-b95b293815d2
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: TESTEST
+  projectName: COSC495-Assignment1
   organizationId: unity_2bf5280446ab86ef54bd
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0

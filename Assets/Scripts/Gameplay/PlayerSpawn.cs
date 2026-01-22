@@ -22,6 +22,10 @@ namespace Platformer.Gameplay
             player.Teleport(model.spawnPoint.transform.position);
             player.jumpState = PlayerController.JumpState.Grounded;
             player.animator.SetBool("dead", false);
+
+            // Reset visual state on respawn
+            player.ResetVisualState();
+
             model.virtualCamera.Follow = player.transform;
             model.virtualCamera.LookAt = player.transform;
             Simulation.Schedule<EnablePlayerInput>(2f);

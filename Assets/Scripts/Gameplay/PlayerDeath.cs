@@ -17,20 +17,32 @@ namespace Platformer.Gameplay
         public override void Execute()
         {
             var player = model.player;
-            if (player.health.IsAlive)
-            {
-                player.health.Die();
-                model.virtualCamera.Follow = null;
-                model.virtualCamera.LookAt = null;
-                // player.collider.enabled = false;
-                player.controlEnabled = false;
+            Debug.Log("[PlayerDeath] Execute called");
 
-                if (player.audioSource && player.ouchAudio)
-                    player.audioSource.PlayOneShot(player.ouchAudio);
-                player.animator.SetTrigger("hurt");
-                player.animator.SetBool("dead", true);
-                Simulation.Schedule<PlayerSpawn>(2);
+            // Make sure health is actually 0
+            if (player.health.CurrentHP > 0)
+            {
+                Debug.Log("[PlayerDeath] Health > 0, forcing death");
+                player.health.Die();
             }
+
+            // Reset sprite color and invincibility state
+            player.ResetVisualState();
+
+            model.virtualCamera.Follow = null;
+            model.virtualCamera.LookAt = null;
+            // player.collider.enabled = false;
+            player.controlEnabled = false;
+
+            if (player.audioSource && player.ouchAudio)
+                player.audioSource.PlayOneShot(player.ouchAudio);
+
+            Debug.Log("[PlayerDeath] Setting death animation");
+            player.animator.SetTrigger("hurt");
+            player.animator.SetBool("dead", true);
+
+            Simulation.Schedule<PlayerSpawn>(2);
+            Debug.Log("[PlayerDeath] Scheduled respawn in 2 seconds");
         }
     }
 }

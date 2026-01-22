@@ -28,6 +28,26 @@ namespace Platformer.Mechanics
         /// </summary>
         public float jumpTakeOffSpeed = 7;
 
+        [Header("Invincibility Settings")]
+        /// <summary>
+        /// Duration of invincibility frames after taking damage.
+        /// </summary>
+        public float invincibilityDuration = 1.0f;
+        /// <summary>
+        /// How fast the sprite flashes during invincibility.
+        /// </summary>
+        public float flashInterval = 0.1f;
+
+        private bool isInvincible = false;
+        private float invincibilityTimer = 0f;
+        private Coroutine flashCoroutine = null;
+        private Color originalSpriteColor;
+
+        /// <summary>
+        /// Check if player is currently invincible.
+        /// </summary>
+        public bool IsInvincible => isInvincible;
+
         public JumpState jumpState = JumpState.Grounded;
         private bool stopJump;
         /*internal new*/ public Collider2D collider2d;
@@ -54,11 +74,21 @@ namespace Platformer.Mechanics
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
 
+            // Store the original sprite color so we can restore it properly
+            originalSpriteColor = spriteRenderer.color;
+
             m_MoveAction = InputSystem.actions.FindAction("Player/Move");
             m_JumpAction = InputSystem.actions.FindAction("Player/Jump");
-            
+
             m_MoveAction.Enable();
             m_JumpAction.Enable();
+
+            Debug.Log($"[PlayerController] Awake - Health Max HP: {health?.maxHP}, Invincibility Duration: {invincibilityDuration}, Original Color: {originalSpriteColor}");
+
+            if (invincibilityDuration <= 0)
+            {
+                Debug.LogWarning("[PlayerController] Invincibility Duration is 0 or less! Player won't have i-frames. Set it to 1.0 in the inspector.");
+            }
         }
 
         protected override void Update()
@@ -78,6 +108,28 @@ namespace Platformer.Mechanics
             {
                 move.x = 0;
             }
+
+            // Handle invincibility timer
+            if (isInvincible)
+            {
+                invincibilityTimer -= Time.deltaTime;
+                if (invincibilityTimer <= 0)
+                {
+                    isInvincible = false;
+
+                    // Stop flash coroutine if it's still running
+                    if (flashCoroutine != null)
+                    {
+                        StopCoroutine(flashCoroutine);
+                        flashCoroutine = null;
+                    }
+
+                    // Force sprite color reset when invincibility ends
+                    spriteRenderer.color = originalSpriteColor;
+                    Debug.Log("[PlayerController] Invincibility ended, sprite color reset to original");
+                }
+            }
+
             UpdateJumpState();
             base.Update();
         }
@@ -137,6 +189,88 @@ namespace Platformer.Mechanics
             animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
 
             targetVelocity = move * maxSpeed;
+        }
+
+        /// <summary>
+        /// Activates invincibility frames with sprite flashing effect.
+        /// </summary>
+        public void ActivateInvincibility()
+        {
+            Debug.Log("[PlayerController] ActivateInvincibility called!");
+
+            // Stop any existing flash coroutine
+            if (flashCoroutine != null)
+            {
+                StopCoroutine(flashCoroutine);
+                flashCoroutine = null;
+                Debug.Log("[PlayerController] Stopped existing flash coroutine");
+            }
+
+            // Always reset sprite color to original before starting
+            spriteRenderer.color = originalSpriteColor;
+
+            if (!isInvincible)
+            {
+                isInvincible = true;
+                invincibilityTimer = invincibilityDuration;
+                Debug.Log($"[PlayerController] Starting invincibility for {invincibilityDuration} seconds");
+                flashCoroutine = StartCoroutine(FlashSprite());
+            }
+            else
+            {
+                Debug.Log("[PlayerController] Already invincible, restarting timer");
+                invincibilityTimer = invincibilityDuration;
+                flashCoroutine = StartCoroutine(FlashSprite());
+            }
+        }
+
+        /// <summary>
+        /// Coroutine that makes the sprite flash during invincibility.
+        /// </summary>
+        private IEnumerator FlashSprite()
+        {
+            Debug.Log("[PlayerController] FlashSprite coroutine started");
+            while (isInvincible)
+            {
+                // Flash bright white (more visible)
+                spriteRenderer.color = new Color(2f, 2f, 2f, 1f);
+                yield return new WaitForSeconds(flashInterval);
+
+                // Flash back to original color (if still invincible)
+                if (isInvincible)
+                {
+                    spriteRenderer.color = originalSpriteColor;
+                    yield return new WaitForSeconds(flashInterval);
+                }
+            }
+            // Ensure sprite is back to original color when invincibility ends
+            spriteRenderer.color = originalSpriteColor;
+            Debug.Log("[PlayerController] FlashSprite ended, sprite reset to original color");
+        }
+
+        /// <summary>
+        /// Applies knockback force to the player.
+        /// </summary>
+        /// <param name="knockbackDirection">Direction of the knockback force.</param>
+        /// <param name="knockbackForce">Strength of the knockback.</param>
+        public void ApplyKnockback(Vector2 knockbackDirection, float knockbackForce = 5f)
+        {
+            velocity = knockbackDirection.normalized * knockbackForce;
+        }
+
+        /// <summary>
+        /// Force reset player visual state (called on death or respawn).
+        /// </summary>
+        public void ResetVisualState()
+        {
+            isInvincible = false;
+            if (flashCoroutine != null)
+            {
+                StopCoroutine(flashCoroutine);
+                flashCoroutine = null;
+            }
+            spriteRenderer.color = originalSpriteColor;
+            Debug.Log($"[PlayerController] Visual state reset (sprite color = {originalSpriteColor})");
         }
 
         public enum JumpState
