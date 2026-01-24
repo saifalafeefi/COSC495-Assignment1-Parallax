@@ -48,9 +48,17 @@ namespace Platformer.Mechanics
         /// </summary>
         public float attackDashDuration = 0.2f;
         /// <summary>
-        /// Name of the attack animation state in the Animator.
+        /// Name of the first attack animation state in the Animator.
         /// </summary>
-        public string attackStateName = "PlayerAttack";
+        public string attackStateName = "PlayerAttack1";
+        /// <summary>
+        /// Name of the second attack animation state in the Animator.
+        /// </summary>
+        public string attack2StateName = "PlayerAttack2";
+        /// <summary>
+        /// Time window after attack 1 to input attack 2 (combo window).
+        /// </summary>
+        public float comboWindow = 0.8f;
         /// <summary>
         /// Attack hitbox range (how far forward to detect enemies).
         /// </summary>
@@ -78,6 +86,8 @@ namespace Platformer.Mechanics
         private GameObject whiteOverlay;
         private Dictionary<Sprite, Sprite> whiteSpriteCache = new Dictionary<Sprite, Sprite>();
         private Sprite lastSprite;
+        private int comboStep = 0; // 0 = no combo, 1 = attack 1 done (can do attack 2)
+        private float comboWindowTimer = 0f;
 
         /// <summary>
         /// Check if player is currently invincible.
@@ -206,6 +216,17 @@ namespace Platformer.Mechanics
                         }
                     }
 
+                }
+            }
+
+            // handle combo window timer
+            if (comboStep > 0)
+            {
+                comboWindowTimer -= Time.deltaTime;
+                if (comboWindowTimer <= 0)
+                {
+                    comboStep = 0; // reset combo if window expires
+                    UnityEngine.Debug.Log("[COMBO] timer expired, reset to step 0");
                 }
             }
 
@@ -406,7 +427,33 @@ namespace Platformer.Mechanics
         private IEnumerator PerformAttack()
         {
             isAttacking = true;
-            animator.SetTrigger("attack");
+
+            // store which attack we're doing NOW (before timer can change it)
+            int currentComboStep = comboStep;
+
+            // stop the combo timer - we've committed to this attack
+            comboWindowTimer = 0f;
+
+            // determine which attack to perform based on combo step
+            string currentAttackState;
+            string attackTrigger;
+
+            if (currentComboStep == 0)
+            {
+                // first attack
+                currentAttackState = attackStateName;
+                attackTrigger = "attack";
+                UnityEngine.Debug.Log("[COMBO] starting attack 1 (comboStep was 0)");
+            }
+            else
+            {
+                // second attack (combo)
+                currentAttackState = attack2StateName;
+                attackTrigger = "attack2";
+                UnityEngine.Debug.Log($"[COMBO] starting attack 2 (comboStep was {currentComboStep})");
+            }
+
+            animator.SetTrigger(attackTrigger);
 
             // start the dash coroutine
             StartCoroutine(AttackDash());
@@ -421,12 +468,28 @@ namespace Platformer.Mechanics
             CheckAttackHit();
 
             // wait until the animator exits the attack state
-            while (animator.GetCurrentAnimatorStateInfo(0).IsName(attackStateName))
+            while (animator.GetCurrentAnimatorStateInfo(0).IsName(currentAttackState))
             {
                 yield return null;
             }
 
             isAttacking = false;
+
+            // handle combo progression (use stored value, not current comboStep)
+            if (currentComboStep == 0)
+            {
+                // first attack finished - open combo window for second attack
+                comboStep = 1;
+                comboWindowTimer = comboWindow;
+                UnityEngine.Debug.Log($"[COMBO] attack 1 finished, opening {comboWindow}s window for attack 2");
+            }
+            else
+            {
+                // second attack finished - reset combo
+                comboStep = 0;
+                comboWindowTimer = 0f;
+                UnityEngine.Debug.Log("[COMBO] attack 2 finished, reset to step 0");
+            }
 
             // immediately read input so movement resumes if key is still held
             if (controlEnabled)
