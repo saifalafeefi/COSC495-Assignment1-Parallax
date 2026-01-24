@@ -53,7 +53,6 @@ namespace Platformer.UI
 
         void Awake()
         {
-            Debug.Log("[HealthUI] Awake - Setting up UI");
             SetupCanvas();
             SetupHealthDisplay();
         }
@@ -64,7 +63,6 @@ namespace Platformer.UI
             canvas = FindObjectOfType<Canvas>();
             if (canvas == null)
             {
-                Debug.Log("[HealthUI] No Canvas found, creating one");
                 GameObject canvasObj = new GameObject("Canvas");
                 canvas = canvasObj.AddComponent<Canvas>();
                 canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -86,46 +84,38 @@ namespace Platformer.UI
             rect.anchoredPosition = screenPosition;
             rect.sizeDelta = new Vector2(300, 50);
 
-            Debug.Log($"[HealthUI] Created HealthDisplay at position {screenPosition}");
         }
 
         void Start()
         {
-            Debug.Log("[HealthUI] Start called");
 
             // find player health if not assigned
             if (playerHealth == null)
             {
-                Debug.Log("[HealthUI] playerHealth not assigned, searching...");
                 var playerController = FindObjectOfType<PlayerController>();
                 if (playerController != null)
                 {
                     playerHealth = playerController.health;
-                    Debug.Log($"[HealthUI] Found player via PlayerController, Health: {(playerHealth != null ? "YES" : "NO")}");
                 }
             }
 
             // create placeholder sprites if none are assigned
             if (fullHeartSprite == null)
             {
-                Debug.Log("[HealthUI] Creating RED placeholder full heart sprite");
                 fullHeartSprite = CreatePlaceholderSprite(new Color(1f, 0f, 0f, 1f)); // bright red
             }
             if (emptyHeartSprite == null)
             {
-                Debug.Log("[HealthUI] Creating DARK placeholder empty heart sprite");
                 emptyHeartSprite = CreatePlaceholderSprite(new Color(0.2f, 0.2f, 0.2f, 1f)); // dark gray
             }
 
             // initial UI setup
             if (playerHealth != null)
             {
-                Debug.Log($"[HealthUI] Initializing hearts for maxHP: {playerHealth.maxHP}");
                 InitializeHearts();
             }
             else
             {
-                Debug.LogError("[HealthUI] FAILED to find playerHealth! Hearts will not display!");
             }
         }
 
@@ -143,7 +133,6 @@ namespace Platformer.UI
                 if (lastKnownCurrentHP != playerHealth.CurrentHP)
                 {
                     lastKnownCurrentHP = playerHealth.CurrentHP;
-                    Debug.Log($"[HealthUI] HP changed to {lastKnownCurrentHP}, updating display");
                     UpdateHearts();
                 }
             }
@@ -154,7 +143,6 @@ namespace Platformer.UI
         /// </summary>
         void InitializeHearts()
         {
-            Debug.Log("[HealthUI] InitializeHearts called");
 
             // clear existing hearts
             foreach (var heart in heartImages)
@@ -168,7 +156,6 @@ namespace Platformer.UI
 
             // create new hearts in the container
             lastKnownMaxHP = playerHealth.maxHP;
-            Debug.Log($"[HealthUI] Creating {playerHealth.maxHP} hearts in HealthDisplay container");
 
             for (int i = 0; i < playerHealth.maxHP; i++)
             {
@@ -185,10 +172,8 @@ namespace Platformer.UI
                 rectTransform.anchoredPosition = new Vector2(i * (heartSize + heartSpacing), 0);
 
                 heartImages.Add(heartImage);
-                Debug.Log($"[HealthUI] Created heart {i} at local position {rectTransform.anchoredPosition}");
             }
 
-            Debug.Log($"[HealthUI] SUCCESS! Created {heartImages.Count} hearts. Check top-left of screen!");
             lastKnownCurrentHP = playerHealth.CurrentHP;
             UpdateHearts();
         }

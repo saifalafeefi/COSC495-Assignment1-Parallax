@@ -40,9 +40,7 @@ namespace Platformer.Mechanics
         /// </summary>
         public void ResetToFull()
         {
-            int oldHP = currentHP;
-            currentHP = maxHP;
-            Debug.Log($"[Health] {gameObject.name} - HP reset: {oldHP} -> {currentHP} (full)");
+                currentHP = maxHP;
         }
 
         /// <summary>
@@ -51,12 +49,9 @@ namespace Platformer.Mechanics
         /// </summary>
         public void Decrement()
         {
-            int oldHP = currentHP;
-            currentHP = Mathf.Clamp(currentHP - 1, 0, maxHP);
-            Debug.Log($"[Health] {gameObject.name} - HP: {oldHP} -> {currentHP}");
+                currentHP = Mathf.Clamp(currentHP - 1, 0, maxHP);
             if (currentHP == 0)
             {
-                Debug.Log($"[Health] {gameObject.name} - HP reached 0, triggering HealthIsZero event");
                 var ev = Schedule<HealthIsZero>();
                 ev.health = this;
             }
@@ -73,7 +68,6 @@ namespace Platformer.Mechanics
         void Awake()
         {
             currentHP = maxHP;
-            Debug.Log($"[Health] {gameObject.name} - Awake, maxHP: {maxHP}, currentHP: {currentHP}");
         }
     }
 }

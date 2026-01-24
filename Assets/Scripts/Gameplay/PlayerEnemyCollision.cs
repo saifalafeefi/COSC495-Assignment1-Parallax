@@ -20,13 +20,31 @@ namespace Platformer.Gameplay
 
         public override void Execute()
         {
-            Debug.Log("[PlayerEnemyCollision] Collision detected!");
+
+            // ignore collision if enemy is dead or doesn't exist
+            if (enemy == null)
+            {
+                return;
+            }
+
+            var enemyHealth = enemy.GetComponent<Health>();
+            if (enemyHealth == null)
+            {
+            }
+            else
+            {
+            }
+
+            if (enemyHealth != null && !enemyHealth.IsAlive)
+            {
+                return;
+            }
+
             var willHurtEnemy = player.Bounds.center.y >= enemy.Bounds.max.y;
 
             if (willHurtEnemy)
             {
                 // player is attacking from above - damage enemy
-                var enemyHealth = enemy.GetComponent<Health>();
                 if (enemyHealth != null)
                 {
                     enemyHealth.Decrement();
@@ -49,20 +67,16 @@ namespace Platformer.Gameplay
             else
             {
                 // player hit by enemy - take damage if not invincible
-                Debug.Log($"[PlayerEnemyCollision] Player hit! IsInvincible: {player.IsInvincible}");
                 if (!player.IsInvincible)
                 {
                     var playerHealth = player.health;
                     if (playerHealth != null)
                     {
-                        Debug.Log($"[PlayerEnemyCollision] Decrementing health from {playerHealth.CurrentHP}");
                         playerHealth.Decrement();
-                        Debug.Log($"[PlayerEnemyCollision] Health now: {playerHealth.CurrentHP}");
 
                         // check if player died - handle death immediately without invincibility
                         if (!playerHealth.IsAlive)
                         {
-                            Debug.Log("[PlayerEnemyCollision] Player HP reached 0, scheduling death");
                             Schedule<PlayerDeath>();
                         }
                         else
@@ -87,14 +101,12 @@ namespace Platformer.Gameplay
                     }
                     else
                     {
-                        Debug.LogWarning("[PlayerEnemyCollision] No health component, instant death!");
                         // no health component, instant death (old behavior)
                         Schedule<PlayerDeath>();
                     }
                 }
                 else
                 {
-                    Debug.Log("[PlayerEnemyCollision] Player is invincible, ignoring collision");
                 }
             }
         }

@@ -38,10 +38,46 @@ namespace Platformer.Mechanics
         /// </summary>
         public float flashInterval = 0.1f;
 
+        [Header("Attack Settings")]
+        /// <summary>
+        /// Distance the player lunges forward during attack.
+        /// </summary>
+        public float attackDashDistance = 2f;
+        /// <summary>
+        /// Duration of the attack dash (how long the lunge takes).
+        /// </summary>
+        public float attackDashDuration = 0.2f;
+        /// <summary>
+        /// Name of the attack animation state in the Animator.
+        /// </summary>
+        public string attackStateName = "PlayerAttack";
+        /// <summary>
+        /// Attack hitbox range (how far forward to detect enemies).
+        /// </summary>
+        public float attackRange = 1.5f;
+        /// <summary>
+        /// Attack hitbox size (width/height of the attack area).
+        /// </summary>
+        public Vector2 attackHitboxSize = new Vector2(1.5f, 1f);
+        /// <summary>
+        /// Knockback force applied to enemies when hit.
+        /// </summary>
+        public float enemyKnockbackForce = 3f;
+        /// <summary>
+        /// Layer mask for detecting enemies.
+        /// </summary>
+        public LayerMask enemyLayer;
+
         private bool isInvincible = false;
         private float invincibilityTimer = 0f;
         private Coroutine flashCoroutine = null;
         private Color originalSpriteColor;
+        private bool isDashing = false;
+        private float dashVelocity = 0f;
+        private bool isAttacking = false;
+        private GameObject whiteOverlay;
+        private Dictionary<Sprite, Sprite> whiteSpriteCache = new Dictionary<Sprite, Sprite>();
+        private Sprite lastSprite;
 
         /// <summary>
         /// Check if player is currently invincible.
@@ -63,6 +99,7 @@ namespace Platformer.Mechanics
 
         private InputAction m_MoveAction;
         private InputAction m_JumpAction;
+        private InputAction m_AttackAction;
 
         public Bounds Bounds => collider2d.bounds;
 
@@ -77,31 +114,63 @@ namespace Platformer.Mechanics
             // store the original sprite color so we can restore it properly
             originalSpriteColor = spriteRenderer.color;
 
+            // create white overlay for damage flash effect
+            CreateWhiteOverlay();
+
             m_MoveAction = InputSystem.actions.FindAction("Player/Move");
             m_JumpAction = InputSystem.actions.FindAction("Player/Jump");
+            m_AttackAction = InputSystem.actions.FindAction("Player/Attack");
 
             m_MoveAction.Enable();
             m_JumpAction.Enable();
 
-            Debug.Log($"[PlayerController] Awake - Health Max HP: {health?.maxHP}, Invincibility Duration: {invincibilityDuration}, Original Color: {originalSpriteColor}");
+            // only enable attack if it exists
+            if (m_AttackAction != null)
+            {
+                m_AttackAction.Enable();
+            }
+            else
+            {
+            }
+
 
             if (invincibilityDuration <= 0)
             {
-                Debug.LogWarning("[PlayerController] Invincibility Duration is 0 or less! Player won't have i-frames. Set it to 1.0 in the inspector.");
             }
         }
 
         protected override void Update()
         {
+            // update white overlay to match current animation frame
+            if (whiteOverlay != null)
+            {
+                UpdateOverlaySprite();
+            }
+
             if (controlEnabled)
             {
-                move.x = m_MoveAction.ReadValue<Vector2>().x;
+                // disable movement input during attack
+                if (!isAttacking)
+                {
+                    move.x = m_MoveAction.ReadValue<Vector2>().x;
+                }
+                else
+                {
+                    move.x = 0; // lock movement during attack
+                }
+
                 if (jumpState == JumpState.Grounded && m_JumpAction.WasPressedThisFrame())
                     jumpState = JumpState.PrepareToJump;
                 else if (m_JumpAction.WasReleasedThisFrame())
                 {
                     stopJump = true;
                     Schedule<PlayerStopJump>().player = this;
+                }
+
+                // handle attack input (only if not already attacking)
+                if (m_AttackAction != null && m_AttackAction.WasPressedThisFrame() && !isAttacking)
+                {
+                    StartCoroutine(PerformAttack());
                 }
             }
             else
@@ -126,7 +195,17 @@ namespace Platformer.Mechanics
 
                     // force sprite color reset when invincibility ends
                     spriteRenderer.color = originalSpriteColor;
-                    Debug.Log("[PlayerController] Invincibility ended, sprite color reset to original");
+
+                    // hide white overlay
+                    if (whiteOverlay != null)
+                    {
+                        SpriteRenderer overlayRenderer = whiteOverlay.GetComponent<SpriteRenderer>();
+                        if (overlayRenderer != null)
+                        {
+                            overlayRenderer.color = new Color(1f, 1f, 1f, 0f);
+                        }
+                    }
+
                 }
             }
 
@@ -188,64 +267,236 @@ namespace Platformer.Mechanics
             animator.SetBool("grounded", IsGrounded);
             animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
 
+            // apply normal movement + dash velocity
             targetVelocity = move * maxSpeed;
+            targetVelocity.x += dashVelocity;
         }
 
         /// <summary>
-        /// Activates invincibility frames with sprite flashing effect.
+        /// Activates invincibility frames with white overlay flash effect.
         /// </summary>
         public void ActivateInvincibility()
         {
-            Debug.Log("[PlayerController] ActivateInvincibility called!");
 
             // stop any existing flash coroutine
             if (flashCoroutine != null)
             {
                 StopCoroutine(flashCoroutine);
                 flashCoroutine = null;
-                Debug.Log("[PlayerController] Stopped existing flash coroutine");
             }
-
-            // always reset sprite color to original before starting
-            spriteRenderer.color = originalSpriteColor;
 
             if (!isInvincible)
             {
                 isInvincible = true;
                 invincibilityTimer = invincibilityDuration;
-                Debug.Log($"[PlayerController] Starting invincibility for {invincibilityDuration} seconds");
                 flashCoroutine = StartCoroutine(FlashSprite());
             }
             else
             {
-                Debug.Log("[PlayerController] Already invincible, restarting timer");
                 invincibilityTimer = invincibilityDuration;
                 flashCoroutine = StartCoroutine(FlashSprite());
             }
         }
 
         /// <summary>
-        /// Coroutine that makes the sprite flash during invincibility.
+        /// Creates a solid white silhouette overlay for damage flash effect.
+        /// </summary>
+        private void CreateWhiteOverlay()
+        {
+            whiteOverlay = new GameObject("WhiteOverlay");
+            whiteOverlay.transform.SetParent(transform);
+            whiteOverlay.transform.localPosition = Vector3.zero;
+            whiteOverlay.transform.localScale = Vector3.one;
+
+            SpriteRenderer overlayRenderer = whiteOverlay.AddComponent<SpriteRenderer>();
+            overlayRenderer.color = new Color(1f, 1f, 1f, 0f); // invisible initially
+            overlayRenderer.sortingLayerName = spriteRenderer.sortingLayerName;
+            overlayRenderer.sortingOrder = spriteRenderer.sortingOrder + 1; // render on top
+
+        }
+
+        /// <summary>
+        /// Updates the overlay sprite to match current animation frame (cached for performance).
+        /// </summary>
+        private void UpdateOverlaySprite()
+        {
+            if (spriteRenderer.sprite == null) return;
+
+            Sprite currentSprite = spriteRenderer.sprite;
+
+            // only update if sprite changed (don't recreate every frame!)
+            if (currentSprite == lastSprite) return;
+
+            lastSprite = currentSprite;
+            SpriteRenderer overlayRenderer = whiteOverlay.GetComponent<SpriteRenderer>();
+
+            // check cache first
+            if (whiteSpriteCache.ContainsKey(currentSprite))
+            {
+                overlayRenderer.sprite = whiteSpriteCache[currentSprite];
+                return;
+            }
+
+            // create white version and cache it
+            Texture2D originalTexture = currentSprite.texture;
+            Texture2D whiteTexture = new Texture2D((int)currentSprite.rect.width, (int)currentSprite.rect.height);
+
+            Color[] pixels = originalTexture.GetPixels(
+                (int)currentSprite.rect.x,
+                (int)currentSprite.rect.y,
+                (int)currentSprite.rect.width,
+                (int)currentSprite.rect.height
+            );
+
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                if (pixels[i].a > 0.01f)
+                {
+                    pixels[i] = new Color(1f, 1f, 1f, pixels[i].a);
+                }
+            }
+
+            whiteTexture.SetPixels(pixels);
+            whiteTexture.Apply();
+
+            Sprite whiteSprite = Sprite.Create(
+                whiteTexture,
+                new Rect(0, 0, whiteTexture.width, whiteTexture.height),
+                new Vector2(0.5f, 0.5f),
+                currentSprite.pixelsPerUnit
+            );
+
+            whiteSpriteCache[currentSprite] = whiteSprite;
+            overlayRenderer.sprite = whiteSprite;
+        }
+
+        /// <summary>
+        /// Coroutine that makes the sprite flash white during invincibility.
         /// </summary>
         private IEnumerator FlashSprite()
         {
-            Debug.Log("[PlayerController] FlashSprite coroutine started");
+            if (whiteOverlay == null)
+            {
+                yield break;
+            }
+
+            SpriteRenderer overlayRenderer = whiteOverlay.GetComponent<SpriteRenderer>();
+
             while (isInvincible)
             {
-                // flash bright white (more visible)
-                spriteRenderer.color = new Color(2f, 2f, 2f, 1f);
+                // show white overlay (flash on)
+                overlayRenderer.color = new Color(1f, 1f, 1f, 1f); // fully opaque white
                 yield return new WaitForSeconds(flashInterval);
 
-                // flash back to original color (if still invincible)
+                // hide white overlay (flash off)
                 if (isInvincible)
                 {
-                    spriteRenderer.color = originalSpriteColor;
+                    overlayRenderer.color = new Color(1f, 1f, 1f, 0f); // invisible
                     yield return new WaitForSeconds(flashInterval);
                 }
             }
-            // ensure sprite is back to original color when invincibility ends
-            spriteRenderer.color = originalSpriteColor;
-            Debug.Log("[PlayerController] FlashSprite ended, sprite reset to original color");
+
+            // ensure overlay is hidden when invincibility ends
+            overlayRenderer.color = new Color(1f, 1f, 1f, 0f);
+        }
+
+        /// <summary>
+        /// Performs the full attack sequence (animation + dash).
+        /// </summary>
+        private IEnumerator PerformAttack()
+        {
+            isAttacking = true;
+            animator.SetTrigger("attack");
+
+            // start the dash coroutine
+            StartCoroutine(AttackDash());
+
+            // wait one frame for the animator to transition to attack state
+            yield return null;
+
+            // wait a brief moment for the attack animation to reach the "hit" frame
+            yield return new WaitForSeconds(0.1f);
+
+            // check for enemies in attack range and deal damage
+            CheckAttackHit();
+
+            // wait until the animator exits the attack state
+            while (animator.GetCurrentAnimatorStateInfo(0).IsName(attackStateName))
+            {
+                yield return null;
+            }
+
+            isAttacking = false;
+
+            // immediately read input so movement resumes if key is still held
+            if (controlEnabled)
+            {
+                move.x = m_MoveAction.ReadValue<Vector2>().x;
+            }
+
+        }
+
+        /// <summary>
+        /// Checks for enemies in attack range and deals damage.
+        /// </summary>
+        private void CheckAttackHit()
+        {
+            // determine attack direction based on which way player is facing
+            float direction = spriteRenderer.flipX ? -1f : 1f;
+
+            // calculate hitbox center position (offset from player in attack direction)
+            Vector2 hitboxCenter = (Vector2)transform.position + new Vector2(direction * attackRange, 0f);
+
+            // find all colliders in the attack hitbox
+            Collider2D[] hits = Physics2D.OverlapBoxAll(hitboxCenter, attackHitboxSize, 0f, enemyLayer);
+
+
+            foreach (var hit in hits)
+            {
+                var enemy = hit.GetComponent<EnemyController>();
+                if (enemy != null && !enemy.IsInvincible)
+                {
+
+                    // calculate knockback direction (away from player)
+                    Vector2 knockbackDir = new Vector2(direction, 0.5f); // slight upward angle
+
+                    // deal damage to enemy
+                    enemy.TakeDamage(knockbackDir, enemyKnockbackForce);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Coroutine that makes the player dash forward during attack.
+        /// </summary>
+        private IEnumerator AttackDash()
+        {
+            isDashing = true;
+            float elapsed = 0f;
+
+            // determine dash direction based on which way player is facing
+            float dashDirection = spriteRenderer.flipX ? -1f : 1f;
+
+            while (elapsed < attackDashDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / attackDashDuration);
+
+                // ease-out curve: starts fast, ends slow
+                // inverse of ease-in: we want high speed at start, low at end
+                float easeOutCurve = 1f - Mathf.Pow(t, 2f); // quadratic ease-out
+
+                // base speed needed to cover the distance
+                float baseSpeed = attackDashDistance / attackDashDuration;
+
+                // apply curve to speed (multiply by ease-out so it starts high, ends low)
+                dashVelocity = dashDirection * baseSpeed * easeOutCurve;
+
+                yield return null;
+            }
+
+            dashVelocity = 0f;
+            isDashing = false;
         }
 
         /// <summary>
@@ -270,7 +521,17 @@ namespace Platformer.Mechanics
                 flashCoroutine = null;
             }
             spriteRenderer.color = originalSpriteColor;
-            Debug.Log($"[PlayerController] visual state reset (sprite color = {originalSpriteColor})");
+
+            // hide white overlay
+            if (whiteOverlay != null)
+            {
+                SpriteRenderer overlayRenderer = whiteOverlay.GetComponent<SpriteRenderer>();
+                if (overlayRenderer != null)
+                {
+                    overlayRenderer.color = new Color(1f, 1f, 1f, 0f);
+                }
+            }
+
         }
 
         /// <summary>
@@ -279,7 +540,25 @@ namespace Platformer.Mechanics
         public void ResetOrientation()
         {
             spriteRenderer.flipX = false;
-            Debug.Log("[PlayerController] orientation reset to face right");
+        }
+
+        /// <summary>
+        /// visualize attack hitbox in editor (helps with adjusting attack range)
+        /// </summary>
+        void OnDrawGizmosSelected()
+        {
+            if (spriteRenderer != null)
+            {
+                // determine attack direction based on which way player is facing
+                float direction = spriteRenderer.flipX ? -1f : 1f;
+
+                // calculate hitbox center position
+                Vector2 hitboxCenter = (Vector2)transform.position + new Vector2(direction * attackRange, 0f);
+
+                // draw the attack hitbox
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireCube(hitboxCenter, attackHitboxSize);
+            }
         }
 
         public enum JumpState
