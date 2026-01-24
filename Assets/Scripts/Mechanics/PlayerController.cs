@@ -315,6 +315,7 @@ namespace Platformer.Mechanics
 
             animator.SetBool("grounded", IsGrounded);
             animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
+            animator.SetFloat("velocityY", velocity.y);
 
             // apply normal movement + dash velocity
             targetVelocity = move * maxSpeed;
