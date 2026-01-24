@@ -442,7 +442,7 @@ namespace Platformer.Mechanics
             {
                 // first attack
                 currentAttackState = attackStateName;
-                attackTrigger = "attack";
+                attackTrigger = "attack1";
                 UnityEngine.Debug.Log("[COMBO] starting attack 1 (comboStep was 0)");
             }
             else

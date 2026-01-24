@@ -63,9 +63,9 @@ MonoBehaviour:
   flashInterval: 0.1
   attackDashDistance: 1
   attackDashDuration: 0.2
-  attackStateName: PlayerAttack
+  attackStateName: PlayerAttack1
   attack2StateName: PlayerAttack2
-  comboWindow: 0.8
+  comboWindow: 0.3
   attackRange: 1.5
   attackHitboxSize: {x: 1.5, y: 1}
   enemyKnockbackForce: 3
