@@ -56,7 +56,11 @@ namespace Platformer.Mechanics
         /// </summary>
         public string attack2StateName = "PlayerAttack2";
         /// <summary>
-        /// Time window after attack 1 to input attack 2 (combo window).
+        /// Name of the third attack animation state in the Animator.
+        /// </summary>
+        public string attack3StateName = "PlayerAttack3";
+        /// <summary>
+        /// Time window after each attack to input next attack (combo window).
         /// </summary>
         public float comboWindow = 0.8f;
         /// <summary>
@@ -86,8 +90,9 @@ namespace Platformer.Mechanics
         private GameObject whiteOverlay;
         private Dictionary<Sprite, Sprite> whiteSpriteCache = new Dictionary<Sprite, Sprite>();
         private Sprite lastSprite;
-        private int comboStep = 0; // 0 = no combo, 1 = attack 1 done (can do attack 2)
+        private int comboStep = 0; // 0 = ready for attack 1, 1 = ready for attack 2, 2 = ready for attack 3
         private float comboWindowTimer = 0f;
+        private bool attackButtonHeld = false; // tracks if attack button is held from previous combo
 
         /// <summary>
         /// Check if player is currently invincible.
@@ -178,9 +183,32 @@ namespace Platformer.Mechanics
                 }
 
                 // handle attack input (only if not already attacking)
-                if (m_AttackAction != null && m_AttackAction.WasPressedThisFrame() && !isAttacking)
+                if (m_AttackAction != null && !isAttacking)
                 {
-                    StartCoroutine(PerformAttack());
+                    bool shouldAttack = false;
+
+                    if (comboStep == 0 && !attackButtonHeld)
+                    {
+                        // no combo active and button not held - require fresh press
+                        shouldAttack = m_AttackAction.WasPressedThisFrame();
+                    }
+                    else
+                    {
+                        // combo window active OR button held from previous combo - holding counts
+                        shouldAttack = m_AttackAction.IsPressed();
+                    }
+
+                    if (shouldAttack)
+                    {
+                        attackButtonHeld = true; // mark that we're in a hold sequence
+                        StartCoroutine(PerformAttack());
+                    }
+                }
+
+                // reset attackButtonHeld when button is released
+                if (m_AttackAction != null && !m_AttackAction.IsPressed())
+                {
+                    attackButtonHeld = false;
                 }
             }
             else
@@ -445,12 +473,19 @@ namespace Platformer.Mechanics
                 attackTrigger = "attack1";
                 UnityEngine.Debug.Log("[COMBO] starting attack 1 (comboStep was 0)");
             }
-            else
+            else if (currentComboStep == 1)
             {
                 // second attack (combo)
                 currentAttackState = attack2StateName;
                 attackTrigger = "attack2";
-                UnityEngine.Debug.Log($"[COMBO] starting attack 2 (comboStep was {currentComboStep})");
+                UnityEngine.Debug.Log("[COMBO] starting attack 2 (comboStep was 1)");
+            }
+            else
+            {
+                // third attack (finisher)
+                currentAttackState = attack3StateName;
+                attackTrigger = "attack3";
+                UnityEngine.Debug.Log("[COMBO] starting attack 3 FINISHER (comboStep was 2)");
             }
 
             animator.SetTrigger(attackTrigger);
@@ -483,12 +518,19 @@ namespace Platformer.Mechanics
                 comboWindowTimer = comboWindow;
                 UnityEngine.Debug.Log($"[COMBO] attack 1 finished, opening {comboWindow}s window for attack 2");
             }
+            else if (currentComboStep == 1)
+            {
+                // second attack finished - open combo window for third attack
+                comboStep = 2;
+                comboWindowTimer = comboWindow;
+                UnityEngine.Debug.Log($"[COMBO] attack 2 finished, opening {comboWindow}s window for attack 3");
+            }
             else
             {
-                // second attack finished - reset combo
+                // third attack finished - reset combo
                 comboStep = 0;
                 comboWindowTimer = 0f;
-                UnityEngine.Debug.Log("[COMBO] attack 2 finished, reset to step 0");
+                UnityEngine.Debug.Log("[COMBO] attack 3 FINISHER finished, reset to step 0");
             }
 
             // immediately read input so movement resumes if key is still held
