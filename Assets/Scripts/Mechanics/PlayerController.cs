@@ -18,6 +18,7 @@ namespace Platformer.Mechanics
         public AudioClip jumpAudio;
         public AudioClip respawnAudio;
         public AudioClip ouchAudio;
+        public AudioClip landAudio;
 
         /// <summary>
         /// Max horizontal speed of the player.
@@ -37,6 +38,10 @@ namespace Platformer.Mechanics
         /// How fast the sprite flashes during invincibility.
         /// </summary>
         public float flashInterval = 0.1f;
+        /// <summary>
+        /// White material to swap to during flash (drag in Inspector).
+        /// </summary>
+        public Material flashMaterial;
 
         [Header("Attack Settings")]
         /// <summary>
@@ -59,6 +64,10 @@ namespace Platformer.Mechanics
         /// Name of the third attack animation state in the Animator.
         /// </summary>
         public string attack3StateName = "PlayerAttack3";
+        /// <summary>
+        /// Name of the aerial attack animation state in the Animator.
+        /// </summary>
+        public string attackAirStateName = "PlayerAttackAir";
         /// <summary>
         /// Time window after each attack to input next attack (combo window).
         /// </summary>
@@ -84,12 +93,10 @@ namespace Platformer.Mechanics
         private float invincibilityTimer = 0f;
         private Coroutine flashCoroutine = null;
         private Color originalSpriteColor;
+        private Material originalMaterial;
         private bool isDashing = false;
         private float dashVelocity = 0f;
         private bool isAttacking = false;
-        private GameObject whiteOverlay;
-        private Dictionary<Sprite, Sprite> whiteSpriteCache = new Dictionary<Sprite, Sprite>();
-        private Sprite lastSprite;
         private int comboStep = 0; // 0 = ready for attack 1, 1 = ready for attack 2, 2 = ready for attack 3
         private float comboWindowTimer = 0f;
         private bool attackButtonHeld = false; // tracks if attack button is held from previous combo
@@ -129,8 +136,8 @@ namespace Platformer.Mechanics
             // store the original sprite color so we can restore it properly
             originalSpriteColor = spriteRenderer.color;
 
-            // create white overlay for damage flash effect
-            CreateWhiteOverlay();
+            // store original material for flash system
+            originalMaterial = spriteRenderer.material;
 
             m_MoveAction = InputSystem.actions.FindAction("Player/Move");
             m_JumpAction = InputSystem.actions.FindAction("Player/Jump");
@@ -156,12 +163,6 @@ namespace Platformer.Mechanics
 
         protected override void Update()
         {
-            // update white overlay to match current animation frame
-            if (whiteOverlay != null)
-            {
-                UpdateOverlaySprite();
-            }
-
             if (controlEnabled)
             {
                 // disable movement input during attack
@@ -231,19 +232,8 @@ namespace Platformer.Mechanics
                         flashCoroutine = null;
                     }
 
-                    // force sprite color reset when invincibility ends
-                    spriteRenderer.color = originalSpriteColor;
-
-                    // hide white overlay
-                    if (whiteOverlay != null)
-                    {
-                        SpriteRenderer overlayRenderer = whiteOverlay.GetComponent<SpriteRenderer>();
-                        if (overlayRenderer != null)
-                        {
-                            overlayRenderer.color = new Color(1f, 1f, 1f, 0f);
-                        }
-                    }
-
+                    // force material reset when invincibility ends
+                    spriteRenderer.material = originalMaterial;
                 }
             }
 
@@ -254,7 +244,6 @@ namespace Platformer.Mechanics
                 if (comboWindowTimer <= 0)
                 {
                     comboStep = 0; // reset combo if window expires
-                    UnityEngine.Debug.Log("[COMBO] timer expired, reset to step 0");
                 }
             }
 
@@ -316,6 +305,7 @@ namespace Platformer.Mechanics
             animator.SetBool("grounded", IsGrounded);
             animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
             animator.SetFloat("velocityY", velocity.y);
+            animator.SetBool("isAttacking", isAttacking);
 
             // apply normal movement + dash velocity
             targetVelocity = move * maxSpeed;
@@ -323,11 +313,10 @@ namespace Platformer.Mechanics
         }
 
         /// <summary>
-        /// Activates invincibility frames with white overlay flash effect.
+        /// Activates invincibility frames with white flash effect.
         /// </summary>
         public void ActivateInvincibility()
         {
-
             // stop any existing flash coroutine
             if (flashCoroutine != null)
             {
@@ -349,105 +338,33 @@ namespace Platformer.Mechanics
         }
 
         /// <summary>
-        /// Creates a solid white silhouette overlay for damage flash effect.
-        /// </summary>
-        private void CreateWhiteOverlay()
-        {
-            whiteOverlay = new GameObject("WhiteOverlay");
-            whiteOverlay.transform.SetParent(transform);
-            whiteOverlay.transform.localPosition = Vector3.zero;
-            whiteOverlay.transform.localScale = Vector3.one;
-
-            SpriteRenderer overlayRenderer = whiteOverlay.AddComponent<SpriteRenderer>();
-            overlayRenderer.color = new Color(1f, 1f, 1f, 0f); // invisible initially
-            overlayRenderer.sortingLayerName = spriteRenderer.sortingLayerName;
-            overlayRenderer.sortingOrder = spriteRenderer.sortingOrder + 1; // render on top
-
-        }
-
-        /// <summary>
-        /// Updates the overlay sprite to match current animation frame (cached for performance).
-        /// </summary>
-        private void UpdateOverlaySprite()
-        {
-            if (spriteRenderer.sprite == null) return;
-
-            Sprite currentSprite = spriteRenderer.sprite;
-
-            // only update if sprite changed (don't recreate every frame!)
-            if (currentSprite == lastSprite) return;
-
-            lastSprite = currentSprite;
-            SpriteRenderer overlayRenderer = whiteOverlay.GetComponent<SpriteRenderer>();
-
-            // check cache first
-            if (whiteSpriteCache.ContainsKey(currentSprite))
-            {
-                overlayRenderer.sprite = whiteSpriteCache[currentSprite];
-                return;
-            }
-
-            // create white version and cache it
-            Texture2D originalTexture = currentSprite.texture;
-            Texture2D whiteTexture = new Texture2D((int)currentSprite.rect.width, (int)currentSprite.rect.height);
-
-            Color[] pixels = originalTexture.GetPixels(
-                (int)currentSprite.rect.x,
-                (int)currentSprite.rect.y,
-                (int)currentSprite.rect.width,
-                (int)currentSprite.rect.height
-            );
-
-            for (int i = 0; i < pixels.Length; i++)
-            {
-                if (pixels[i].a > 0.01f)
-                {
-                    pixels[i] = new Color(1f, 1f, 1f, pixels[i].a);
-                }
-            }
-
-            whiteTexture.SetPixels(pixels);
-            whiteTexture.Apply();
-
-            Sprite whiteSprite = Sprite.Create(
-                whiteTexture,
-                new Rect(0, 0, whiteTexture.width, whiteTexture.height),
-                new Vector2(0.5f, 0.5f),
-                currentSprite.pixelsPerUnit
-            );
-
-            whiteSpriteCache[currentSprite] = whiteSprite;
-            overlayRenderer.sprite = whiteSprite;
-        }
-
-        /// <summary>
-        /// Coroutine that makes the sprite flash white during invincibility.
+        /// Coroutine that makes the sprite flash white during invincibility by swapping materials.
         /// </summary>
         private IEnumerator FlashSprite()
         {
-            if (whiteOverlay == null)
+            if (flashMaterial == null)
             {
+                UnityEngine.Debug.LogWarning("[FLASH] no flash material assigned!");
                 yield break;
             }
 
-            SpriteRenderer overlayRenderer = whiteOverlay.GetComponent<SpriteRenderer>();
-
             while (isInvincible)
             {
-                // show white overlay (flash on)
-                overlayRenderer.color = new Color(1f, 1f, 1f, 1f); // fully opaque white
+                // flash on - swap to white material and set sprite texture
+                spriteRenderer.material = flashMaterial;
+                spriteRenderer.material.SetTexture("_MainTex", spriteRenderer.sprite.texture);
                 yield return new WaitForSeconds(flashInterval);
 
-                // hide white overlay (flash off)
+                // flash off - restore original material
                 if (isInvincible)
                 {
-                    overlayRenderer.color = new Color(1f, 1f, 1f, 0f); // invisible
+                    spriteRenderer.material = originalMaterial;
                     yield return new WaitForSeconds(flashInterval);
                 }
             }
 
-            // ensure overlay is hidden when invincibility ends
-            overlayRenderer.color = new Color(1f, 1f, 1f, 0f);
+            // ensure original material is restored when invincibility ends
+            spriteRenderer.material = originalMaterial;
         }
 
         /// <summary>
@@ -463,30 +380,34 @@ namespace Platformer.Mechanics
             // stop the combo timer - we've committed to this attack
             comboWindowTimer = 0f;
 
-            // determine which attack to perform based on combo step
+            // determine which attack to perform based on combo step AND grounded status
             string currentAttackState;
             string attackTrigger;
 
-            if (currentComboStep == 0)
+            // check if player is in the air
+            if (!IsGrounded)
             {
-                // first attack
+                // aerial attack - always use air attack, no combo in air
+                currentAttackState = attackAirStateName;
+                attackTrigger = "attackAir";
+            }
+            else if (currentComboStep == 0)
+            {
+                // first attack (grounded)
                 currentAttackState = attackStateName;
                 attackTrigger = "attack1";
-                UnityEngine.Debug.Log("[COMBO] starting attack 1 (comboStep was 0)");
             }
             else if (currentComboStep == 1)
             {
                 // second attack (combo)
                 currentAttackState = attack2StateName;
                 attackTrigger = "attack2";
-                UnityEngine.Debug.Log("[COMBO] starting attack 2 (comboStep was 1)");
             }
             else
             {
                 // third attack (finisher)
                 currentAttackState = attack3StateName;
                 attackTrigger = "attack3";
-                UnityEngine.Debug.Log("[COMBO] starting attack 3 FINISHER (comboStep was 2)");
             }
 
             animator.SetTrigger(attackTrigger);
@@ -512,26 +433,28 @@ namespace Platformer.Mechanics
             isAttacking = false;
 
             // handle combo progression (use stored value, not current comboStep)
-            if (currentComboStep == 0)
+            // aerial attacks don't progress combo - combo is only for grounded attacks
+            if (currentAttackState == attackAirStateName)
+            {
+                // aerial attack finished - don't change combo state
+            }
+            else if (currentComboStep == 0)
             {
                 // first attack finished - open combo window for second attack
                 comboStep = 1;
                 comboWindowTimer = comboWindow;
-                UnityEngine.Debug.Log($"[COMBO] attack 1 finished, opening {comboWindow}s window for attack 2");
             }
             else if (currentComboStep == 1)
             {
                 // second attack finished - open combo window for third attack
                 comboStep = 2;
                 comboWindowTimer = comboWindow;
-                UnityEngine.Debug.Log($"[COMBO] attack 2 finished, opening {comboWindow}s window for attack 3");
             }
             else
             {
                 // third attack finished - reset combo
                 comboStep = 0;
                 comboWindowTimer = 0f;
-                UnityEngine.Debug.Log("[COMBO] attack 3 FINISHER finished, reset to step 0");
             }
 
             // immediately read input so movement resumes if key is still held
@@ -626,18 +549,7 @@ namespace Platformer.Mechanics
                 StopCoroutine(flashCoroutine);
                 flashCoroutine = null;
             }
-            spriteRenderer.color = originalSpriteColor;
-
-            // hide white overlay
-            if (whiteOverlay != null)
-            {
-                SpriteRenderer overlayRenderer = whiteOverlay.GetComponent<SpriteRenderer>();
-                if (overlayRenderer != null)
-                {
-                    overlayRenderer.color = new Color(1f, 1f, 1f, 0f);
-                }
-            }
-
+            spriteRenderer.material = originalMaterial;
         }
 
         /// <summary>

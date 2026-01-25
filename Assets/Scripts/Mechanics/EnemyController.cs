@@ -24,6 +24,10 @@ namespace Platformer.Mechanics
         /// How fast the sprite flashes during invincibility.
         /// </summary>
         public float flashInterval = 0.1f;
+        /// <summary>
+        /// White material to swap to during flash (drag in Inspector).
+        /// </summary>
+        public Material flashMaterial;
 
         internal PatrolPath.Mover mover;
         internal AnimationController control;
@@ -35,10 +39,8 @@ namespace Platformer.Mechanics
         private float invincibilityTimer = 0f;
         private Coroutine flashCoroutine = null;
         private Color originalSpriteColor;
+        private Material originalMaterial;
         private Health health;
-        private GameObject whiteOverlay;
-        private Dictionary<Sprite, Sprite> whiteSpriteCache = new Dictionary<Sprite, Sprite>();
-        private Sprite lastSprite;
 
         public Bounds Bounds => _collider.bounds;
 
@@ -58,9 +60,8 @@ namespace Platformer.Mechanics
             // store the original sprite color so we can restore it properly
             originalSpriteColor = spriteRenderer.color;
 
-            // create white overlay for damage flash effect
-            CreateWhiteOverlay();
-
+            // store original material for flash system
+            originalMaterial = spriteRenderer.material;
         }
 
         void OnCollisionEnter2D(Collision2D collision)
@@ -82,12 +83,6 @@ namespace Platformer.Mechanics
 
         void Update()
         {
-            // update white overlay to match current animation frame
-            if (whiteOverlay != null)
-            {
-                UpdateOverlaySprite();
-            }
-
             // handle invincibility timer
             if (isInvincible)
             {
@@ -103,18 +98,8 @@ namespace Platformer.Mechanics
                         flashCoroutine = null;
                     }
 
-                    // force sprite color reset when invincibility ends
-                    spriteRenderer.color = originalSpriteColor;
-
-                    // hide white overlay
-                    if (whiteOverlay != null)
-                    {
-                        SpriteRenderer overlayRenderer = whiteOverlay.GetComponent<SpriteRenderer>();
-                        if (overlayRenderer != null)
-                        {
-                            overlayRenderer.color = new Color(1f, 1f, 1f, 0f);
-                        }
-                    }
+                    // force material reset when invincibility ends
+                    spriteRenderer.material = originalMaterial;
                 }
             }
 
@@ -166,83 +151,10 @@ namespace Platformer.Mechanics
         }
 
         /// <summary>
-        /// Creates a solid white silhouette overlay for damage flash effect.
-        /// </summary>
-        private void CreateWhiteOverlay()
-        {
-            whiteOverlay = new GameObject("WhiteOverlay");
-            whiteOverlay.transform.SetParent(transform);
-            whiteOverlay.transform.localPosition = Vector3.zero;
-            whiteOverlay.transform.localScale = Vector3.one;
-
-            SpriteRenderer overlayRenderer = whiteOverlay.AddComponent<SpriteRenderer>();
-            overlayRenderer.color = new Color(1f, 1f, 1f, 0f); // invisible initially
-            overlayRenderer.sortingLayerName = spriteRenderer.sortingLayerName;
-            overlayRenderer.sortingOrder = spriteRenderer.sortingOrder + 1; // render on top
-
-        }
-
-        /// <summary>
-        /// Updates the overlay sprite to match current animation frame (cached for performance).
-        /// </summary>
-        private void UpdateOverlaySprite()
-        {
-            if (spriteRenderer.sprite == null) return;
-
-            Sprite currentSprite = spriteRenderer.sprite;
-
-            // only update if sprite changed (don't recreate every frame!)
-            if (currentSprite == lastSprite) return;
-
-            lastSprite = currentSprite;
-            SpriteRenderer overlayRenderer = whiteOverlay.GetComponent<SpriteRenderer>();
-
-            // check cache first
-            if (whiteSpriteCache.ContainsKey(currentSprite))
-            {
-                overlayRenderer.sprite = whiteSpriteCache[currentSprite];
-                return;
-            }
-
-            // create white version and cache it
-            Texture2D originalTexture = currentSprite.texture;
-            Texture2D whiteTexture = new Texture2D((int)currentSprite.rect.width, (int)currentSprite.rect.height);
-
-            Color[] pixels = originalTexture.GetPixels(
-                (int)currentSprite.rect.x,
-                (int)currentSprite.rect.y,
-                (int)currentSprite.rect.width,
-                (int)currentSprite.rect.height
-            );
-
-            for (int i = 0; i < pixels.Length; i++)
-            {
-                if (pixels[i].a > 0.01f)
-                {
-                    pixels[i] = new Color(1f, 1f, 1f, pixels[i].a);
-                }
-            }
-
-            whiteTexture.SetPixels(pixels);
-            whiteTexture.Apply();
-
-            Sprite whiteSprite = Sprite.Create(
-                whiteTexture,
-                new Rect(0, 0, whiteTexture.width, whiteTexture.height),
-                new Vector2(0.5f, 0.5f),
-                currentSprite.pixelsPerUnit
-            );
-
-            whiteSpriteCache[currentSprite] = whiteSprite;
-            overlayRenderer.sprite = whiteSprite;
-        }
-
-        /// <summary>
-        /// Activates invincibility frames with white overlay flash effect.
+        /// Activates invincibility frames with white flash effect.
         /// </summary>
         public void ActivateInvincibility()
         {
-
             // stop any existing flash coroutine
             if (flashCoroutine != null)
             {
@@ -264,33 +176,33 @@ namespace Platformer.Mechanics
         }
 
         /// <summary>
-        /// Coroutine that makes the sprite flash white during invincibility.
+        /// Coroutine that makes the sprite flash white during invincibility by swapping materials.
         /// </summary>
         private IEnumerator FlashSprite()
         {
-            if (whiteOverlay == null)
+            if (flashMaterial == null)
             {
+                UnityEngine.Debug.LogWarning("[ENEMY FLASH] no flash material assigned!");
                 yield break;
             }
 
-            SpriteRenderer overlayRenderer = whiteOverlay.GetComponent<SpriteRenderer>();
-
             while (isInvincible)
             {
-                // show white overlay (flash on)
-                overlayRenderer.color = new Color(1f, 1f, 1f, 1f); // fully opaque white
+                // flash on - swap to white material and set sprite texture
+                spriteRenderer.material = flashMaterial;
+                spriteRenderer.material.SetTexture("_MainTex", spriteRenderer.sprite.texture);
                 yield return new WaitForSeconds(flashInterval);
 
-                // hide white overlay (flash off)
+                // flash off - restore original material
                 if (isInvincible)
                 {
-                    overlayRenderer.color = new Color(1f, 1f, 1f, 0f); // invisible
+                    spriteRenderer.material = originalMaterial;
                     yield return new WaitForSeconds(flashInterval);
                 }
             }
 
-            // ensure overlay is hidden when invincibility ends
-            overlayRenderer.color = new Color(1f, 1f, 1f, 0f);
+            // ensure original material is restored when invincibility ends
+            spriteRenderer.material = originalMaterial;
         }
 
         /// <summary>

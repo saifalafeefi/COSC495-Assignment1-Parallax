@@ -13,7 +13,11 @@ namespace Platformer.Gameplay
 
         public override void Execute()
         {
-
+            // play landing sound once
+            if (player.landAudio != null && player.audioSource != null)
+            {
+                player.audioSource.PlayOneShot(player.landAudio);
+            }
         }
     }
 }
