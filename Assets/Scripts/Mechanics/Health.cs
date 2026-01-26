@@ -49,7 +49,21 @@ namespace Platformer.Mechanics
         /// </summary>
         public void Decrement()
         {
-                currentHP = Mathf.Clamp(currentHP - 1, 0, maxHP);
+            currentHP = Mathf.Clamp(currentHP - 1, 0, maxHP);
+            if (currentHP == 0)
+            {
+                var ev = Schedule<HealthIsZero>();
+                ev.health = this;
+            }
+        }
+
+        /// <summary>
+        /// Decrement the HP of the entity by a specified amount.
+        /// </summary>
+        /// <param name="amount">amount of damage to subtract from HP</param>
+        public void Decrement(int amount)
+        {
+            currentHP = Mathf.Clamp(currentHP - amount, 0, maxHP);
             if (currentHP == 0)
             {
                 var ev = Schedule<HealthIsZero>();

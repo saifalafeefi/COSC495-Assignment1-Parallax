@@ -33,7 +33,11 @@ namespace Platformer.Mechanics
         /// <summary>
         /// Duration of invincibility frames after taking damage.
         /// </summary>
-        public float invincibilityDuration = 1.0f;
+        public float invincibilityDuration = 1.5f;
+        /// <summary>
+        /// Duration of hurt stun (player can't move). Should be less than invincibilityDuration.
+        /// </summary>
+        public float hurtDuration = 0.5f;
         /// <summary>
         /// How fast the sprite flashes during invincibility.
         /// </summary>
@@ -43,15 +47,17 @@ namespace Platformer.Mechanics
         /// </summary>
         public Material flashMaterial;
 
+        [Header("Knockback Settings")]
+        /// <summary>
+        /// Horizontal knockback force when hit by enemy.
+        /// </summary>
+        public float knockbackHorizontalForce = 8f;
+        /// <summary>
+        /// Vertical (upward) knockback force when hit by enemy.
+        /// </summary>
+        public float knockbackVerticalForce = 10f;
+
         [Header("Attack Settings")]
-        /// <summary>
-        /// Distance the player lunges forward during attack.
-        /// </summary>
-        public float attackDashDistance = 2f;
-        /// <summary>
-        /// Duration of the attack dash (how long the lunge takes).
-        /// </summary>
-        public float attackDashDuration = 0.2f;
         /// <summary>
         /// Name of the first attack animation state in the Animator.
         /// </summary>
@@ -72,14 +78,50 @@ namespace Platformer.Mechanics
         /// Time window after each attack to input next attack (combo window).
         /// </summary>
         public float comboWindow = 0.8f;
+
+        [Header("Attack 1 & 2 Hitbox")]
         /// <summary>
-        /// Attack hitbox range (how far forward to detect enemies).
+        /// Attack 1/2 hitbox range (how far forward to detect enemies).
         /// </summary>
-        public float attackRange = 1.5f;
+        public float attack12Range = 1.5f;
         /// <summary>
-        /// Attack hitbox size (width/height of the attack area).
+        /// Attack 1/2 hitbox size (width/height of the attack area).
         /// </summary>
-        public Vector2 attackHitboxSize = new Vector2(1.5f, 1f);
+        public Vector2 attack12HitboxSize = new Vector2(1.5f, 1f);
+        /// <summary>
+        /// Damage dealt by attack 1 and 2.
+        /// </summary>
+        public int attack12Damage = 1;
+
+        [Header("Attack 3 (Finisher) Hitbox")]
+        /// <summary>
+        /// Attack 3 hitbox range (how far forward to detect enemies).
+        /// </summary>
+        public float attack3Range = 2f;
+        /// <summary>
+        /// Attack 3 hitbox size (width/height of the attack area).
+        /// </summary>
+        public Vector2 attack3HitboxSize = new Vector2(2f, 1.5f);
+        /// <summary>
+        /// Damage dealt by attack 3 finisher.
+        /// </summary>
+        public int attack3Damage = 2;
+
+        [Header("Aerial Attack Hitbox")]
+        /// <summary>
+        /// Aerial attack hitbox range (how far forward to detect enemies).
+        /// </summary>
+        public float attackAirRange = 1.2f;
+        /// <summary>
+        /// Aerial attack hitbox size (width/height of the attack area).
+        /// </summary>
+        public Vector2 attackAirHitboxSize = new Vector2(1.2f, 1.2f);
+        /// <summary>
+        /// Damage dealt by aerial attack.
+        /// </summary>
+        public int attackAirDamage = 1;
+
+        [Header("Attack Settings")]
         /// <summary>
         /// Knockback force applied to enemies when hit.
         /// </summary>
@@ -91,12 +133,14 @@ namespace Platformer.Mechanics
 
         private bool isInvincible = false;
         private float invincibilityTimer = 0f;
+        private bool isHurtStunned = false;
+        private float hurtStunTimer = 0f;
         private Coroutine flashCoroutine = null;
         private Color originalSpriteColor;
         private Material originalMaterial;
-        private bool isDashing = false;
-        private float dashVelocity = 0f;
         private bool isAttacking = false;
+        private float knockbackVelocityX = 0f;
+        private float knockbackDecayRate = 10f; // how fast horizontal knockback decays per second
         private int comboStep = 0; // 0 = ready for attack 1, 1 = ready for attack 2, 2 = ready for attack 3
         private float comboWindowTimer = 0f;
         private bool attackButtonHeld = false; // tracks if attack button is held from previous combo
@@ -163,6 +207,18 @@ namespace Platformer.Mechanics
 
         protected override void Update()
         {
+            // handle hurt stun timer
+            if (isHurtStunned)
+            {
+                hurtStunTimer -= Time.deltaTime;
+                if (hurtStunTimer <= 0f)
+                {
+                    // hurt stun ended - restore control (but keep i-frames!)
+                    isHurtStunned = false;
+                    controlEnabled = true;
+                }
+            }
+
             if (controlEnabled)
             {
                 // disable movement input during attack
@@ -306,10 +362,25 @@ namespace Platformer.Mechanics
             animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
             animator.SetFloat("velocityY", velocity.y);
             animator.SetBool("isAttacking", isAttacking);
+            animator.SetBool("hurt", isHurtStunned);
 
-            // apply normal movement + dash velocity
+            // apply normal movement + knockback
             targetVelocity = move * maxSpeed;
-            targetVelocity.x += dashVelocity;
+            targetVelocity.x += knockbackVelocityX;
+
+            // decay horizontal knockback over time
+            if (knockbackVelocityX != 0)
+            {
+                float decay = knockbackDecayRate * Time.deltaTime;
+                if (Mathf.Abs(knockbackVelocityX) <= decay)
+                {
+                    knockbackVelocityX = 0;
+                }
+                else
+                {
+                    knockbackVelocityX -= Mathf.Sign(knockbackVelocityX) * decay;
+                }
+            }
         }
 
         /// <summary>
@@ -329,11 +400,21 @@ namespace Platformer.Mechanics
                 isInvincible = true;
                 invincibilityTimer = invincibilityDuration;
                 flashCoroutine = StartCoroutine(FlashSprite());
+
+                // disable control during hurt animation
+                isHurtStunned = true;
+                controlEnabled = false;
+                hurtStunTimer = hurtDuration;
             }
             else
             {
                 invincibilityTimer = invincibilityDuration;
                 flashCoroutine = StartCoroutine(FlashSprite());
+
+                // reset hurt stun if hit again during i-frames (shouldn't happen but just in case)
+                isHurtStunned = true;
+                controlEnabled = false;
+                hurtStunTimer = hurtDuration;
             }
         }
 
@@ -412,17 +493,25 @@ namespace Platformer.Mechanics
 
             animator.SetTrigger(attackTrigger);
 
-            // start the dash coroutine
-            StartCoroutine(AttackDash());
-
             // wait one frame for the animator to transition to attack state
             yield return null;
 
             // wait a brief moment for the attack animation to reach the "hit" frame
             yield return new WaitForSeconds(0.1f);
 
-            // check for enemies in attack range and deal damage
-            CheckAttackHit();
+            // check for enemies in attack range and deal damage (use correct hitbox per attack)
+            if (currentAttackState == attackAirStateName)
+            {
+                CheckAttackHit(attackAirRange, attackAirHitboxSize, attackAirDamage);
+            }
+            else if (currentComboStep == 2) // attack 3 finisher
+            {
+                CheckAttackHit(attack3Range, attack3HitboxSize, attack3Damage);
+            }
+            else // attack 1 or 2
+            {
+                CheckAttackHit(attack12Range, attack12HitboxSize, attack12Damage);
+            }
 
             // wait until the animator exits the attack state
             while (animator.GetCurrentAnimatorStateInfo(0).IsName(currentAttackState))
@@ -468,74 +557,49 @@ namespace Platformer.Mechanics
         /// <summary>
         /// Checks for enemies in attack range and deals damage.
         /// </summary>
-        private void CheckAttackHit()
+        /// <param name="range">how far forward the hitbox extends</param>
+        /// <param name="hitboxSize">width/height of the hitbox</param>
+        /// <param name="damage">amount of damage to deal</param>
+        private void CheckAttackHit(float range, Vector2 hitboxSize, int damage)
         {
             // determine attack direction based on which way player is facing
             float direction = spriteRenderer.flipX ? -1f : 1f;
 
             // calculate hitbox center position (offset from player in attack direction)
-            Vector2 hitboxCenter = (Vector2)transform.position + new Vector2(direction * attackRange, 0f);
+            Vector2 hitboxCenter = (Vector2)transform.position + new Vector2(direction * range, 0f);
 
             // find all colliders in the attack hitbox
-            Collider2D[] hits = Physics2D.OverlapBoxAll(hitboxCenter, attackHitboxSize, 0f, enemyLayer);
-
+            Collider2D[] hits = Physics2D.OverlapBoxAll(hitboxCenter, hitboxSize, 0f, enemyLayer);
 
             foreach (var hit in hits)
             {
                 var enemy = hit.GetComponent<EnemyController>();
                 if (enemy != null && !enemy.IsInvincible)
                 {
-
                     // calculate knockback direction (away from player)
                     Vector2 knockbackDir = new Vector2(direction, 0.5f); // slight upward angle
 
                     // deal damage to enemy
-                    enemy.TakeDamage(knockbackDir, enemyKnockbackForce);
+                    enemy.TakeDamage(damage, knockbackDir, enemyKnockbackForce);
                 }
             }
         }
 
         /// <summary>
-        /// Coroutine that makes the player dash forward during attack.
+        /// Applies knockback force to the player in a projectile arc.
         /// </summary>
-        private IEnumerator AttackDash()
-        {
-            isDashing = true;
-            float elapsed = 0f;
-
-            // determine dash direction based on which way player is facing
-            float dashDirection = spriteRenderer.flipX ? -1f : 1f;
-
-            while (elapsed < attackDashDuration)
-            {
-                elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / attackDashDuration);
-
-                // ease-out curve: starts fast, ends slow
-                // inverse of ease-in: we want high speed at start, low at end
-                float easeOutCurve = 1f - Mathf.Pow(t, 2f); // quadratic ease-out
-
-                // base speed needed to cover the distance
-                float baseSpeed = attackDashDistance / attackDashDuration;
-
-                // apply curve to speed (multiply by ease-out so it starts high, ends low)
-                dashVelocity = dashDirection * baseSpeed * easeOutCurve;
-
-                yield return null;
-            }
-
-            dashVelocity = 0f;
-            isDashing = false;
-        }
-
-        /// <summary>
-        /// Applies knockback force to the player.
-        /// </summary>
-        /// <param name="knockbackDirection">Direction of the knockback force.</param>
-        /// <param name="knockbackForce">Strength of the knockback.</param>
+        /// <param name="knockbackDirection">Direction of the knockback force (horizontal component determines direction).</param>
+        /// <param name="knockbackForce">Strength of the knockback (UNUSED - uses knockbackHorizontalForce/knockbackVerticalForce instead).</param>
         public void ApplyKnockback(Vector2 knockbackDirection, float knockbackForce = 5f)
         {
-            velocity = knockbackDirection.normalized * knockbackForce;
+            // determine horizontal direction (left or right)
+            float horizontalDirection = Mathf.Sign(knockbackDirection.x);
+
+            // apply horizontal knockback (stored separately for smooth decay)
+            knockbackVelocityX = horizontalDirection * knockbackHorizontalForce;
+
+            // apply vertical knockback directly (gravity provides natural decay)
+            velocity.y = knockbackVerticalForce;
         }
 
         /// <summary>
@@ -544,6 +608,10 @@ namespace Platformer.Mechanics
         public void ResetVisualState()
         {
             isInvincible = false;
+            isHurtStunned = false;
+            hurtStunTimer = 0f;
+            controlEnabled = true;
+            knockbackVelocityX = 0f;
             if (flashCoroutine != null)
             {
                 StopCoroutine(flashCoroutine);
@@ -561,7 +629,7 @@ namespace Platformer.Mechanics
         }
 
         /// <summary>
-        /// visualize attack hitbox in editor (helps with adjusting attack range)
+        /// visualize attack hitboxes in editor (helps with adjusting attack range)
         /// </summary>
         void OnDrawGizmosSelected()
         {
@@ -570,12 +638,20 @@ namespace Platformer.Mechanics
                 // determine attack direction based on which way player is facing
                 float direction = spriteRenderer.flipX ? -1f : 1f;
 
-                // calculate hitbox center position
-                Vector2 hitboxCenter = (Vector2)transform.position + new Vector2(direction * attackRange, 0f);
+                // draw attack 1/2 hitbox (green)
+                Vector2 hitbox12Center = (Vector2)transform.position + new Vector2(direction * attack12Range, 0f);
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireCube(hitbox12Center, attack12HitboxSize);
 
-                // draw the attack hitbox
+                // draw attack 3 finisher hitbox (red)
+                Vector2 hitbox3Center = (Vector2)transform.position + new Vector2(direction * attack3Range, 0f);
                 Gizmos.color = Color.red;
-                Gizmos.DrawWireCube(hitboxCenter, attackHitboxSize);
+                Gizmos.DrawWireCube(hitbox3Center, attack3HitboxSize);
+
+                // draw aerial attack hitbox (cyan)
+                Vector2 hitboxAirCenter = (Vector2)transform.position + new Vector2(direction * attackAirRange, 0f);
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawWireCube(hitboxAirCenter, attackAirHitboxSize);
             }
         }
 

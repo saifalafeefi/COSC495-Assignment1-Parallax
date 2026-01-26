@@ -113,9 +113,10 @@ namespace Platformer.Mechanics
         /// <summary>
         /// Called when enemy takes damage from player attack.
         /// </summary>
-        /// <param name="knockbackDirection">Direction to knock the enemy back.</param>
-        /// <param name="knockbackForce">Force of the knockback.</param>
-        public void TakeDamage(Vector2 knockbackDirection, float knockbackForce = 3f)
+        /// <param name="damage">amount of damage to deal</param>
+        /// <param name="knockbackDirection">direction to knock the enemy back</param>
+        /// <param name="knockbackForce">force of the knockback</param>
+        public void TakeDamage(int damage, Vector2 knockbackDirection, float knockbackForce = 3f)
         {
             if (isInvincible)
             {
@@ -124,7 +125,7 @@ namespace Platformer.Mechanics
 
             if (health != null)
             {
-                health.Decrement();
+                health.Decrement(damage);
 
                 if (!health.IsAlive)
                 {

@@ -127,221 +127,332 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: player_attack_air_0
+      name: playerAttackAir_0
       rect:
         serializedVersion: 2
-        x: 26
-        y: 47
-        width: 61
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 76916de788c860c10800000000000000
-      internalID: 2019456000793647463
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: player_attack_air_1
-      rect:
-        serializedVersion: 2
-        x: 175
+        x: 27
         y: 48
-        width: 58
-        height: 71
+        width: 59
+        height: 62
       alignment: 9
-      pivot: {x: 0.6522343, y: 0.45025614}
+      pivot: {x: 0.46443906, y: 0.4887197}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: e663c79bd504e71b0800000000000000
-      internalID: -5657013310642702738
+      spriteID: c9159216594c20f438b11edc297acb0a
+      internalID: -249049220
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: player_attack_air_2
+      name: playerAttackAir_1
       rect:
         serializedVersion: 2
-        x: 327
+        x: 176
+        y: 49
+        width: 56
+        height: 69
+      alignment: 9
+      pivot: {x: 0.6748401, y: 0.4594572}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 21f2a44a856dcd545895bdc4ad8eac4e
+      internalID: 833828377
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerAttackAir_2
+      rect:
+        serializedVersion: 2
+        x: 328
+        y: 45
+        width: 63
+        height: 75
+      alignment: 9
+      pivot: {x: 0.7109181, y: 0.50932425}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a67dfa28737d9604d904e234d6d06a42
+      internalID: -996738639
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerAttackAir_3
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 45
+        width: 63
+        height: 75
+      alignment: 9
+      pivot: {x: 0.7109172, y: 0.49067453}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 77280b0709701a3479c32883ecd5a0c2
+      internalID: 77144166
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerAttackAir_4
+      rect:
+        serializedVersion: 2
+        x: 658
         y: 44
-        width: 65
-        height: 77
+        width: 59
+        height: 93
       alignment: 9
-      pivot: {x: 0.6992319, y: 0.5000001}
+      pivot: {x: 0.6540952, y: 0.39471945}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
-      physicsShape: []
-      tessellationDetail: -1
+      physicsShape:
+      - - {x: 29.5, y: -3.5}
+        - {x: 29.5, y: 40.5}
+        - {x: 25.5, y: 46.5}
+        - {x: 2.5, y: 46.5}
+        - {x: -17.5, y: 41.5}
+        - {x: -29.5, y: 16.5}
+        - {x: -29.5, y: -1.5}
+        - {x: -27.5, y: -0.5}
+        - {x: -26.5, y: -26.5}
+        - {x: -23.5, y: -39.5}
+        - {x: -1.5, y: -46.5}
+        - {x: 24.5, y: -46.5}
+      - - {x: 9.5, y: 19.5}
+        - {x: 10.5, y: 21.5}
+        - {x: 12.5, y: 19.5}
+      tessellationDetail: 0
       bones: []
-      spriteID: 7eea9da76fcf194a0800000000000000
-      internalID: -6588206644313084185
+      spriteID: ddedefad650199c4fb1af3fde0055bd0
+      internalID: 1969315426
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: player_attack_air_3
-      rect:
-        serializedVersion: 2
-        x: 487
-        y: 44
-        width: 65
-        height: 77
-      alignment: 9
-      pivot: {x: 0.6901761, y: 0.5000001}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 2e73a25efd1dbdae0800000000000000
-      internalID: -1523393289382119454
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: player_attack_air_4
-      rect:
-        serializedVersion: 2
-        x: 657
-        y: 43
-        width: 61
-        height: 95
-      alignment: 9
-      pivot: {x: 0.6157987, y: 0.3946645}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 2d0e92e4afe8182f0800000000000000
-      internalID: -972338838830980910
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: player_attack_air_5
+      name: playerAttackAir_5
       rect:
         serializedVersion: 2
         x: 820
-        y: 43
-        width: 142
-        height: 109
+        y: 44
+        width: 140
+        height: 107
       alignment: 9
-      pivot: {x: 0.2720066, y: 0.4513967}
+      pivot: {x: 0.26521346, y: 0.4477112}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
-      physicsShape: []
-      tessellationDetail: -1
+      physicsShape:
+      - - {x: 70, y: 13.5}
+        - {x: 50, y: 53.5}
+        - {x: -70, y: 53.5}
+        - {x: -70, y: 24.5}
+        - {x: -57, y: 30.5}
+        - {x: -16, y: 28.5}
+        - {x: 3, y: 1.5}
+        - {x: -3, y: -5.5}
+        - {x: -11, y: 16.5}
+        - {x: -16, y: 24.5}
+        - {x: -41, y: 28.5}
+        - {x: -44, y: 24.5}
+        - {x: -52, y: 14.5}
+        - {x: -54, y: -36.5}
+        - {x: -50, y: -40.5}
+        - {x: -43, y: -39.5}
+        - {x: -40, y: -36.5}
+        - {x: -39, y: -33.5}
+        - {x: -28, y: -39.5}
+        - {x: -23, y: -42.5}
+        - {x: -18, y: -43.5}
+        - {x: 0, y: -52.5}
+        - {x: 11, y: -53.5}
+        - {x: 70, y: -53.5}
+      - - {x: -14, y: -18.5}
+        - {x: -13, y: -17.5}
+        - {x: -12, y: -11.5}
+        - {x: -8, y: -14.5}
+        - {x: -5, y: -18.5}
+      tessellationDetail: 0
       bones: []
-      spriteID: 4e819be60ff99bed0800000000000000
-      internalID: -2397709471599486748
+      spriteID: 0df615edb4286c44ba3c9ea31fcf2029
+      internalID: 383468885
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: player_attack_air_6
+      name: playerAttackAir_6
       rect:
         serializedVersion: 2
-        x: 999
-        y: 25
-        width: 97
-        height: 123
+        x: 1000
+        y: 26
+        width: 95
+        height: 121
       alignment: 9
-      pivot: {x: 0.19051023, y: 0.54785687}
+      pivot: {x: 0.19080682, y: 0.55201846}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
-      physicsShape: []
-      tessellationDetail: -1
+      physicsShape:
+      - - {x: 47.5, y: -23.5}
+        - {x: 47.5, y: 19.5}
+        - {x: 36.5, y: 53.5}
+        - {x: 11.5, y: 60.5}
+        - {x: -12.5, y: 60.5}
+        - {x: -47.5, y: 25.5}
+        - {x: -47.5, y: -35.5}
+        - {x: -38.5, y: -38.5}
+        - {x: -30.5, y: -37.5}
+        - {x: -33.5, y: -24.5}
+        - {x: -11.5, y: -56.5}
+        - {x: 5.5, y: -60.5}
+        - {x: 19.5, y: -60.5}
+      - - {x: -13.5, y: -16.5}
+        - {x: -16.5, y: -14.5}
+        - {x: -15.5, y: -14.5}
+        - {x: -14.5, y: -12.5}
+        - {x: -13.5, y: -12.5}
+        - {x: -11.5, y: -15.5}
+        - {x: -13.5, y: -17.5}
+      tessellationDetail: 0
       bones: []
-      spriteID: 442561de9fcb26c90800000000000000
-      internalID: -7177967074464607676
+      spriteID: baf0351e2f7267c4fb38e4845216181f
+      internalID: -1819511189
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: player_attack_air_7
+      name: playerAttackAir_7
       rect:
         serializedVersion: 2
-        x: 1160
-        y: 37
-        width: 72
-        height: 80
+        x: 1161
+        y: 38
+        width: 70
+        height: 78
       alignment: 9
-      pivot: {x: 0.26291063, y: 0.6692335}
+      pivot: {x: 0.24023438, y: 0.67932343}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
-      physicsShape: []
-      tessellationDetail: -1
+      physicsShape:
+      - - {x: 12, y: -38}
+        - {x: 33, y: -14}
+        - {x: 35, y: 0}
+        - {x: 35, y: 4}
+        - {x: -3, y: 39}
+        - {x: -35, y: 39}
+        - {x: -35, y: -31}
+        - {x: -19, y: -32}
+        - {x: -19, y: -20}
+        - {x: -18, y: -28}
+        - {x: -11, y: -39}
+        - {x: 1, y: -39}
+      - - {x: -6, y: -11}
+        - {x: -6, y: -7}
+        - {x: -3, y: -3}
+        - {x: -2, y: 0}
+        - {x: 4, y: -1}
+        - {x: 8, y: -3}
+        - {x: 12, y: -4}
+        - {x: 17, y: -6}
+        - {x: 13, y: -6}
+        - {x: 10, y: -8}
+        - {x: 5, y: -10}
+        - {x: 4, y: -9}
+        - {x: 0, y: -9}
+        - {x: -7, y: -13}
+      tessellationDetail: 0
       bones: []
-      spriteID: 971db2dcea563c2b0800000000000000
-      internalID: -5565492913058885255
+      spriteID: 0f3f96c0d8486ec439f18d54fca8e3dd
+      internalID: 1361554381
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: player_attack_air_8
+      name: playerAttackAir_8
       rect:
         serializedVersion: 2
-        x: 1320
-        y: 37
-        width: 60
-        height: 80
+        x: 1321
+        y: 38
+        width: 58
+        height: 78
       alignment: 9
-      pivot: {x: 0.33322144, y: 0.6765915}
+      pivot: {x: 0.27089506, y: 0.69725573}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
-      physicsShape: []
-      tessellationDetail: -1
+      physicsShape:
+      - - {x: 13, y: -37}
+        - {x: 29, y: -32}
+        - {x: 29, y: 39}
+        - {x: -29, y: 39}
+        - {x: -29, y: -31}
+        - {x: -13, y: -32}
+        - {x: -13, y: -20}
+        - {x: -12, y: -28}
+        - {x: -5, y: -39}
+        - {x: 3, y: -39}
+      tessellationDetail: 0
       bones: []
-      spriteID: d585efeb8be9f11a0800000000000000
-      internalID: -6836571193009612707
+      spriteID: baba25322bf49f042ba5d0bb1d971753
+      internalID: -51546338
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: player_attack_air_9
+      name: playerAttackAir_9
       rect:
         serializedVersion: 2
-        x: 1480
-        y: 37
-        width: 60
-        height: 80
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 1481
+        y: 38
+        width: 58
+        height: 78
+      alignment: 9
+      pivot: {x: 0.30706787, y: 0.67932343}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
-      physicsShape: []
-      tessellationDetail: -1
+      physicsShape:
+      - - {x: 19, y: -32}
+        - {x: 29, y: -11}
+        - {x: 29, y: 30}
+        - {x: 25, y: 39}
+        - {x: -29, y: 39}
+        - {x: -29, y: -31}
+        - {x: -13, y: -32}
+        - {x: -13, y: -20}
+        - {x: -12, y: -28}
+        - {x: -7, y: -39}
+        - {x: 5, y: -39}
+      tessellationDetail: 0
       bones: []
-      spriteID: 722a92baa31b54880800000000000000
-      internalID: -8627294645620465113
+      spriteID: 488a8181064c3cb48bedefb1a4fafeae
+      internalID: -1112874746
       vertices: []
       indices: 
       edges: []
@@ -358,18 +469,20 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      player_attack_air_0: 2019456000793647463
-      player_attack_air_1: -5657013310642702738
-      player_attack_air_2: -6588206644313084185
-      player_attack_air_3: -1523393289382119454
-      player_attack_air_4: -972338838830980910
-      player_attack_air_5: -2397709471599486748
-      player_attack_air_6: -7177967074464607676
-      player_attack_air_7: -5565492913058885255
-      player_attack_air_8: -6836571193009612707
-      player_attack_air_9: -8627294645620465113
+      playerAttackAir_0: -249049220
+      playerAttackAir_1: 833828377
+      playerAttackAir_2: -996738639
+      playerAttackAir_3: 77144166
+      playerAttackAir_4: 1969315426
+      playerAttackAir_5: 383468885
+      playerAttackAir_6: -1819511189
+      playerAttackAir_7: 1361554381
+      playerAttackAir_8: -51546338
+      playerAttackAir_9: -1112874746
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

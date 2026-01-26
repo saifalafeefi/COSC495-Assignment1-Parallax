@@ -324,28 +324,6 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: playerAttack3_Sheet_9
-      rect:
-        serializedVersion: 2
-        x: 1467
-        y: 26
-        width: 43
-        height: 44
-      alignment: 9
-      pivot: {x: 0.54878557, y: 0.4999993}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 60c90b4f8d7705a90800000000000000
-      internalID: -7327224820029940730
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
