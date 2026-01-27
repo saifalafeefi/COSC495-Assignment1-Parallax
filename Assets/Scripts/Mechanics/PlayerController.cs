@@ -631,7 +631,7 @@ namespace Platformer.Mechanics
         /// <summary>
         /// visualize attack hitboxes in editor (helps with adjusting attack range)
         /// </summary>
-        void OnDrawGizmosSelected()
+        void OnDrawGizmos()
         {
             if (spriteRenderer != null)
             {

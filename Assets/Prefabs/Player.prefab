@@ -71,14 +71,14 @@ MonoBehaviour:
   attack3StateName: PlayerAttack3
   attackAirStateName: PlayerAttackAir
   comboWindow: 0.3
-  attack12Range: 1.5
-  attack12HitboxSize: {x: 1.5, y: 1}
+  attack12Range: 0.8
+  attack12HitboxSize: {x: 2, y: 1}
   attack12Damage: 1
-  attack3Range: 1.5
-  attack3HitboxSize: {x: 2, y: 1.5}
+  attack3Range: 0.9
+  attack3HitboxSize: {x: 2.7, y: 1.5}
   attack3Damage: 2
   attackAirRange: 0.5
-  attackAirHitboxSize: {x: 2, y: 2}
+  attackAirHitboxSize: {x: 2.2, y: 2}
   attackAirDamage: 2
   enemyKnockbackForce: 30
   enemyLayer:
