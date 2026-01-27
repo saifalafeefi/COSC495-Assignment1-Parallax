@@ -219,7 +219,7 @@ MonoBehaviour:
   path: {fileID: 0}
   ouch: {fileID: 8300000, guid: b7f741588644cd64bbee6387cb54a96d, type: 3}
   invincibilityDuration: 0.2
-  flashInterval: 0.05
+  flashInterval: 0.1
   flashMaterial: {fileID: 2100000, guid: b28efccbcae6d4342b1d6ebf20794f41, type: 2}
 --- !u!82 &5843668731025413174
 AudioSource:

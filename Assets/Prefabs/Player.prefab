@@ -80,7 +80,7 @@ MonoBehaviour:
   attackAirRange: 0.5
   attackAirHitboxSize: {x: 2.2, y: 2}
   attackAirDamage: 2
-  enemyKnockbackForce: 30
+  enemyKnockbackForce: 15
   enemyLayer:
     serializedVersion: 2
     m_Bits: 8
