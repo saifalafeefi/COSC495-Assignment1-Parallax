@@ -27,7 +27,7 @@ namespace Platformer.Mechanics
         /// <summary>
         /// Initial jump velocity at the start of a jump.
         /// </summary>
-        public float jumpTakeOffSpeed = 7;
+        public float jumpTakeOffSpeed = 12;
 
         [Header("Invincibility Settings")]
         /// <summary>
@@ -151,7 +151,6 @@ namespace Platformer.Mechanics
         public bool IsInvincible => isInvincible;
 
         public JumpState jumpState = JumpState.Grounded;
-        private bool stopJump;
         /*internal new*/ public Collider2D collider2d;
         /*internal new*/ public AudioSource audioSource;
         public Health health;
@@ -231,12 +230,16 @@ namespace Platformer.Mechanics
                     move.x = 0; // lock movement during attack
                 }
 
+                // handle jump input
                 if (jumpState == JumpState.Grounded && m_JumpAction.WasPressedThisFrame())
-                    jumpState = JumpState.PrepareToJump;
-                else if (m_JumpAction.WasReleasedThisFrame())
                 {
-                    stopJump = true;
-                    Schedule<PlayerStopJump>().player = this;
+                    jumpState = JumpState.PrepareToJump;
+                }
+
+                // variable jump height - release jump to fall faster
+                if (jumpState == JumpState.InFlight && m_JumpAction.WasReleasedThisFrame() && velocity.y > 0)
+                {
+                    velocity.y *= 0.5f; // cut jump short
                 }
 
                 // handle attack input (only if not already attacking)
@@ -258,6 +261,7 @@ namespace Platformer.Mechanics
                     if (shouldAttack)
                     {
                         attackButtonHeld = true; // mark that we're in a hold sequence
+                        isAttacking = true; // set immediately to prevent animator transitions
                         StartCoroutine(PerformAttack());
                     }
                 }
@@ -315,7 +319,6 @@ namespace Platformer.Mechanics
                 case JumpState.PrepareToJump:
                     jumpState = JumpState.Jumping;
                     jump = true;
-                    stopJump = false;
                     break;
                 case JumpState.Jumping:
                     if (!IsGrounded)
@@ -343,14 +346,6 @@ namespace Platformer.Mechanics
             {
                 velocity.y = jumpTakeOffSpeed * model.jumpModifier;
                 jump = false;
-            }
-            else if (stopJump)
-            {
-                stopJump = false;
-                if (velocity.y > 0)
-                {
-                    velocity.y = velocity.y * model.jumpDeceleration;
-                }
             }
 
             if (move.x > 0.01f)

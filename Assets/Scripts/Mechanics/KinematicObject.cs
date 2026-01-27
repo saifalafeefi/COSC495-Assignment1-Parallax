@@ -12,12 +12,12 @@ namespace Platformer.Mechanics
         /// <summary>
         /// The minimum normal (dot product) considered suitable for the entity sit on.
         /// </summary>
-        public float minGroundNormalY = .65f;
+        public float minGroundNormalY = .9f;
 
         /// <summary>
         /// A custom gravity coefficient applied to this entity.
         /// </summary>
-        public float gravityModifier = 1f;
+        public float gravityModifier = 2.5f;
 
         /// <summary>
         /// The current velocity of the entity.
@@ -160,9 +160,19 @@ namespace Platformer.Mechanics
                     }
                     else
                     {
-                        //We are airborne, but hit something, so cancel vertical up and horizontal velocity.
-                        velocity.x *= 0;
-                        velocity.y = Mathf.Min(velocity.y, 0);
+                        // we are airborne and hit something
+                        // only cancel velocity components pushing into the surface
+                        var projection = Vector2.Dot(velocity, currentNormal);
+                        if (projection < 0)
+                        {
+                            velocity = velocity - projection * currentNormal;
+                        }
+                        // only cap upward velocity if we hit a ceiling (normal pointing down)
+                        // don't cancel jump momentum when hitting walls!
+                        if (currentNormal.y < -0.5f) // hit ceiling
+                        {
+                            velocity.y = Mathf.Min(velocity.y, 0);
+                        }
                     }
                     //remove shellDistance from actual move distance.
                     var modifiedDistance = hitBuffer[i].distance - shellRadius;
