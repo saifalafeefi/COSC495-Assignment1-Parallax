@@ -3,9 +3,9 @@ using UnityEngine;
 namespace Platformer.Mechanics
 {
     /// <summary>
-    /// health potion powerup that heals the player when collected.
+    /// health vial powerup that heals the player when collected.
     /// </summary>
-    public class HealthPotion : MonoBehaviour
+    public class HealthVial : MonoBehaviour
     {
         [Header("Healing Settings")]
         /// <summary>
@@ -20,7 +20,7 @@ namespace Platformer.Mechanics
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            // check if player collected the potion
+            // check if player collected the vial
             var player = collision.GetComponent<PlayerController>();
             if (player != null)
             {
@@ -43,7 +43,7 @@ namespace Platformer.Mechanics
                         player.audioSource.PlayOneShot(collectSound);
                     }
 
-                    // destroy the potion
+                    // destroy the vial
                     Destroy(gameObject);
                 }
                 else if (health != null && health.CurrentHP >= health.maxHP)

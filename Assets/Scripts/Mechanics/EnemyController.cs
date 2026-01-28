@@ -116,9 +116,10 @@ namespace Platformer.Mechanics
         /// <param name="damage">amount of damage to deal</param>
         /// <param name="knockbackDirection">direction to knock the enemy back</param>
         /// <param name="knockbackForce">force of the knockback</param>
-        public void TakeDamage(int damage, Vector2 knockbackDirection, float knockbackForce = 3f)
+        /// <param name="pierceInvincibility">if true, ignores i-frames and deals damage anyway</param>
+        public void TakeDamage(int damage, Vector2 knockbackDirection, float knockbackForce = 3f, bool pierceInvincibility = false)
         {
-            if (isInvincible)
+            if (isInvincible && !pierceInvincibility)
             {
                 return;
             }

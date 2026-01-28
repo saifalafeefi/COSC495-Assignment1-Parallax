@@ -150,6 +150,11 @@ namespace Platformer.Mechanics
         /// </summary>
         public bool IsInvincible => isInvincible;
 
+        /// <summary>
+        /// Check if player has speed boost active (set by SpeedPotion).
+        /// </summary>
+        public bool HasSpeedBoost { get; set; } = false;
+
         public JumpState jumpState = JumpState.Grounded;
         /*internal new*/ public Collider2D collider2d;
         /*internal new*/ public AudioSource audioSource;
@@ -569,13 +574,19 @@ namespace Platformer.Mechanics
             foreach (var hit in hits)
             {
                 var enemy = hit.GetComponent<EnemyController>();
-                if (enemy != null && !enemy.IsInvincible)
+                if (enemy != null)
                 {
-                    // calculate knockback direction (away from player)
-                    Vector2 knockbackDir = new Vector2(direction, 0.5f); // slight upward angle
+                    // with speed boost, ignore enemy i-frames (pierce through invincibility)
+                    bool canHit = !enemy.IsInvincible || HasSpeedBoost;
 
-                    // deal damage to enemy
-                    enemy.TakeDamage(damage, knockbackDir, enemyKnockbackForce);
+                    if (canHit)
+                    {
+                        // calculate knockback direction (away from player)
+                        Vector2 knockbackDir = new Vector2(direction, 0.5f); // slight upward angle
+
+                        // deal damage to enemy (pass pierce flag if we have speed boost)
+                        enemy.TakeDamage(damage, knockbackDir, enemyKnockbackForce, HasSpeedBoost);
+                    }
                 }
             }
         }
@@ -607,6 +618,7 @@ namespace Platformer.Mechanics
             hurtStunTimer = 0f;
             controlEnabled = true;
             knockbackVelocityX = 0f;
+            HasSpeedBoost = false; // clear speed boost on death
             if (flashCoroutine != null)
             {
                 StopCoroutine(flashCoroutine);
