@@ -72,16 +72,22 @@ namespace Platformer.Mechanics
 
         private IEnumerator ApplySpeedBoost(PlayerController player)
         {
+            // generate unique ID for this powerup instance
+            string powerupID = "speed_" + System.Guid.NewGuid().ToString();
+
             // store original values
             float originalSpeed = player.maxSpeed;
             float originalAnimSpeed = player.animator.speed;
-            Color originalColor = Color.white;
             SpriteRenderer spriteRenderer = player.GetComponent<SpriteRenderer>();
+            PowerupColorManager colorManager = player.GetComponent<PowerupColorManager>();
 
-            if (spriteRenderer != null && enableSpriteTint)
+            if (colorManager == null)
             {
-                originalColor = spriteRenderer.color;
+                Debug.LogError("[SPEED VIAL] No PowerupColorManager on player!");
+                yield break;
             }
+
+            Debug.Log($"[SPEED VIAL] START - ID: {powerupID}");
 
             // spawn particle effect if provided
             GameObject effectInstance = null;
@@ -95,10 +101,10 @@ namespace Platformer.Mechanics
             player.animator.speed = originalAnimSpeed * attackSpeedMultiplier;
             player.HasSpeedBoost = true; // enable i-frame piercing
 
-            // apply sprite tint
-            if (spriteRenderer != null && enableSpriteTint)
+            // add color to blend
+            if (enableSpriteTint)
             {
-                spriteRenderer.color = speedTintColor;
+                colorManager.AddColor(powerupID, speedTintColor);
             }
 
             // wait for normal duration (boost time - warning time)
@@ -106,23 +112,33 @@ namespace Platformer.Mechanics
             yield return new WaitForSeconds(normalDuration);
 
             // warning phase - flash the tint to indicate boost ending soon
-            if (spriteRenderer != null && enableSpriteTint && warningDuration > 0)
+            if (enableSpriteTint && warningDuration > 0)
             {
+                Debug.Log($"[SPEED VIAL] WARNING START");
+
                 float elapsed = 0f;
                 while (elapsed < warningDuration)
                 {
                     elapsed += Time.deltaTime;
+
+                    // recalculate colors every frame (other powerups might finish during our warning!)
+                    Color currentBlend = colorManager.GetCurrentBlend();
+                    Color blendWithoutThis = colorManager.GetBlendWithout(powerupID);
 
                     // calculate flash using sine wave (smooth fade in/out)
                     float flashPhase = Mathf.Sin(elapsed * warningFlashSpeed * Mathf.PI * 2f);
                     // convert from -1...1 to 0...1 range
                     float alpha = (flashPhase + 1f) / 2f;
 
-                    // lerp between original color and tint color based on alpha
-                    spriteRenderer.color = Color.Lerp(originalColor, speedTintColor, alpha);
+                    // pulse from current blend to what it would be without this powerup
+                    colorManager.SetSpriteColor(Color.Lerp(currentBlend, blendWithoutThis, alpha));
 
                     yield return null;
                 }
+
+                // restore to CURRENT blend (recalculate fresh, don't use stale snapshot!)
+                colorManager.SetSpriteColor(colorManager.GetCurrentBlend());
+                Debug.Log($"[SPEED VIAL] WARNING END - Restored to current blend");
             }
             else
             {
@@ -135,10 +151,11 @@ namespace Platformer.Mechanics
             player.animator.speed = originalAnimSpeed;
             player.HasSpeedBoost = false; // disable i-frame piercing
 
-            // restore sprite color
-            if (spriteRenderer != null && enableSpriteTint)
+            // remove color from blend (manager will auto-update sprite)
+            if (enableSpriteTint)
             {
-                spriteRenderer.color = originalColor;
+                colorManager.RemoveColor(powerupID);
+                Debug.Log($"[SPEED VIAL] END - Removed from blend");
             }
 
             // destroy particle effect

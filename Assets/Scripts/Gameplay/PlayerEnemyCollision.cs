@@ -21,6 +21,12 @@ namespace Platformer.Gameplay
         public override void Execute()
         {
 
+            // ignore collision if player is rolling (phasing through enemies)
+            if (player != null && player.IsRolling)
+            {
+                return;
+            }
+
             // ignore collision if enemy is dead or doesn't exist
             if (enemy == null)
             {

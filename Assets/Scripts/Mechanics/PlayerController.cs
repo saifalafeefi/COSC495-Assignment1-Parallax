@@ -145,6 +145,42 @@ namespace Platformer.Mechanics
         private float comboWindowTimer = 0f;
         private bool attackButtonHeld = false; // tracks if attack button is held from previous combo
 
+        #region Double Jump
+        [Header("Double Jump Settings")]
+        public bool allowDoubleJump = true;
+        private bool hasDoubleJump = false;
+        private bool hasUsedDoubleJump = false;
+        #endregion
+
+        #region Roll
+        [Header("Roll Settings")]
+        public string rollStateName = "PlayerRoll";
+        public float rollDistance = 3f;
+        public float rollDuration = 0.5f;
+        public float rollCooldown = 1f;
+
+        private bool isRolling = false;
+        private float rollCooldownTimer = 0f;
+        private float rollVelocityX = 0f; // stores roll velocity separate from normal movement
+        private int enemyLayerIndex = -1; // cached enemy layer index for collision toggling
+        private InputAction m_RollAction;
+        #endregion
+
+        #region Wall Jump
+        [Header("Wall Jump Settings")]
+        public bool allowWallJump = true;
+        public float wallClingDuration = 0.3f;
+        public float wallSlideGravityMultiplier = 0.5f;
+        public float wallJumpHorizontalForce = 8f;
+        public float wallJumpVerticalForce = 12f;
+
+        private bool isTouchingWall = false;
+        private bool isWallSliding = false;
+        private float wallClingTimer = 0f;
+        private Vector2 wallNormal = Vector2.zero;
+        private bool canWallJump = false;
+        #endregion
+
         /// <summary>
         /// Check if player is currently invincible.
         /// </summary>
@@ -154,6 +190,21 @@ namespace Platformer.Mechanics
         /// Check if player has speed boost active (set by SpeedPotion).
         /// </summary>
         public bool HasSpeedBoost { get; set; } = false;
+
+        /// <summary>
+        /// Check if player is currently wall sliding.
+        /// </summary>
+        public bool IsWallSliding => isWallSliding;
+
+        /// <summary>
+        /// Check if player is currently rolling.
+        /// </summary>
+        public bool IsRolling => isRolling;
+
+        /// <summary>
+        /// Get the original sprite color before any powerups/effects were applied.
+        /// </summary>
+        public Color OriginalSpriteColor => originalSpriteColor;
 
         public JumpState jumpState = JumpState.Grounded;
         /*internal new*/ public Collider2D collider2d;
@@ -190,6 +241,7 @@ namespace Platformer.Mechanics
             m_MoveAction = InputSystem.actions.FindAction("Player/Move");
             m_JumpAction = InputSystem.actions.FindAction("Player/Jump");
             m_AttackAction = InputSystem.actions.FindAction("Player/Attack");
+            m_RollAction = InputSystem.actions.FindAction("Player/Roll");
 
             m_MoveAction.Enable();
             m_JumpAction.Enable();
@@ -203,9 +255,24 @@ namespace Platformer.Mechanics
             {
             }
 
+            if (m_RollAction != null)
+            {
+                m_RollAction.Enable();
+            }
+
 
             if (invincibilityDuration <= 0)
             {
+            }
+
+            // extract enemy layer index from enemyLayer mask (for roll collision toggling)
+            for (int i = 0; i < 32; i++)
+            {
+                if ((enemyLayer.value & (1 << i)) != 0)
+                {
+                    enemyLayerIndex = i;
+                    break;
+                }
             }
         }
 
@@ -225,20 +292,39 @@ namespace Platformer.Mechanics
 
             if (controlEnabled)
             {
-                // disable movement input during attack
+                // lock movement during attack (but NOT during roll - roll preserves momentum!)
                 if (!isAttacking)
                 {
                     move.x = m_MoveAction.ReadValue<Vector2>().x;
                 }
                 else
                 {
-                    move.x = 0; // lock movement during attack
+                    move.x = 0;
                 }
 
-                // handle jump input
-                if (jumpState == JumpState.Grounded && m_JumpAction.WasPressedThisFrame())
+                // detect jump input - handle ground jump, wall jump, and double jump
+                if (m_JumpAction.WasPressedThisFrame())
                 {
-                    jumpState = JumpState.PrepareToJump;
+                    if (jumpState == JumpState.Grounded)
+                    {
+                        jumpState = JumpState.PrepareToJump;
+                    }
+                    else if (allowWallJump && canWallJump && isTouchingWall)
+                    {
+                        // wall jump takes priority over double jump
+                        PerformWallJump();
+                        Debug.Log("[WALL JUMP] wall jump executed");
+                    }
+                    else if (allowDoubleJump && hasDoubleJump && !hasUsedDoubleJump && jumpState == JumpState.InFlight)
+                    {
+                        // apply jump velocity directly (can't use ground jump system since we're airborne)
+                        velocity.y = jumpTakeOffSpeed * model.jumpModifier;
+                        hasUsedDoubleJump = true;
+
+                        // play jump sound
+                        if (audioSource && jumpAudio)
+                            audioSource.PlayOneShot(jumpAudio);
+                    }
                 }
 
                 // variable jump height - release jump to fall faster
@@ -275,6 +361,60 @@ namespace Platformer.Mechanics
                 if (m_AttackAction != null && !m_AttackAction.IsPressed())
                 {
                     attackButtonHeld = false;
+                }
+
+                // handle roll cooldown timer
+                if (rollCooldownTimer > 0)
+                {
+                    rollCooldownTimer -= Time.deltaTime;
+                }
+
+                // handle roll input - only if not attacking, not hurt, not rolling, cooldown finished (works in air!)
+                if (m_RollAction != null && !isRolling && !isAttacking && !isHurtStunned && rollCooldownTimer <= 0f)
+                {
+                    if (m_RollAction.WasPressedThisFrame())
+                    {
+                        Debug.Log("[ROLL] roll initiated");
+                        StartCoroutine(PerformRoll());
+                    }
+                }
+
+                // handle wall detection and wall sliding
+                if (allowWallJump && !IsGrounded && IsTouchingWall && !isAttacking && !isRolling)
+                {
+                    // determine if player is moving toward wall
+                    bool movingTowardWall = (move.x > 0 && CurrentWallNormal.x < 0) || (move.x < 0 && CurrentWallNormal.x > 0);
+
+                    if (movingTowardWall && velocity.y <= 0)
+                    {
+                        isTouchingWall = true;
+                        wallNormal = CurrentWallNormal;
+                        wallClingTimer += Time.deltaTime;
+
+                        if (wallClingTimer < wallClingDuration)
+                        {
+                            // cling to wall - stop vertical movement
+                            velocity.y = 0f;
+                            isWallSliding = false;
+                            canWallJump = true;
+                            Debug.Log("[WALL JUMP] clinging to wall");
+                        }
+                        else
+                        {
+                            // slide down wall - reduced gravity
+                            isWallSliding = true;
+                            canWallJump = true;
+                            Debug.Log("[WALL JUMP] sliding down wall");
+                        }
+                    }
+                    else
+                    {
+                        ResetWallState();
+                    }
+                }
+                else if (IsGrounded || !IsTouchingWall)
+                {
+                    ResetWallState();
                 }
             }
             else
@@ -330,6 +470,14 @@ namespace Platformer.Mechanics
                     {
                         Schedule<PlayerJumped>().player = this;
                         jumpState = JumpState.InFlight;
+
+                        // grant double jump when leaving ground
+                        if (allowDoubleJump)
+                        {
+                            hasDoubleJump = true;
+                            hasUsedDoubleJump = false;
+                            Debug.Log("[DOUBLE JUMP] double jump available");
+                        }
                     }
                     break;
                 case JumpState.InFlight:
@@ -340,9 +488,23 @@ namespace Platformer.Mechanics
                     }
                     break;
                 case JumpState.Landed:
+                    // reset double jump flags on landing
+                    hasDoubleJump = false;
+                    hasUsedDoubleJump = false;
+                    Debug.Log("[DOUBLE JUMP] double jump reset on landing");
+
                     jumpState = JumpState.Grounded;
                     break;
             }
+        }
+
+        protected override float GetGravityMultiplier()
+        {
+            if (isWallSliding)
+            {
+                return gravityModifier * wallSlideGravityMultiplier;
+            }
+            return base.GetGravityMultiplier();
         }
 
         protected override void ComputeVelocity()
@@ -363,10 +525,13 @@ namespace Platformer.Mechanics
             animator.SetFloat("velocityY", velocity.y);
             animator.SetBool("isAttacking", isAttacking);
             animator.SetBool("hurt", isHurtStunned);
+            animator.SetBool("isRolling", isRolling);
+            animator.SetBool("isWallSliding", isWallSliding);
 
-            // apply normal movement + knockback
+            // apply normal movement + knockback + roll boost
             targetVelocity = move * maxSpeed;
             targetVelocity.x += knockbackVelocityX;
+            targetVelocity.x += rollVelocityX; // roll boost is additive, respects player input!
 
             // decay horizontal knockback over time
             if (knockbackVelocityX != 0)
@@ -431,9 +596,8 @@ namespace Platformer.Mechanics
 
             while (isInvincible)
             {
-                // flash on - swap to white material and set sprite texture
+                // flash on - swap to white material (GUI/Text shader renders as solid white)
                 spriteRenderer.material = flashMaterial;
-                spriteRenderer.material.SetTexture("_MainTex", spriteRenderer.sprite.texture);
                 yield return new WaitForSeconds(flashInterval);
 
                 // flash off - restore original material
@@ -555,6 +719,143 @@ namespace Platformer.Mechanics
         }
 
         /// <summary>
+        /// Performs the full roll sequence (animation + movement + invincibility).
+        /// </summary>
+        private IEnumerator PerformRoll()
+        {
+            isRolling = true;
+
+            // disable collision with enemies (phase through them!)
+            if (enemyLayerIndex != -1)
+            {
+                Physics2D.IgnoreLayerCollision(gameObject.layer, enemyLayerIndex, true);
+                RefreshContactFilter(); // update cached layer mask!
+                Debug.Log("[ROLL] disabled collision with enemies and refreshed contact filter");
+            }
+
+            // activate invincibility immediately
+            bool wasInvincible = isInvincible;
+            if (!wasInvincible)
+            {
+                isInvincible = true;
+                invincibilityTimer = rollDuration;
+                flashCoroutine = StartCoroutine(FlashSprite());
+                Debug.Log("[ROLL] invincibility activated");
+            }
+
+            // determine roll direction based on sprite orientation
+            float rollDirection = spriteRenderer.flipX ? -1f : 1f;
+
+            // calculate roll BOOST (this gets ADDED to your current movement)
+            float maxRollBoost = rollDirection * (rollDistance / rollDuration);
+
+            Debug.Log($"[ROLL] max roll boost: {maxRollBoost}");
+
+            // trigger roll animation
+            animator.SetTrigger("roll");
+            Debug.Log($"[ROLL] rolling {(rollDirection > 0 ? "right" : "left")}");
+
+            yield return null;
+
+            // ease roll BOOST from max to 0 (player input still controls base movement!)
+            float elapsedTime = 0f;
+            while (elapsedTime < rollDuration)
+            {
+                float t = elapsedTime / rollDuration;
+                // ease-out quadratic: boost goes from full to 0 smoothly
+                float boostMultiplier = Mathf.Pow(1f - t, 2f);
+
+                // rollVelocityX is just the BOOST (gets added to player input in ComputeVelocity)
+                rollVelocityX = maxRollBoost * boostMultiplier;
+
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+
+            rollVelocityX = 0f; // boost ends
+
+            // wait until animator exits roll state
+            float timeout = rollDuration + 0.5f;
+            float waitTime = 0f;
+            while (animator.GetCurrentAnimatorStateInfo(0).IsName(rollStateName) && waitTime < timeout)
+            {
+                waitTime += Time.deltaTime;
+                yield return null;
+            }
+
+            if (waitTime >= timeout)
+            {
+                Debug.LogWarning("[ROLL] animation timeout - check animator setup");
+            }
+
+            isRolling = false;
+            rollCooldownTimer = rollCooldown;
+
+            // re-enable collision with enemies
+            if (enemyLayerIndex != -1)
+            {
+                Physics2D.IgnoreLayerCollision(gameObject.layer, enemyLayerIndex, false);
+                RefreshContactFilter(); // update cached layer mask!
+                Debug.Log("[ROLL] re-enabled collision with enemies");
+            }
+
+            Debug.Log($"[ROLL] roll complete");
+        }
+
+        /// <summary>
+        /// Perform a wall jump - jump away from wall in opposite direction.
+        /// </summary>
+        private void PerformWallJump()
+        {
+            // jump direction opposite of wall normal
+            float jumpDirectionX = Mathf.Sign(wallNormal.x);
+
+            // apply velocities
+            velocity.x = jumpDirectionX * wallJumpHorizontalForce;
+            velocity.y = wallJumpVerticalForce * model.jumpModifier;
+
+            // flip sprite to face jump direction
+            spriteRenderer.flipX = jumpDirectionX < 0;
+
+            // reset wall state
+            ResetWallState();
+
+            // refresh double jump
+            if (allowDoubleJump)
+            {
+                hasDoubleJump = true;
+                hasUsedDoubleJump = false;
+                Debug.Log("[WALL JUMP] double jump refreshed");
+            }
+
+            // set jump state
+            jumpState = JumpState.InFlight;
+
+            // play jump sound
+            if (audioSource && jumpAudio)
+                audioSource.PlayOneShot(jumpAudio);
+
+            Debug.Log($"[WALL JUMP] jumped {(jumpDirectionX > 0 ? "right" : "left")} away from wall");
+        }
+
+        /// <summary>
+        /// Reset all wall-related state variables.
+        /// </summary>
+        private void ResetWallState()
+        {
+            if (isTouchingWall || isWallSliding)
+            {
+                Debug.Log("[WALL JUMP] leaving wall");
+            }
+
+            isTouchingWall = false;
+            isWallSliding = false;
+            canWallJump = false;
+            wallClingTimer = 0f;
+            wallNormal = Vector2.zero;
+        }
+
+        /// <summary>
         /// Checks for enemies in attack range and deals damage.
         /// </summary>
         /// <param name="range">how far forward the hitbox extends</param>
@@ -625,6 +926,25 @@ namespace Platformer.Mechanics
                 flashCoroutine = null;
             }
             spriteRenderer.material = originalMaterial;
+
+            // reset double jump state
+            hasDoubleJump = false;
+            hasUsedDoubleJump = false;
+
+            // reset roll state
+            isRolling = false;
+            rollCooldownTimer = 0f;
+            rollVelocityX = 0f;
+
+            // re-enable collision with enemies (in case player died during roll)
+            if (enemyLayerIndex != -1)
+            {
+                Physics2D.IgnoreLayerCollision(gameObject.layer, enemyLayerIndex, false);
+                RefreshContactFilter(); // update cached layer mask!
+            }
+
+            // reset wall state
+            ResetWallState();
         }
 
         /// <summary>

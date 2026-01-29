@@ -30,6 +30,16 @@ namespace Platformer.Mechanics
         /// <value></value>
         public bool IsGrounded { get; private set; }
 
+        /// <summary>
+        /// The normal of the wall the entity is currently touching (if any).
+        /// </summary>
+        public Vector2 CurrentWallNormal { get; protected set; }
+
+        /// <summary>
+        /// Is the entity currently touching a wall?
+        /// </summary>
+        public bool IsTouchingWall { get; protected set; }
+
         protected Vector2 targetVelocity;
         protected Vector2 groundNormal;
         protected Rigidbody2D body;
@@ -99,11 +109,33 @@ namespace Platformer.Mechanics
 
         }
 
+        /// <summary>
+        /// Override this to modify gravity based on state (e.g., wall sliding).
+        /// </summary>
+        protected virtual float GetGravityMultiplier()
+        {
+            return gravityModifier;
+        }
+
+        /// <summary>
+        /// Refresh the contact filter layer mask (call after changing layer collision settings).
+        /// </summary>
+        protected void RefreshContactFilter()
+        {
+            contactFilter.SetLayerMask(Physics2D.GetLayerCollisionMask(gameObject.layer));
+        }
+
         protected virtual void FixedUpdate()
         {
+            // reset wall detection each frame
+            IsTouchingWall = false;
+            CurrentWallNormal = Vector2.zero;
+
+            float currentGravityModifier = GetGravityMultiplier();
+
             //if already falling, fall faster than the jump speed, otherwise use normal gravity.
             if (velocity.y < 0)
-                velocity += gravityModifier * Physics2D.gravity * Time.deltaTime;
+                velocity += currentGravityModifier * Physics2D.gravity * Time.deltaTime;
             else
                 velocity += Physics2D.gravity * Time.deltaTime;
 
@@ -147,6 +179,13 @@ namespace Platformer.Mechanics
                             groundNormal = currentNormal;
                             currentNormal.x = 0;
                         }
+                    }
+
+                    // check if we're touching a wall (vertical or near-vertical surface)
+                    if (Mathf.Abs(currentNormal.y) < 0.3f && Mathf.Abs(currentNormal.x) > 0.7f)
+                    {
+                        IsTouchingWall = true;
+                        CurrentWallNormal = currentNormal;
                     }
                     if (IsGrounded)
                     {

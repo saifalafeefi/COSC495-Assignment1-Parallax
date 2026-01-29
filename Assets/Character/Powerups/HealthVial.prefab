@@ -224,4 +224,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.HealthPotion
   healAmount: 1
+  enableTint: 1
+  tintColor: {r: 0.21568629, g: 0.58431375, b: 0.43529415, a: 1}
+  tintDuration: 0
+  fadeOutDuration: 1.5
   collectSound: {fileID: 0}
