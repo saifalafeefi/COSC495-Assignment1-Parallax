@@ -29,6 +29,16 @@ namespace Platformer.Mechanics
         /// </summary>
         public Material flashMaterial;
 
+        [Header("Damage Feedback")]
+        /// <summary>
+        /// damage number prefab to spawn when taking damage (optional).
+        /// </summary>
+        public GameObject damageNumberPrefab;
+        /// <summary>
+        /// vertical offset above sprite to spawn damage number (in units).
+        /// </summary>
+        public float damageNumberOffset = 0.5f;
+
         internal PatrolPath.Mover mover;
         internal AnimationController control;
         internal Collider2D _collider;
@@ -128,6 +138,9 @@ namespace Platformer.Mechanics
             {
                 health.Decrement(damage);
 
+                // spawn damage number
+                SpawnDamageNumber(damage);
+
                 if (!health.IsAlive)
                 {
                     // disable collider immediately to prevent collision with player
@@ -149,6 +162,35 @@ namespace Platformer.Mechanics
             else
             {
                 Schedule<EnemyDeath>().enemy = this;
+            }
+        }
+
+        /// <summary>
+        /// spawn a damage number above the enemy.
+        /// </summary>
+        /// <param name="damage">damage value to display</param>
+        private void SpawnDamageNumber(int damage)
+        {
+            if (damageNumberPrefab == null)
+            {
+                return; // no prefab assigned, skip
+            }
+
+            // calculate spawn position at top of sprite
+            Vector3 spawnPosition = transform.position;
+            spawnPosition.y = _collider.bounds.max.y + damageNumberOffset;
+
+            // instantiate and initialize damage number
+            GameObject damageNumberObj = Instantiate(damageNumberPrefab, spawnPosition, Quaternion.identity);
+            DamageNumber damageNumber = damageNumberObj.GetComponent<DamageNumber>();
+
+            if (damageNumber != null)
+            {
+                damageNumber.Initialize(damage, spawnPosition);
+            }
+            else
+            {
+                Debug.LogWarning("[ENEMY] DamageNumber prefab missing DamageNumber component!");
             }
         }
 

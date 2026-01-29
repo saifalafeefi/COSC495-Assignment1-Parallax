@@ -221,6 +221,9 @@ MonoBehaviour:
   invincibilityDuration: 0.2
   flashInterval: 0.1
   flashMaterial: {fileID: 2100000, guid: b28efccbcae6d4342b1d6ebf20794f41, type: 2}
+  damageNumberPrefab: {fileID: 7226005136005355022, guid: ce9a0b50287295341b038d385144b1a6,
+    type: 3}
+  damageNumberOffset: 0.2
 --- !u!82 &5843668731025413174
 AudioSource:
   m_ObjectHideFlags: 0
