@@ -201,7 +201,7 @@ TextureImporter:
         width: 56
         height: 48
       alignment: 9
-      pivot: {x: 0.43755558, y: 0.49999937}
+      pivot: {x: 0.4263153, y: 0.47377348}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -223,7 +223,7 @@ TextureImporter:
         width: 114
         height: 63
       alignment: 9
-      pivot: {x: 0.24234009, y: 0.49999976}
+      pivot: {x: 0.23129754, y: 0.40009132}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -245,7 +245,7 @@ TextureImporter:
         width: 133
         height: 65
       alignment: 9
-      pivot: {x: 0.17923914, y: 0.43544304}
+      pivot: {x: 0.16504136, y: 0.33860856}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -267,7 +267,7 @@ TextureImporter:
         width: 87
         height: 61
       alignment: 9
-      pivot: {x: 0.17041436, y: 0.4770699}
+      pivot: {x: 0.16317925, y: 0.38420418}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -284,12 +284,12 @@ TextureImporter:
       name: playerAttack3_Sheet_7
       rect:
         serializedVersion: 2
-        x: 1156
+        x: 1155
         y: 18
         width: 62
         height: 53
       alignment: 9
-      pivot: {x: 0.25183696, y: 0.5659776}
+      pivot: {x: 0.24168544, y: 0.4947222}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []

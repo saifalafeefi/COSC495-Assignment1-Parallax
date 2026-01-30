@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7136120512748114900}
   - component: {fileID: 8776253124438993965}
   - component: {fileID: 8216949141705993811}
+  - component: {fileID: 3409201830004081155}
   m_Layer: 0
   m_Name: DamageVial
   m_TagString: Untagged
@@ -106,7 +107,7 @@ Animator:
   m_GameObject: {fileID: 7052666099553717565}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: cd6c2035a560cc141a653e5b27ed396f, type: 2}
+  m_Controller: {fileID: 9100000, guid: 1b23db99a0895214e9ca548b5fd860f1, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -156,7 +157,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.16, y: 0.45}
+    oldSize: {x: 0.22857143, y: 0.64285713}
     newSize: {x: 0.16, y: 0.45}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -210,3 +211,22 @@ MonoBehaviour:
   rotationMaxAngle: 15
   rotationSpeed: 5
   randomizeRotationOffset: 1
+--- !u!114 &3409201830004081155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7052666099553717565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1b49c7d5131da54284fe89f1387cac3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.DamageVial
+  boostDuration: 6
+  damageMultiplier: 2
+  enableTint: 1
+  tintColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  warningDuration: 2
+  warningFlashSpeed: 6
+  collectSound: {fileID: 0}
