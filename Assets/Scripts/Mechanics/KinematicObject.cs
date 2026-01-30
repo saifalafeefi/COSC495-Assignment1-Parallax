@@ -20,6 +20,11 @@ namespace Platformer.Mechanics
         public float gravityModifier = 2.5f;
 
         /// <summary>
+        /// Use unscaled time for movement (ignores Time.timeScale).
+        /// </summary>
+        public bool useUnscaledTime = false;
+
+        /// <summary>
         /// The current velocity of the entity.
         /// </summary>
         public Vector2 velocity;
@@ -132,18 +137,19 @@ namespace Platformer.Mechanics
             CurrentWallNormal = Vector2.zero;
 
             float currentGravityModifier = GetGravityMultiplier();
+            float deltaTime = useUnscaledTime ? Time.fixedUnscaledDeltaTime : Time.deltaTime;
 
             //if already falling, fall faster than the jump speed, otherwise use normal gravity.
             if (velocity.y < 0)
-                velocity += currentGravityModifier * Physics2D.gravity * Time.deltaTime;
+                velocity += currentGravityModifier * Physics2D.gravity * deltaTime;
             else
-                velocity += Physics2D.gravity * Time.deltaTime;
+                velocity += Physics2D.gravity * deltaTime;
 
             velocity.x = targetVelocity.x;
 
             IsGrounded = false;
 
-            var deltaPosition = velocity * Time.deltaTime;
+            var deltaPosition = velocity * deltaTime;
 
             var moveAlongGround = new Vector2(groundNormal.y, -groundNormal.x);
 

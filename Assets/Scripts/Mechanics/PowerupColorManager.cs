@@ -27,7 +27,6 @@ namespace Platformer.Mechanics
         {
             activePowerupColors[powerupID] = color;
             UpdateSpriteColor();
-            Debug.Log($"[COLOR MGR] Added {powerupID}: {color}, Total active: {activePowerupColors.Count}");
         }
 
         /// <summary>
@@ -53,7 +52,18 @@ namespace Platformer.Mechanics
             if (activePowerupColors.Remove(powerupID))
             {
                 UpdateSpriteColor();
-                Debug.Log($"[COLOR MGR] Removed {powerupID}, Total active: {activePowerupColors.Count}");
+            }
+        }
+
+        /// <summary>
+        /// clear all powerup colors and reset sprite to original (used on death).
+        /// </summary>
+        public void ClearAllColors()
+        {
+            activePowerupColors.Clear();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = originalColor;
             }
         }
 
@@ -133,7 +143,6 @@ namespace Platformer.Mechanics
             if (spriteRenderer != null)
             {
                 spriteRenderer.color = GetCurrentBlend();
-                Debug.Log($"[COLOR MGR] Sprite color updated to: {spriteRenderer.color}");
             }
         }
 

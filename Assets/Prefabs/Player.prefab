@@ -16,7 +16,8 @@ GameObject:
   - component: {fileID: 8509783501685719824}
   - component: {fileID: 6082575806313374961}
   - component: {fileID: 1824045667}
-  - component: {fileID: 9144994283296686053}
+  - component: {fileID: 829009253661379645}
+  - component: {fileID: 2964223675858037092}
   m_Layer: 13
   m_Name: Player
   m_TagString: Player
@@ -84,6 +85,16 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 8
+  allowDoubleJump: 1
+  rollStateName: PlayerRoll
+  rollDistance: 6
+  rollDuration: 0.5
+  rollCooldown: 1
+  allowWallJump: 1
+  wallClingDuration: 0.3
+  wallSlideGravityMultiplier: 0.5
+  wallJumpHorizontalForce: 8
+  wallJumpVerticalForce: 12
   jumpState: 0
   collider2d: {fileID: 0}
   audioSource: {fileID: 0}
@@ -353,7 +364,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.32, y: 0.54}
   m_EdgeRadius: 0
---- !u!114 &9144994283296686053
+--- !u!114 &829009253661379645
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -362,7 +373,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 1208144871472054}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8534e17a0f90604c9afd4f5c73d829f, type: 3}
+  m_Script: {fileID: 11500000, guid: cc89a8b175cc83e42bcaa5170802ff1d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  m_Id: 2cedde77-9eec-414f-a172-5c4b3c8e2891
+  m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.PowerupColorManager
+--- !u!114 &2964223675858037092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208144871472054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bc38df330ec7e749a63638d3dc8b73c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.GhostTrail
+  enableTrail: 0
+  ghostSpawnInterval: 0.05
+  ghostLifetime: 0.3
+  ghostStartAlpha: 0.5
+  minSpeedThreshold: 2

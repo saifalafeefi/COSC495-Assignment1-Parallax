@@ -32,6 +32,16 @@ namespace Platformer.Mechanics
         /// </summary>
         public float fadeOutDuration = 1f;
 
+        [Header("Bloom Effect")]
+        /// <summary>
+        /// enable bloom tint flash on collection.
+        /// </summary>
+        public bool enableBloomTint = true;
+        /// <summary>
+        /// bloom tint color (applied to camera bloom).
+        /// </summary>
+        public Color bloomTintColor = new Color(0.3f, 1f, 0.3f, 1f); // bright green
+
         [Header("Audio")]
         /// <summary>
         /// sound effect to play when collected.
@@ -61,6 +71,16 @@ namespace Platformer.Mechanics
                     if (collectSound != null && player.audioSource != null)
                     {
                         player.audioSource.PlayOneShot(collectSound);
+                    }
+
+                    // apply bloom tint effect
+                    if (enableBloomTint)
+                    {
+                        var bloomController = FindFirstObjectByType<BloomTintController>();
+                        if (bloomController != null)
+                        {
+                            bloomController.ApplyTint(bloomTintColor);
+                        }
                     }
 
                     // apply green tint effect if enabled
@@ -94,7 +114,6 @@ namespace Platformer.Mechanics
                 yield break;
             }
 
-            Debug.Log($"[HEALTH VIAL] START - ID: {powerupID}");
 
             // add green to blend
             if (enableTint)
@@ -133,7 +152,6 @@ namespace Platformer.Mechanics
             if (enableTint)
             {
                 colorManager.RemoveColor(powerupID);
-                Debug.Log($"[HEALTH VIAL] END - Removed from blend");
             }
         }
     }

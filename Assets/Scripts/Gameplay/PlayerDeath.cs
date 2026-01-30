@@ -17,12 +17,10 @@ namespace Platformer.Gameplay
         public override void Execute()
         {
             var player = model.player;
-            Debug.Log("[PlayerDeath] Execute called");
 
             // make sure health is actually 0
             if (player.health.CurrentHP > 0)
             {
-                Debug.Log("[PlayerDeath] Health > 0, forcing death");
                 player.health.Die();
             }
 
@@ -35,17 +33,14 @@ namespace Platformer.Gameplay
             // disable collider so enemies can't hit the corpse
             player.collider2d.enabled = false;
             player.controlEnabled = false;
-            Debug.Log("[PlayerDeath] Disabled player collider and controls");
 
             if (player.audioSource && player.ouchAudio)
                 player.audioSource.PlayOneShot(player.ouchAudio);
 
-            Debug.Log("[PlayerDeath] Setting death animation");
             player.animator.SetTrigger("hurt");
             player.animator.SetBool("dead", true);
 
             Simulation.Schedule<PlayerSpawn>(2);
-            Debug.Log("[PlayerDeath] Scheduled respawn in 2 seconds");
         }
     }
 }

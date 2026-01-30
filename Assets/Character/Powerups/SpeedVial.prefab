@@ -227,8 +227,11 @@ MonoBehaviour:
   speedMultiplier: 1.5
   attackSpeedMultiplier: 2
   speedEffectPrefab: {fileID: 0}
-  speedTintColor: {r: 1, g: 0.9798179, b: 0, a: 1}
+  speedTintColor: {r: 1, g: 1, b: 0, a: 1}
   enableSpriteTint: 1
   warningDuration: 2
   warningFlashSpeed: 6
+  enableBloomTint: 1
+  bloomTintColor: {r: 1, g: 1, b: 0, a: 1}
+  bloomFadeDuration: 1
   collectSound: {fileID: 0}

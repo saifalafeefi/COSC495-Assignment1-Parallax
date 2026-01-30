@@ -13,7 +13,7 @@ public class HealthUISetup : EditorWindow
     public static void SetupHealthUI()
     {
         // Find or create Canvas
-        Canvas canvas = FindObjectOfType<Canvas>();
+        Canvas canvas = FindFirstObjectByType<Canvas>();
         if (canvas == null)
         {
             GameObject canvasObj = new GameObject("Canvas");
@@ -66,7 +66,7 @@ public class HealthUISetup : EditorWindow
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player == null)
         {
-            player = FindObjectOfType<PlayerController>()?.gameObject;
+            player = FindFirstObjectByType<PlayerController>()?.gameObject;
         }
 
         if (player != null)

@@ -36,6 +36,16 @@ namespace Platformer.Mechanics
         /// </summary>
         public float warningFlashSpeed = 3f;
 
+        [Header("Bloom Effect")]
+        /// <summary>
+        /// enable bloom tint flash on collection.
+        /// </summary>
+        public bool enableBloomTint = true;
+        /// <summary>
+        /// bloom tint color (applied to camera bloom).
+        /// </summary>
+        public Color bloomTintColor = new Color(1f, 0f, 0f, 1f); // pure red
+
         [Header("Audio")]
         /// <summary>
         /// sound effect to play when collected.
@@ -52,6 +62,16 @@ namespace Platformer.Mechanics
                 if (collectSound != null && player.audioSource != null)
                 {
                     player.audioSource.PlayOneShot(collectSound);
+                }
+
+                // apply bloom tint effect
+                if (enableBloomTint)
+                {
+                    var bloomController = FindFirstObjectByType<BloomTintController>();
+                    if (bloomController != null)
+                    {
+                        bloomController.ApplyTint(bloomTintColor);
+                    }
                 }
 
                 // start the damage boost coroutine on the PLAYER (not this object!)
@@ -82,7 +102,6 @@ namespace Platformer.Mechanics
                 yield break;
             }
 
-            Debug.Log($"[DAMAGE VIAL] START - ID: {powerupID}");
 
             // apply damage boost (multiply all attack damage values)
             player.attack12Damage = Mathf.RoundToInt(originalAttack12Damage * damageMultiplier);
@@ -102,8 +121,6 @@ namespace Platformer.Mechanics
             // warning phase - flash the tint to indicate boost ending soon
             if (enableTint && warningDuration > 0)
             {
-                Debug.Log($"[DAMAGE VIAL] WARNING START");
-
                 float elapsed = 0f;
                 while (elapsed < warningDuration)
                 {
@@ -126,7 +143,6 @@ namespace Platformer.Mechanics
 
                 // restore to CURRENT blend (recalculate fresh, don't use stale snapshot!)
                 colorManager.SetSpriteColor(colorManager.GetCurrentBlend());
-                Debug.Log($"[DAMAGE VIAL] WARNING END - Restored to current blend");
             }
             else
             {
@@ -143,7 +159,6 @@ namespace Platformer.Mechanics
             if (enableTint)
             {
                 colorManager.RemoveColor(powerupID);
-                Debug.Log($"[DAMAGE VIAL] END - Removed from blend");
             }
         }
     }

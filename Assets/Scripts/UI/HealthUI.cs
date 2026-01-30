@@ -60,7 +60,7 @@ namespace Platformer.UI
         void SetupCanvas()
         {
             // find or create Canvas
-            canvas = FindObjectOfType<Canvas>();
+            canvas = FindFirstObjectByType<Canvas>();
             if (canvas == null)
             {
                 GameObject canvasObj = new GameObject("Canvas");
@@ -92,7 +92,7 @@ namespace Platformer.UI
             // find player health if not assigned
             if (playerHealth == null)
             {
-                var playerController = FindObjectOfType<PlayerController>();
+                var playerController = FindFirstObjectByType<PlayerController>();
                 if (playerController != null)
                 {
                     playerHealth = playerController.health;

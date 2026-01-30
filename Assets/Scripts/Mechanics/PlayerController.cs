@@ -190,6 +190,12 @@ namespace Platformer.Mechanics
         /// Check if player has speed boost active (set by SpeedPotion).
         /// </summary>
         public bool HasSpeedBoost { get; set; } = false;
+        public bool HasTimeSlowActive { get; set; } = false;
+
+        /// <summary>
+        /// get correct delta time based on whether player is using unscaled time.
+        /// </summary>
+        private float DeltaTime => useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
 
         /// <summary>
         /// Check if player is currently wall sliding.
@@ -281,7 +287,7 @@ namespace Platformer.Mechanics
             // handle hurt stun timer
             if (isHurtStunned)
             {
-                hurtStunTimer -= Time.deltaTime;
+                hurtStunTimer -= DeltaTime;
                 if (hurtStunTimer <= 0f)
                 {
                     // hurt stun ended - restore control (but keep i-frames!)
@@ -366,7 +372,7 @@ namespace Platformer.Mechanics
                 // handle roll cooldown timer
                 if (rollCooldownTimer > 0)
                 {
-                    rollCooldownTimer -= Time.deltaTime;
+                    rollCooldownTimer -= DeltaTime;
                 }
 
                 // handle roll input - only if not attacking, not hurt, not rolling, cooldown finished (works in air!)
@@ -389,7 +395,7 @@ namespace Platformer.Mechanics
                     {
                         isTouchingWall = true;
                         wallNormal = CurrentWallNormal;
-                        wallClingTimer += Time.deltaTime;
+                        wallClingTimer += DeltaTime;
 
                         if (wallClingTimer < wallClingDuration)
                         {
@@ -425,7 +431,7 @@ namespace Platformer.Mechanics
             // handle invincibility timer
             if (isInvincible)
             {
-                invincibilityTimer -= Time.deltaTime;
+                invincibilityTimer -= DeltaTime;
                 if (invincibilityTimer <= 0)
                 {
                     isInvincible = false;
@@ -445,7 +451,7 @@ namespace Platformer.Mechanics
             // handle combo window timer
             if (comboStep > 0)
             {
-                comboWindowTimer -= Time.deltaTime;
+                comboWindowTimer -= DeltaTime;
                 if (comboWindowTimer <= 0)
                 {
                     comboStep = 0; // reset combo if window expires
@@ -476,7 +482,6 @@ namespace Platformer.Mechanics
                         {
                             hasDoubleJump = true;
                             hasUsedDoubleJump = false;
-                            Debug.Log("[DOUBLE JUMP] double jump available");
                         }
                     }
                     break;
@@ -491,7 +496,6 @@ namespace Platformer.Mechanics
                     // reset double jump flags on landing
                     hasDoubleJump = false;
                     hasUsedDoubleJump = false;
-                    Debug.Log("[DOUBLE JUMP] double jump reset on landing");
 
                     jumpState = JumpState.Grounded;
                     break;
@@ -536,7 +540,7 @@ namespace Platformer.Mechanics
             // decay horizontal knockback over time
             if (knockbackVelocityX != 0)
             {
-                float decay = knockbackDecayRate * Time.deltaTime;
+                float decay = knockbackDecayRate * DeltaTime;
                 if (Mathf.Abs(knockbackVelocityX) <= decay)
                 {
                     knockbackVelocityX = 0;
@@ -661,7 +665,7 @@ namespace Platformer.Mechanics
             yield return null;
 
             // wait a brief moment for the attack animation to reach the "hit" frame
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSecondsRealtime(0.1f);
 
             // check for enemies in attack range and deal damage (use correct hitbox per attack)
             if (currentAttackState == attackAirStateName)
@@ -768,7 +772,7 @@ namespace Platformer.Mechanics
                 // rollVelocityX is just the BOOST (gets added to player input in ComputeVelocity)
                 rollVelocityX = maxRollBoost * boostMultiplier;
 
-                elapsedTime += Time.deltaTime;
+                elapsedTime += DeltaTime;
                 yield return null;
             }
 
@@ -779,7 +783,7 @@ namespace Platformer.Mechanics
             float waitTime = 0f;
             while (animator.GetCurrentAnimatorStateInfo(0).IsName(rollStateName) && waitTime < timeout)
             {
-                waitTime += Time.deltaTime;
+                waitTime += DeltaTime;
                 yield return null;
             }
 
@@ -878,7 +882,7 @@ namespace Platformer.Mechanics
                 if (enemy != null)
                 {
                     // with speed boost, ignore enemy i-frames (pierce through invincibility)
-                    bool canHit = !enemy.IsInvincible || HasSpeedBoost;
+                    bool canHit = !enemy.IsInvincible || HasSpeedBoost || HasTimeSlowActive;
 
                     if (canHit)
                     {
@@ -886,7 +890,7 @@ namespace Platformer.Mechanics
                         Vector2 knockbackDir = new Vector2(direction, 0.5f); // slight upward angle
 
                         // deal damage to enemy (pass pierce flag if we have speed boost)
-                        enemy.TakeDamage(damage, knockbackDir, enemyKnockbackForce, HasSpeedBoost);
+                        enemy.TakeDamage(damage, knockbackDir, enemyKnockbackForce, HasSpeedBoost || HasTimeSlowActive);
                     }
                 }
             }
@@ -920,6 +924,33 @@ namespace Platformer.Mechanics
             controlEnabled = true;
             knockbackVelocityX = 0f;
             HasSpeedBoost = false; // clear speed boost on death
+
+            // reset time slow effects if active
+            if (HasTimeSlowActive)
+            {
+                HasTimeSlowActive = false;
+                Time.timeScale = 1f;
+                Time.fixedDeltaTime = 0.02f;
+                useUnscaledTime = false;
+
+                // reset animator to 1.0
+                animator.speed = 1f;
+
+                // disable ghost trail
+                var ghostTrail = GetComponent<GhostTrail>();
+                if (ghostTrail != null)
+                {
+                    ghostTrail.DisableTrail();
+                }
+
+                // remove time vial color tint
+                var colorManager = GetComponent<PowerupColorManager>();
+                if (colorManager != null)
+                {
+                    colorManager.ClearAllColors(); // nuke all color tints on death
+                }
+            }
+
             if (flashCoroutine != null)
             {
                 StopCoroutine(flashCoroutine);
