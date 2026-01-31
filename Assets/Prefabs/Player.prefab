@@ -54,6 +54,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minGroundNormalY: 0.9
   gravityModifier: 1
+  useUnscaledTime: 0
   velocity: {x: 0, y: 0}
   jumpAudio: {fileID: 8300000, guid: 67975c08d56ceb147bad38572d805aa8, type: 3}
   respawnAudio: {fileID: 8300000, guid: e18959d46b63f3c4c8cc020a433cf848, type: 3}
@@ -95,6 +96,13 @@ MonoBehaviour:
   wallSlideGravityMultiplier: 0.5
   wallJumpHorizontalForce: 8
   wallJumpVerticalForce: 12
+  rangedProjectilePrefab: {fileID: 5804341126621111131, guid: 21aa6fa46b9c303439f558d150a08254,
+    type: 3}
+  rangedAttackCooldown: 0.5
+  projectileSpawnAnimationTime: 0.65
+  projectileSpawnOffset: {x: 1, y: 0}
+  rangedAttackDamage: 5
+  rangedAttackStateName: PlayerAttackRanged
   jumpState: 0
   collider2d: {fileID: 0}
   audioSource: {fileID: 0}
@@ -389,7 +397,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.GhostTrail
   enableTrail: 0
-  ghostSpawnInterval: 0.05
+  ghostSpawnInterval: 0.025
   ghostLifetime: 0.3
   ghostStartAlpha: 0.5
   minSpeedThreshold: 2

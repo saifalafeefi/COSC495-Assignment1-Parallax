@@ -181,6 +181,39 @@ namespace Platformer.Mechanics
         private bool canWallJump = false;
         #endregion
 
+        #region Ranged Attack
+        [Header("Ranged Attack Settings")]
+        /// <summary>
+        /// prefab for the ranged attack projectile (drag in Inspector).
+        /// </summary>
+        public GameObject rangedProjectilePrefab;
+        /// <summary>
+        /// cooldown time between ranged attacks (seconds).
+        /// </summary>
+        public float rangedAttackCooldown = 1f;
+        /// <summary>
+        /// normalized time (0-1) in the animation to spawn the projectile. 0 = start of animation, 0.5 = halfway, 1 = end of animation.
+        /// </summary>
+        [Range(0f, 1f)]
+        public float projectileSpawnAnimationTime = 0.3f;
+        /// <summary>
+        /// offset from player position to spawn projectile (x = horizontal, y = vertical).
+        /// </summary>
+        public Vector2 projectileSpawnOffset = new Vector2(1f, 0f);
+        /// <summary>
+        /// damage dealt by ranged attack projectile.
+        /// </summary>
+        public int rangedAttackDamage = 1;
+        /// <summary>
+        /// name of the ranged attack animation state in the Animator.
+        /// </summary>
+        public string rangedAttackStateName = "PlayerAttackRanged";
+
+        private InputAction m_RangedAttackAction;
+        private float rangedAttackCooldownTimer = 0f;
+        private bool isFiringRangedAttack = false; // prevent firing again while animation is playing
+        #endregion
+
         /// <summary>
         /// Check if player is currently invincible.
         /// </summary>
@@ -248,6 +281,7 @@ namespace Platformer.Mechanics
             m_JumpAction = InputSystem.actions.FindAction("Player/Jump");
             m_AttackAction = InputSystem.actions.FindAction("Player/Attack");
             m_RollAction = InputSystem.actions.FindAction("Player/Roll");
+            m_RangedAttackAction = InputSystem.actions.FindAction("Player/RangedAttack");
 
             m_MoveAction.Enable();
             m_JumpAction.Enable();
@@ -264,6 +298,11 @@ namespace Platformer.Mechanics
             if (m_RollAction != null)
             {
                 m_RollAction.Enable();
+            }
+
+            if (m_RangedAttackAction != null)
+            {
+                m_RangedAttackAction.Enable();
             }
 
 
@@ -382,6 +421,22 @@ namespace Platformer.Mechanics
                     {
                         Debug.Log("[ROLL] roll initiated");
                         StartCoroutine(PerformRoll());
+                    }
+                }
+
+                // handle ranged attack cooldown timer
+                if (rangedAttackCooldownTimer > 0)
+                {
+                    rangedAttackCooldownTimer -= DeltaTime;
+                }
+
+                // handle ranged attack input - only when grounded, not attacking, not rolling, not hurt, not firing, cooldown finished
+                if (m_RangedAttackAction != null && IsGrounded && !isAttacking && !isRolling && !isHurtStunned && !isFiringRangedAttack && rangedAttackCooldownTimer <= 0f)
+                {
+                    if (m_RangedAttackAction.WasPressedThisFrame())
+                    {
+                        Debug.Log("[RANGED] ranged attack initiated");
+                        StartCoroutine(PerformRangedAttack());
                     }
                 }
 
@@ -807,6 +862,86 @@ namespace Platformer.Mechanics
         }
 
         /// <summary>
+        /// perform the full ranged attack sequence (animation + spawn projectile at specific frame).
+        /// </summary>
+        private IEnumerator PerformRangedAttack()
+        {
+            if (rangedProjectilePrefab == null)
+            {
+                Debug.LogWarning("[RANGED] no projectile prefab assigned!");
+                yield break;
+            }
+
+            isFiringRangedAttack = true;
+
+            // trigger ranged attack animation
+            animator.SetTrigger("rangedAttack");
+            Debug.Log("[RANGED] animation triggered");
+
+            // wait one frame for animator to transition
+            yield return null;
+
+            // wait until animation reaches the spawn frame
+            bool projectileSpawned = false;
+            while (animator.GetCurrentAnimatorStateInfo(0).IsName(rangedAttackStateName))
+            {
+                // get normalized time (0-1) of current animation
+                float normalizedTime = animator.GetCurrentAnimatorStateInfo(0).normalizedTime % 1f; // mod 1 handles looping animations
+
+                // spawn projectile when animation reaches the target time
+                if (!projectileSpawned && normalizedTime >= projectileSpawnAnimationTime)
+                {
+                    SpawnProjectile();
+                    projectileSpawned = true;
+                    Debug.Log($"[RANGED] projectile spawned at animation time {normalizedTime:F2} (target: {projectileSpawnAnimationTime:F2})");
+                }
+
+                yield return null;
+            }
+
+            // safety: if animation ended before reaching spawn time, spawn it now
+            if (!projectileSpawned)
+            {
+                SpawnProjectile();
+                Debug.LogWarning($"[RANGED] animation ended before reaching spawn time {projectileSpawnAnimationTime:F2}, spawned at end");
+            }
+
+            isFiringRangedAttack = false;
+
+            // start cooldown
+            rangedAttackCooldownTimer = rangedAttackCooldown;
+
+            Debug.Log("[RANGED] attack complete");
+        }
+
+        /// <summary>
+        /// spawn the ranged attack projectile at current player position.
+        /// </summary>
+        private void SpawnProjectile()
+        {
+            // determine direction based on sprite orientation
+            float direction = spriteRenderer.flipX ? -1f : 1f;
+
+            // calculate spawn position with offset
+            Vector2 spawnOffset = new Vector2(projectileSpawnOffset.x * direction, projectileSpawnOffset.y);
+            Vector3 spawnPosition = transform.position + (Vector3)spawnOffset;
+
+            // spawn projectile
+            GameObject projectile = Instantiate(rangedProjectilePrefab, spawnPosition, Quaternion.identity);
+            ProjectileFist fist = projectile.GetComponent<ProjectileFist>();
+
+            if (fist != null)
+            {
+                fist.Initialize(direction, rangedAttackDamage);
+                Debug.Log($"[RANGED] projectile created at {spawnPosition}, direction: {(direction > 0 ? "right" : "left")}, damage: {rangedAttackDamage}");
+            }
+            else
+            {
+                Debug.LogWarning("[RANGED] projectile prefab missing ProjectileFist component!");
+            }
+        }
+
+        /// <summary>
         /// Perform a wall jump - jump away from wall in opposite direction.
         /// </summary>
         private void PerformWallJump()
@@ -966,6 +1101,10 @@ namespace Platformer.Mechanics
             isRolling = false;
             rollCooldownTimer = 0f;
             rollVelocityX = 0f;
+
+            // reset ranged attack state
+            rangedAttackCooldownTimer = 0f;
+            isFiringRangedAttack = false;
 
             // re-enable collision with enemies (in case player died during roll)
             if (enemyLayerIndex != -1)

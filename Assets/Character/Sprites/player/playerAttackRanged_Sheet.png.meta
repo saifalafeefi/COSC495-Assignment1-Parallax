@@ -1,0 +1,453 @@
+fileFormatVersion: 2
+guid: 11a3e2920a503664b818e73db775d75e
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -874173854055928130
+    second: playerAttackRanged_Sheet_0
+  - first:
+      213: 607701866698466367
+    second: playerAttackRanged_Sheet_1
+  - first:
+      213: 6089107444701255266
+    second: playerAttackRanged_Sheet_2
+  - first:
+      213: -5248996424742425108
+    second: playerAttackRanged_Sheet_3
+  - first:
+      213: -1564899332323664964
+    second: playerAttackRanged_Sheet_4
+  - first:
+      213: 3535307893796507453
+    second: playerAttackRanged_Sheet_5
+  - first:
+      213: 9147857627846601542
+    second: playerAttackRanged_Sheet_6
+  - first:
+      213: 4629831228707768180
+    second: playerAttackRanged_Sheet_7
+  - first:
+      213: -3428695926562363365
+    second: playerAttackRanged_Sheet_8
+  - first:
+      213: -1801901540573439368
+    second: playerAttackRanged_Sheet_9
+  - first:
+      213: 7590054370071023460
+    second: playerAttackRanged_Sheet_10
+  - first:
+      213: -7821180181741045969
+    second: playerAttackRanged_Sheet_11
+  - first:
+      213: -6182664381255517512
+    second: playerAttackRanged_Sheet_12
+  - first:
+      213: 6966296602130114348
+    second: playerAttackRanged_Sheet_13
+  - first:
+      213: -8616239139064281443
+    second: playerAttackRanged_Sheet_14
+  - first:
+      213: -323711528171508320
+    second: playerAttackRanged_Sheet_15
+  - first:
+      213: 4230048357631531499
+    second: playerAttackRanged_Sheet_16
+  - first:
+      213: -6265577964700676927
+    second: playerAttackRanged_Sheet_17
+  - first:
+      213: 8282359740971736371
+    second: playerAttackRanged_Sheet_18
+  - first:
+      213: -3104176643537678247
+    second: playerAttackRanged_Sheet_19
+  - first:
+      213: -7819757086991689602
+    second: playerAttackRanged_Sheet_20
+  - first:
+      213: 4341795163433765258
+    second: playerAttackRanged_Sheet_21
+  - first:
+      213: 6555125244808327635
+    second: playerAttackRanged_Sheet_22
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 1
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 70
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: playerAttackRanged_Sheet_0
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 7
+        width: 60
+        height: 68
+      alignment: 9
+      pivot: {x: 0.5897515, y: 0.56787956}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ebeef05e28f4ed3f0800000000000000
+      internalID: -874173854055928130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerAttackRanged_Sheet_1
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 2
+        width: 59
+        height: 72
+      alignment: 9
+      pivot: {x: 0.55215555, y: 0.617532}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3467e5c0adfe6800800000000000000
+      internalID: 607701866698466367
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerAttackRanged_Sheet_2
+      rect:
+        serializedVersion: 2
+        x: 365
+        y: 3
+        width: 107
+        height: 72
+      alignment: 9
+      pivot: {x: 0.18365335, y: 0.5213695}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 266da90a5fad08450800000000000000
+      internalID: 6089107444701255266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerAttackRanged_Sheet_3
+      rect:
+        serializedVersion: 2
+        x: 525
+        y: 4
+        width: 107
+        height: 72
+      alignment: 9
+      pivot: {x: 0.18365307, y: 0.5106852}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cedaee3ef81d727b0800000000000000
+      internalID: -5248996424742425108
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerAttackRanged_Sheet_4
+      rect:
+        serializedVersion: 2
+        x: 685
+        y: 3
+        width: 107
+        height: 72
+      alignment: 9
+      pivot: {x: 0.18365364, y: 0.5106848}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbb1a93395c584ae0800000000000000
+      internalID: -1564899332323664964
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerAttackRanged_Sheet_5
+      rect:
+        serializedVersion: 2
+        x: 1005
+        y: 3
+        width: 107
+        height: 72
+      alignment: 9
+      pivot: {x: 0.18365307, y: 0.5213695}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3f006d6ccfef0130800000000000000
+      internalID: 3535307893796507453
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerAttackRanged_Sheet_7
+      rect:
+        serializedVersion: 2
+        x: 1165
+        y: 3
+        width: 107
+        height: 72
+      alignment: 9
+      pivot: {x: 0.20522188, y: 0.5427389}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 477032df8f6704040800000000000000
+      internalID: 4629831228707768180
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerAttackRanged_Sheet_8
+      rect:
+        serializedVersion: 2
+        x: 1314
+        y: 2
+        width: 47
+        height: 71
+      alignment: 9
+      pivot: {x: 0.56546867, y: 0.55417603}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b18eb668833da60d0800000000000000
+      internalID: -3428695926562363365
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerAttackRanged_Sheet_11
+      rect:
+        serializedVersion: 2
+        x: 1453
+        y: 2
+        width: 68
+        height: 76
+      alignment: 9
+      pivot: {x: 0.66969746, y: 0.47975585}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3fe0665241f1f834e9e9de88d9146340
+      internalID: 102920888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerAttackRanged_Sheet_14
+      rect:
+        serializedVersion: 2
+        x: 1613
+        y: 2
+        width: 68
+        height: 76
+      alignment: 9
+      pivot: {x: 0.7262645, y: 0.4291441}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0492736927ee40478e08dca15c0457e
+      internalID: -838195702
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: playerAttackRanged_Sheet_9
+      rect:
+        serializedVersion: 2
+        x: 845
+        y: 3
+        width: 107
+        height: 72
+      alignment: 9
+      pivot: {x: 0.18365364, y: 0.5213695}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 06798deaa4e0c9349a8d0a861c133fac
+      internalID: -1801901540573439368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 95dec9f4d0233a54f9c2ea6712789dad
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":160.0,"y":96.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
+    nameFileIdTable:
+      playerAttackRanged_Sheet_0: -874173854055928130
+      playerAttackRanged_Sheet_1: 607701866698466367
+      playerAttackRanged_Sheet_10: 7590054370071023460
+      playerAttackRanged_Sheet_11: 102920888
+      playerAttackRanged_Sheet_12: 1217431219
+      playerAttackRanged_Sheet_13: -920255600
+      playerAttackRanged_Sheet_14: -838195702
+      playerAttackRanged_Sheet_15: -1903335396
+      playerAttackRanged_Sheet_16: 429209862
+      playerAttackRanged_Sheet_17: 97059043
+      playerAttackRanged_Sheet_18: 1561859647
+      playerAttackRanged_Sheet_19: 1597449088
+      playerAttackRanged_Sheet_2: 6089107444701255266
+      playerAttackRanged_Sheet_20: -682515148
+      playerAttackRanged_Sheet_21: 1134254149
+      playerAttackRanged_Sheet_22: -853125351
+      playerAttackRanged_Sheet_3: -5248996424742425108
+      playerAttackRanged_Sheet_4: -1564899332323664964
+      playerAttackRanged_Sheet_5: 3535307893796507453
+      playerAttackRanged_Sheet_6: 9147857627846601542
+      playerAttackRanged_Sheet_7: 4629831228707768180
+      playerAttackRanged_Sheet_8: -3428695926562363365
+      playerAttackRanged_Sheet_9: -1801901540573439368
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

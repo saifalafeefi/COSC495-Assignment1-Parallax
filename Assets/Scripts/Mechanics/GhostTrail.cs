@@ -64,6 +64,7 @@ namespace Platformer.Mechanics
             // add sprite renderer with current sprite
             SpriteRenderer ghostRenderer = ghost.AddComponent<SpriteRenderer>();
             ghostRenderer.sprite = spriteRenderer.sprite;
+            ghostRenderer.flipX = spriteRenderer.flipX; // match player's facing direction
             ghostRenderer.sortingLayerName = spriteRenderer.sortingLayerName;
             ghostRenderer.sortingOrder = spriteRenderer.sortingOrder - 1; // behind player
 
