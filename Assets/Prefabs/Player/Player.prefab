@@ -67,7 +67,7 @@ MonoBehaviour:
   flashInterval: 0.1
   flashMaterial: {fileID: 2100000, guid: b28efccbcae6d4342b1d6ebf20794f41, type: 2}
   knockbackHorizontalForce: 8
-  knockbackVerticalForce: 10
+  knockbackVerticalForce: 4
   attackStateName: PlayerAttack1
   attack2StateName: PlayerAttack2
   attack3StateName: PlayerAttack3
@@ -81,7 +81,7 @@ MonoBehaviour:
   attack3Damage: 2
   attackAirRange: 0.5
   attackAirHitboxSize: {x: 2, y: 3}
-  attackAirDamage: 1
+  attackAirDamage: 2
   enemyKnockbackForce: 10
   enemyLayer:
     serializedVersion: 2
@@ -101,7 +101,7 @@ MonoBehaviour:
   rangedAttackCooldown: 1
   projectileSpawnAnimationTime: 0.65
   projectileSpawnOffset: {x: 1, y: 0}
-  rangedAttackDamage: 1
+  rangedAttackDamage: 5
   rangedAttackStateName: PlayerAttackRanged
   jumpState: 0
   collider2d: {fileID: 0}
