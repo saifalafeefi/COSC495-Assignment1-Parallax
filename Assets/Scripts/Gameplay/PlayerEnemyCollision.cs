@@ -13,7 +13,7 @@ namespace Platformer.Gameplay
     /// <typeparam name="EnemyCollision"></typeparam>
     public class PlayerEnemyCollision : Simulation.Event<PlayerEnemyCollision>
     {
-        public EnemyController enemy;
+        public MonoBehaviour enemy;
         public PlayerController player;
 
         PlatformerModel model = Simulation.GetModel<PlatformerModel>();
@@ -46,26 +46,42 @@ namespace Platformer.Gameplay
                 return;
             }
 
-            var willHurtEnemy = player.Bounds.center.y >= enemy.Bounds.max.y;
+            // get enemy bounds (works for both enemy1 and enemy2)
+            Bounds enemyBounds;
+            var enemy1 = enemy as enemy1;
+            var enemy2 = enemy as enemy2;
+            if (enemy1 != null)
+                enemyBounds = enemy1.Bounds;
+            else if (enemy2 != null)
+                enemyBounds = enemy2.Bounds;
+            else
+                return; // not a valid enemy
+
+            // player only hurts enemy if ATTACKING from above (not just landing on head!)
+            bool playerIsAbove = player.Bounds.center.y >= enemyBounds.max.y;
+            bool playerIsAttacking = player.isAttacking;
+            var willHurtEnemy = playerIsAbove && playerIsAttacking;
 
             if (willHurtEnemy)
             {
                 // player is attacking from above - damage enemy
-                if (enemyHealth != null)
+                // calculate knockback direction (downward from player)
+                Vector2 knockbackDir = new Vector2(0, -1f);
+
+                // call TakeDamage on the specific enemy type (so all death logic runs!)
+                if (enemy1 != null)
                 {
-                    enemyHealth.Decrement();
-                    if (!enemyHealth.IsAlive)
-                    {
-                        Schedule<EnemyDeath>().enemy = enemy;
-                        player.Bounce(2);
-                    }
-                    else
-                    {
-                        player.Bounce(7);
-                    }
+                    enemy1.TakeDamage(1, knockbackDir, 0f);
+                    player.Bounce(enemyHealth != null && enemyHealth.IsAlive ? 7 : 2);
+                }
+                else if (enemy2 != null)
+                {
+                    enemy2.TakeDamage(1, knockbackDir, 0f);
+                    player.Bounce(enemyHealth != null && enemyHealth.IsAlive ? 7 : 2);
                 }
                 else
                 {
+                    // fallback for unknown enemy type
                     Schedule<EnemyDeath>().enemy = enemy;
                     player.Bounce(2);
                 }
@@ -99,7 +115,7 @@ namespace Platformer.Gameplay
 
                             // apply knockback away from enemy
                             Vector2 knockbackDirection = new Vector2(
-                                player.Bounds.center.x - enemy.Bounds.center.x,
+                                player.Bounds.center.x - enemyBounds.center.x,
                                 1f // slight upward force
                             );
                             player.ApplyKnockback(knockbackDirection, 5f);

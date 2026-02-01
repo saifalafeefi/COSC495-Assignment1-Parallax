@@ -138,7 +138,7 @@ namespace Platformer.Mechanics
         private Coroutine flashCoroutine = null;
         private Color originalSpriteColor;
         private Material originalMaterial;
-        private bool isAttacking = false;
+        public bool isAttacking = false;
         private float knockbackVelocityX = 0f;
         private float knockbackDecayRate = 10f; // how fast horizontal knockback decays per second
         private int comboStep = 0; // 0 = ready for attack 1, 1 = ready for attack 2, 2 = ready for attack 3
@@ -1013,19 +1013,29 @@ namespace Platformer.Mechanics
 
             foreach (var hit in hits)
             {
-                var enemy = hit.GetComponent<EnemyController>();
-                if (enemy != null)
-                {
-                    // with speed boost, ignore enemy i-frames (pierce through invincibility)
-                    bool canHit = !enemy.IsInvincible || HasSpeedBoost || HasTimeSlowActive;
+                // try both enemy types
+                var enemy1 = hit.GetComponent<enemy1>();
+                var enemy2 = hit.GetComponent<enemy2>();
 
+                bool isInvincible = false;
+                if (enemy1 != null)
+                {
+                    isInvincible = enemy1.IsInvincible;
+                    bool canHit = !isInvincible || HasSpeedBoost || HasTimeSlowActive;
                     if (canHit)
                     {
-                        // calculate knockback direction (away from player)
-                        Vector2 knockbackDir = new Vector2(direction, 0.5f); // slight upward angle
-
-                        // deal damage to enemy (pass pierce flag if we have speed boost)
-                        enemy.TakeDamage(damage, knockbackDir, enemyKnockbackForce, HasSpeedBoost || HasTimeSlowActive);
+                        Vector2 knockbackDir = new Vector2(direction, 0.5f);
+                        enemy1.TakeDamage(damage, knockbackDir, enemyKnockbackForce, HasSpeedBoost || HasTimeSlowActive);
+                    }
+                }
+                else if (enemy2 != null)
+                {
+                    isInvincible = enemy2.IsInvincible;
+                    bool canHit = !isInvincible || HasSpeedBoost || HasTimeSlowActive;
+                    if (canHit)
+                    {
+                        Vector2 knockbackDir = new Vector2(direction, 0.5f);
+                        enemy2.TakeDamage(damage, knockbackDir, enemyKnockbackForce, HasSpeedBoost || HasTimeSlowActive);
                     }
                 }
             }

@@ -62,12 +62,8 @@ namespace Platformer.Mechanics
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            Debug.Log($"[SPEED VIAL] OnTriggerEnter2D called! Hit: {collision.gameObject.name}");
-
             // check if player collected the vial
             var player = collision.GetComponent<PlayerController>();
-
-            Debug.Log($"[SPEED VIAL] PlayerController found: {player != null}");
 
             if (player != null)
             {
@@ -128,7 +124,6 @@ namespace Platformer.Mechanics
             // add color to blend
             if (enableSpriteTint)
             {
-                Debug.Log($"[SPEED VIAL] Adding color tint: {speedTintColor}, enableSpriteTint={enableSpriteTint}");
                 colorManager.AddColor(powerupID, speedTintColor);
             }
             else

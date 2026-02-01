@@ -115,25 +115,28 @@ namespace Platformer.Mechanics
             }
 
             // check if hit an enemy
-            var enemy = other.GetComponent<EnemyController>();
-            if (enemy != null)
+            var enemy1 = other.GetComponent<enemy1>();
+            var enemy2 = other.GetComponent<enemy2>();
+
+            if (enemy1 != null)
             {
                 hasHit = true;
-
-                // calculate knockback direction (same direction as projectile movement)
-                Vector2 knockbackDir = new Vector2(direction, 0.3f); // slight upward angle
-
-                // deal damage to enemy
-                enemy.TakeDamage(damage, knockbackDir, 2f, false);
-
-                Debug.Log($"[PROJECTILE] hit enemy '{other.gameObject.name}', dealt {damage} damage");
-
-                // destroy projectile after hit
+                Vector2 knockbackDir = new Vector2(direction, 0.3f);
+                enemy1.TakeDamage(damage, knockbackDir, 2f, false);
+                Debug.Log($"[PROJECTILE] hit enemy1 '{other.gameObject.name}', dealt {damage} damage");
+                Destroy(gameObject);
+            }
+            else if (enemy2 != null)
+            {
+                hasHit = true;
+                Vector2 knockbackDir = new Vector2(direction, 0.3f);
+                enemy2.TakeDamage(damage, knockbackDir, 2f, false);
+                Debug.Log($"[PROJECTILE] hit enemy2 '{other.gameObject.name}', dealt {damage} damage");
                 Destroy(gameObject);
             }
             else
             {
-                Debug.Log($"[PROJECTILE] hit '{other.gameObject.name}' but it's not an enemy (no EnemyController component)");
+                Debug.Log($"[PROJECTILE] hit '{other.gameObject.name}' but it's not an enemy");
             }
         }
 

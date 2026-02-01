@@ -1,5 +1,6 @@
 using Platformer.Core;
 using Platformer.Mechanics;
+using UnityEngine;
 
 namespace Platformer.Gameplay
 {
@@ -9,14 +10,28 @@ namespace Platformer.Gameplay
     /// <typeparam name="EnemyDeath"></typeparam>
     public class EnemyDeath : Simulation.Event<EnemyDeath>
     {
-        public EnemyController enemy;
+        public MonoBehaviour enemy;
 
         public override void Execute()
         {
-            enemy._collider.enabled = false;
-            enemy.control.enabled = false;
-            if (enemy._audio && enemy.ouch)
-                enemy._audio.PlayOneShot(enemy.ouch);
+            // check if it's enemy1 or enemy2 and disable accordingly
+            var enemy1 = enemy as enemy1;
+            var enemy2 = enemy as enemy2;
+
+            if (enemy1 != null)
+            {
+                enemy1._collider.enabled = false;
+                enemy1.enabled = false;
+                if (enemy1._audio && enemy1.ouch)
+                    enemy1._audio.PlayOneShot(enemy1.ouch);
+            }
+            else if (enemy2 != null)
+            {
+                enemy2._collider.enabled = false;
+                enemy2.enabled = false;
+                if (enemy2._audio && enemy2.ouch)
+                    enemy2._audio.PlayOneShot(enemy2.ouch);
+            }
         }
     }
 }

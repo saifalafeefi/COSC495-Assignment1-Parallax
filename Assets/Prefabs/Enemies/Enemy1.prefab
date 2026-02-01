@@ -13,8 +13,7 @@ GameObject:
   - component: {fileID: 1605217082131907960}
   - component: {fileID: 1702612949800919892}
   - component: {fileID: 1724124757368974630}
-  - component: {fileID: 2651140156555518892}
-  - component: {fileID: 772289407653213039}
+  - component: {fileID: 1093484940451547567}
   - component: {fileID: 5843668731025413174}
   - component: {fileID: 9176799386480048175}
   m_Layer: 3
@@ -184,7 +183,7 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 0.45, y: 0.09}
   m_Direction: 0
---- !u!114 &2651140156555518892
+--- !u!114 &1093484940451547567
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -193,11 +192,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1661912868639658944}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be4d02721cd9d4baa869d3b890cec48f, type: 3}
+  m_Script: {fileID: 11500000, guid: 2d4ef77857624534e925a773861c4604, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  minGroundNormalY: 0.65
-  gravityModifier: 1
+  m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.enemy1
+  minGroundNormalY: 0.9
+  gravityModifier: 2.5
   useUnscaledTime: 0
   velocity: {x: 0, y: 0}
   maxSpeed: 7
@@ -205,18 +204,6 @@ MonoBehaviour:
   move: {x: 0, y: 0}
   jump: 0
   stopJump: 0
---- !u!114 &772289407653213039
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1661912868639658944}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb1c2f7da49f85b4084bf4b080b9eba5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
   path: {fileID: 0}
   ouch: {fileID: 8300000, guid: b7f741588644cd64bbee6387cb54a96d, type: 3}
   invincibilityDuration: 0.2
@@ -224,7 +211,7 @@ MonoBehaviour:
   flashMaterial: {fileID: 2100000, guid: b28efccbcae6d4342b1d6ebf20794f41, type: 2}
   damageNumberPrefab: {fileID: 7226005136005355022, guid: 8d485ecb55a56d34d90792be18b82d01,
     type: 3}
-  damageNumberOffset: 0.5
+  damageNumberOffset: 0
 --- !u!82 &5843668731025413174
 AudioSource:
   m_ObjectHideFlags: 0

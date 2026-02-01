@@ -197,8 +197,8 @@ MonoBehaviour:
   lifetime: 1
   floatDistance: 2
   angleVariation: 30
-  popScale: 1.2
-  popDuration: 0.15
+  popScale: 3
+  popDuration: 0
   damageColors:
   - {r: 1, g: 0.3, b: 0.3, a: 1}
   - {r: 1, g: 0.5, b: 0.2, a: 1}

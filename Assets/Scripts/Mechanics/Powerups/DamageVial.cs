@@ -94,6 +94,7 @@ namespace Platformer.Mechanics
             int originalAttack12Damage = player.attack12Damage;
             int originalAttack3Damage = player.attack3Damage;
             int originalAttackAirDamage = player.attackAirDamage;
+            int originalRangedAttackDamage = player.rangedAttackDamage;
             PowerupColorManager colorManager = player.GetComponent<PowerupColorManager>();
 
             if (colorManager == null)
@@ -107,6 +108,7 @@ namespace Platformer.Mechanics
             player.attack12Damage = Mathf.RoundToInt(originalAttack12Damage * damageMultiplier);
             player.attack3Damage = Mathf.RoundToInt(originalAttack3Damage * damageMultiplier);
             player.attackAirDamage = Mathf.RoundToInt(originalAttackAirDamage * damageMultiplier);
+            player.rangedAttackDamage = Mathf.RoundToInt(originalRangedAttackDamage * damageMultiplier);
 
             // add color to blend
             if (enableTint)
@@ -154,6 +156,7 @@ namespace Platformer.Mechanics
             player.attack12Damage = originalAttack12Damage;
             player.attack3Damage = originalAttack3Damage;
             player.attackAirDamage = originalAttackAirDamage;
+            player.rangedAttackDamage = originalRangedAttackDamage;
 
             // remove color from blend (manager will auto-update sprite)
             if (enableTint)

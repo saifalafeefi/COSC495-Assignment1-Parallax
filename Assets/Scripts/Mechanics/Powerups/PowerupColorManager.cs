@@ -16,7 +16,6 @@ namespace Platformer.Mechanics
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
             originalColor = spriteRenderer.color;
-            Debug.Log($"[COLORMANAGER] Awake: originalColor stored as {originalColor}");
         }
 
         /// <summary>
@@ -26,7 +25,6 @@ namespace Platformer.Mechanics
         /// <param name="color">color to add to the blend</param>
         public void AddColor(string powerupID, Color color)
         {
-            Debug.Log($"[COLORMANAGER] AddColor called: ID={powerupID}, color={color}");
             activePowerupColors[powerupID] = color;
             UpdateSpriteColor();
         }
@@ -143,12 +141,10 @@ namespace Platformer.Mechanics
         private void UpdateSpriteColor()
         {
             Color blendColor = GetCurrentBlend();
-            Debug.Log($"[COLORMANAGER] UpdateSpriteColor: blendColor={blendColor}, spriteRenderer={spriteRenderer != null}");
 
             if (spriteRenderer != null)
             {
                 spriteRenderer.color = blendColor;
-                Debug.Log($"[COLORMANAGER] Sprite color set to: {spriteRenderer.color}");
             }
             else
             {

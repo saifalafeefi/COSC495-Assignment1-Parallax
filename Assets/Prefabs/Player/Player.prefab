@@ -82,10 +82,11 @@ MonoBehaviour:
   attackAirRange: 0.5
   attackAirHitboxSize: {x: 2, y: 3}
   attackAirDamage: 2
-  enemyKnockbackForce: 10
+  enemyKnockbackForce: 20
   enemyLayer:
     serializedVersion: 2
     m_Bits: 8
+  isAttacking: 0
   allowDoubleJump: 1
   rollStateName: PlayerRoll
   rollDistance: 3
