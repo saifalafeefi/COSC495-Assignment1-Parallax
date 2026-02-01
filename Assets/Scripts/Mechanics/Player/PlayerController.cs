@@ -139,6 +139,7 @@ namespace Platformer.Mechanics
         private Color originalSpriteColor;
         private Material originalMaterial;
         public bool isAttacking = false;
+        private string currentAttackState = "";
         private float knockbackVelocityX = 0f;
         private float knockbackDecayRate = 10f; // how fast horizontal knockback decays per second
         private int comboStep = 0; // 0 = ready for attack 1, 1 = ready for attack 2, 2 = ready for attack 3
@@ -419,7 +420,6 @@ namespace Platformer.Mechanics
                 {
                     if (m_RollAction.WasPressedThisFrame())
                     {
-                        Debug.Log("[ROLL] roll initiated");
                         StartCoroutine(PerformRoll());
                     }
                 }
@@ -685,7 +685,6 @@ namespace Platformer.Mechanics
             comboWindowTimer = 0f;
 
             // determine which attack to perform based on combo step AND grounded status
-            string currentAttackState;
             string attackTrigger;
 
             // check if player is in the air
@@ -789,7 +788,6 @@ namespace Platformer.Mechanics
             {
                 Physics2D.IgnoreLayerCollision(gameObject.layer, enemyLayerIndex, true);
                 RefreshContactFilter(); // update cached layer mask!
-                Debug.Log("[ROLL] disabled collision with enemies and refreshed contact filter");
             }
 
             // activate invincibility immediately
@@ -799,7 +797,6 @@ namespace Platformer.Mechanics
                 isInvincible = true;
                 invincibilityTimer = rollDuration;
                 flashCoroutine = StartCoroutine(FlashSprite());
-                Debug.Log("[ROLL] invincibility activated");
             }
 
             // determine roll direction based on sprite orientation
@@ -808,11 +805,9 @@ namespace Platformer.Mechanics
             // calculate roll BOOST (this gets ADDED to your current movement)
             float maxRollBoost = rollDirection * (rollDistance / rollDuration);
 
-            Debug.Log($"[ROLL] max roll boost: {maxRollBoost}");
 
             // trigger roll animation
             animator.SetTrigger("roll");
-            Debug.Log($"[ROLL] rolling {(rollDirection > 0 ? "right" : "left")}");
 
             yield return null;
 
@@ -844,7 +839,6 @@ namespace Platformer.Mechanics
 
             if (waitTime >= timeout)
             {
-                Debug.LogWarning("[ROLL] animation timeout - check animator setup");
             }
 
             isRolling = false;
@@ -855,10 +849,8 @@ namespace Platformer.Mechanics
             {
                 Physics2D.IgnoreLayerCollision(gameObject.layer, enemyLayerIndex, false);
                 RefreshContactFilter(); // update cached layer mask!
-                Debug.Log("[ROLL] re-enabled collision with enemies");
             }
 
-            Debug.Log($"[ROLL] roll complete");
         }
 
         /// <summary>
@@ -1011,6 +1003,10 @@ namespace Platformer.Mechanics
             // find all colliders in the attack hitbox
             Collider2D[] hits = Physics2D.OverlapBoxAll(hitboxCenter, hitboxSize, 0f, enemyLayer);
 
+            // check if this is an air attack (for bounce mechanic)
+            bool isAirAttack = currentAttackState == attackAirStateName;
+            bool hitEnemy = false;
+
             foreach (var hit in hits)
             {
                 // try both enemy types
@@ -1026,6 +1022,7 @@ namespace Platformer.Mechanics
                     {
                         Vector2 knockbackDir = new Vector2(direction, 0.5f);
                         enemy1.TakeDamage(damage, knockbackDir, enemyKnockbackForce, HasSpeedBoost || HasTimeSlowActive);
+                        hitEnemy = true;
                     }
                 }
                 else if (enemy2 != null)
@@ -1036,8 +1033,15 @@ namespace Platformer.Mechanics
                     {
                         Vector2 knockbackDir = new Vector2(direction, 0.5f);
                         enemy2.TakeDamage(damage, knockbackDir, enemyKnockbackForce, HasSpeedBoost || HasTimeSlowActive);
+                        hitEnemy = true;
                     }
                 }
+            }
+
+            // if air attacking and hit enemy, bounce!
+            if (isAirAttack && hitEnemy)
+            {
+                Bounce(7); // bounce on successful air attack hit
             }
         }
 

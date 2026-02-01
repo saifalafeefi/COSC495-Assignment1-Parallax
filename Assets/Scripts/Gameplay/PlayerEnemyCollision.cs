@@ -57,10 +57,9 @@ namespace Platformer.Gameplay
             else
                 return; // not a valid enemy
 
-            // player only hurts enemy if ATTACKING from above (not just landing on head!)
-            bool playerIsAbove = player.Bounds.center.y >= enemyBounds.max.y;
+            // player only hurts enemy if ATTACKING (from any angle!)
             bool playerIsAttacking = player.isAttacking;
-            var willHurtEnemy = playerIsAbove && playerIsAttacking;
+            var willHurtEnemy = playerIsAttacking;
 
             if (willHurtEnemy)
             {

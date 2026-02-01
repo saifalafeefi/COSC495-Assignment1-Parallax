@@ -321,4 +321,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9935bd882944ff548a9d9ca8ccfe9cca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.Health
-  maxHP: 3
+  maxHP: 5
