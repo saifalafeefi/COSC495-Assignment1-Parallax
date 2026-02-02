@@ -1025,9 +1025,10 @@ namespace Platformer.Mechanics
 
             foreach (var hit in hits)
             {
-                // try both enemy types
+                // try all enemy types
                 var enemy1 = hit.GetComponent<enemy1>();
                 var enemy2 = hit.GetComponent<enemy2>();
+                var enemy3 = hit.GetComponent<enemy3>();
 
                 bool isInvincible = false;
                 if (enemy1 != null)
@@ -1049,6 +1050,17 @@ namespace Platformer.Mechanics
                     {
                         Vector2 knockbackDir = new Vector2(direction, 0.5f);
                         enemy2.TakeDamage(damage, knockbackDir, enemyKnockbackForce, HasSpeedBoost || HasTimeSlowActive);
+                        hitEnemy = true;
+                    }
+                }
+                else if (enemy3 != null)
+                {
+                    isInvincible = enemy3.IsInvincible;
+                    bool canHit = !isInvincible || HasSpeedBoost || HasTimeSlowActive;
+                    if (canHit)
+                    {
+                        Vector2 knockbackDir = new Vector2(direction, 0.5f);
+                        enemy3.TakeDamage(damage, knockbackDir, enemyKnockbackForce, HasSpeedBoost || HasTimeSlowActive);
                         hitEnemy = true;
                     }
                 }

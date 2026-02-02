@@ -46,14 +46,17 @@ namespace Platformer.Gameplay
                 return;
             }
 
-            // get enemy bounds (works for both enemy1 and enemy2)
+            // get enemy bounds (works for enemy1, enemy2, enemy3)
             Bounds enemyBounds;
             var enemy1 = enemy as enemy1;
             var enemy2 = enemy as enemy2;
+            var enemy3 = enemy as enemy3;
             if (enemy1 != null)
                 enemyBounds = enemy1.Bounds;
             else if (enemy2 != null)
                 enemyBounds = enemy2.Bounds;
+            else if (enemy3 != null)
+                enemyBounds = enemy3.Bounds;
             else
                 return; // not a valid enemy
 
@@ -76,6 +79,11 @@ namespace Platformer.Gameplay
                 else if (enemy2 != null)
                 {
                     enemy2.TakeDamage(1, knockbackDir, 0f);
+                    player.Bounce(enemyHealth != null && enemyHealth.IsAlive ? 7 : 2);
+                }
+                else if (enemy3 != null)
+                {
+                    enemy3.TakeDamage(1, knockbackDir, 0f);
                     player.Bounce(enemyHealth != null && enemyHealth.IsAlive ? 7 : 2);
                 }
                 else

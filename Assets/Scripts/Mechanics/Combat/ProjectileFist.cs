@@ -117,6 +117,7 @@ namespace Platformer.Mechanics
             // check if hit an enemy
             var enemy1 = other.GetComponent<enemy1>();
             var enemy2 = other.GetComponent<enemy2>();
+            var enemy3 = other.GetComponent<enemy3>();
 
             if (enemy1 != null)
             {
@@ -132,6 +133,14 @@ namespace Platformer.Mechanics
                 Vector2 knockbackDir = new Vector2(direction, 0.3f);
                 enemy2.TakeDamage(damage, knockbackDir, 2f, false);
                 Debug.Log($"[PROJECTILE] hit enemy2 '{other.gameObject.name}', dealt {damage} damage");
+                Destroy(gameObject);
+            }
+            else if (enemy3 != null)
+            {
+                hasHit = true;
+                Vector2 knockbackDir = new Vector2(direction, 0.3f);
+                enemy3.TakeDamage(damage, knockbackDir, 2f, false);
+                Debug.Log($"[PROJECTILE] hit enemy3 '{other.gameObject.name}', dealt {damage} damage");
                 Destroy(gameObject);
             }
             else
