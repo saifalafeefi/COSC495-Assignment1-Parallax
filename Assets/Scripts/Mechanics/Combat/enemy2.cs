@@ -84,9 +84,16 @@ namespace Platformer.Mechanics
                 }
             }
 
-            // shooting logic (only when alive)
+            // shooting logic and sprite flip (only when alive)
             if (!isDead)
             {
+                // flip sprite to face player
+                if (player != null && spriteRenderer != null)
+                {
+                    bool playerIsRight = player.transform.position.x > transform.position.x;
+                    spriteRenderer.flipX = playerIsRight;
+                }
+
                 HandleShooting();
             }
         }

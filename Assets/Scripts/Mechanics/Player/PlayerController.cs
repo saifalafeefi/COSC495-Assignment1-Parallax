@@ -430,8 +430,8 @@ namespace Platformer.Mechanics
                     rangedAttackCooldownTimer -= DeltaTime;
                 }
 
-                // handle ranged attack input - only when grounded, not attacking, not rolling, not hurt, not firing, cooldown finished
-                if (m_RangedAttackAction != null && IsGrounded && !isAttacking && !isRolling && !isHurtStunned && !isFiringRangedAttack && rangedAttackCooldownTimer <= 0f)
+                // handle ranged attack input - not attacking, not rolling, not hurt, not firing, cooldown finished
+                if (m_RangedAttackAction != null && !isAttacking && !isRolling && !isHurtStunned && !isFiringRangedAttack && rangedAttackCooldownTimer <= 0f)
                 {
                     if (m_RangedAttackAction.WasPressedThisFrame())
                     {
@@ -586,6 +586,7 @@ namespace Platformer.Mechanics
             animator.SetBool("hurt", isHurtStunned);
             animator.SetBool("isRolling", isRolling);
             animator.SetBool("isWallSliding", isWallSliding);
+            animator.SetBool("isFiringRanged", isFiringRangedAttack);
 
             // apply normal movement + knockback + roll boost
             targetVelocity = move * maxSpeed;

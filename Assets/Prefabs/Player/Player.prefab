@@ -61,7 +61,7 @@ MonoBehaviour:
   ouchAudio: {fileID: 8300000, guid: 6c05149e5a2fba64ba172e25a61074b7, type: 3}
   landAudio: {fileID: 8300000, guid: dd6057fd464f77942a0bf39c54651b32, type: 3}
   maxSpeed: 7
-  jumpTakeOffSpeed: 10
+  jumpTakeOffSpeed: 8
   invincibilityDuration: 1.5
   hurtDuration: 0.5
   flashInterval: 0.1

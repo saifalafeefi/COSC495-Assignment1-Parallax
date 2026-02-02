@@ -205,7 +205,7 @@ MonoBehaviour:
   damageNumberOffset: 0.5
   projectilePrefab: {fileID: 3147885243010825308, guid: ca2e64748c5126344a1d6eef214edf7e,
     type: 3}
-  shootInterval: 1
+  shootInterval: 2
   shootRange: 10
   projectileSpeed: 5
   projectileDamage: 1
