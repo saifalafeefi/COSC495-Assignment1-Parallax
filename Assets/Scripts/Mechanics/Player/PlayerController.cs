@@ -138,6 +138,14 @@ namespace Platformer.Mechanics
         private Coroutine flashCoroutine = null;
         private Color originalSpriteColor;
         private Material originalMaterial;
+
+        // original values for powerup reset on death
+        private float originalMaxSpeed;
+        private int originalAttack12Damage;
+        private int originalAttack3Damage;
+        private int originalAttackAirDamage;
+        private int originalRangedAttackDamage;
+
         public bool isAttacking = false;
         private string currentAttackState = "";
         private float knockbackVelocityX = 0f;
@@ -277,6 +285,13 @@ namespace Platformer.Mechanics
 
             // store original material for flash system
             originalMaterial = spriteRenderer.material;
+
+            // store original values for powerup reset on death
+            originalMaxSpeed = maxSpeed;
+            originalAttack12Damage = attack12Damage;
+            originalAttack3Damage = attack3Damage;
+            originalAttackAirDamage = attackAirDamage;
+            originalRangedAttackDamage = rangedAttackDamage;
 
             m_MoveAction = InputSystem.actions.FindAction("Player/Move");
             m_JumpAction = InputSystem.actions.FindAction("Player/Jump");
@@ -1138,6 +1153,51 @@ namespace Platformer.Mechanics
         public void ResetOrientation()
         {
             spriteRenderer.flipX = false;
+        }
+
+        /// <summary>
+        /// clear all active powerups and reset player stats to original values (called on death)
+        /// </summary>
+        public void ClearAllPowerups()
+        {
+            // stop all running coroutines (powerups run as coroutines on player)
+            StopAllCoroutines();
+
+            // reset speed values to original
+            maxSpeed = originalMaxSpeed;
+            animator.speed = 1f;
+
+            // reset damage values to original
+            attack12Damage = originalAttack12Damage;
+            attack3Damage = originalAttack3Damage;
+            attackAirDamage = originalAttackAirDamage;
+            rangedAttackDamage = originalRangedAttackDamage;
+
+            // clear powerup flags
+            HasSpeedBoost = false;
+
+            // reset time slow effects if active
+            if (HasTimeSlowActive)
+            {
+                HasTimeSlowActive = false;
+                Time.timeScale = 1f;
+                Time.fixedDeltaTime = 0.02f;
+                useUnscaledTime = false;
+
+                // disable ghost trail if exists
+                var ghostTrail = GetComponent<GhostTrail>();
+                if (ghostTrail != null)
+                {
+                    ghostTrail.DisableTrail();
+                }
+            }
+
+            // clear all powerup color tints
+            var colorManager = GetComponent<PowerupColorManager>();
+            if (colorManager != null)
+            {
+                colorManager.ClearAllColors();
+            }
         }
 
         /// <summary>

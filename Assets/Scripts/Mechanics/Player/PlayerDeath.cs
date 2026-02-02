@@ -27,6 +27,9 @@ namespace Platformer.Gameplay
             // reset sprite color and invincibility state
             player.ResetVisualState();
 
+            // clear all active powerups (stats, coroutines, flags)
+            player.ClearAllPowerups();
+
             model.virtualCamera.Follow = null;
             model.virtualCamera.LookAt = null;
 

@@ -24,7 +24,9 @@ namespace Platformer.Gameplay
 
             player.Teleport(model.spawnPoint.transform.position);
             player.jumpState = PlayerController.JumpState.Grounded;
-            player.animator.SetBool("dead", false);
+
+            // trigger respawn animation (transitions from Death → Respawn)
+            player.animator.SetTrigger("respawn");
 
             // reset visual state on respawn (color, invincibility)
             player.ResetVisualState();
