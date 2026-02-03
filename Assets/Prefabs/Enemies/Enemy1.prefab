@@ -205,7 +205,12 @@ MonoBehaviour:
   jump: 0
   stopJump: 0
   path: {fileID: 0}
-  ouch: {fileID: 8300000, guid: b7f741588644cd64bbee6387cb54a96d, type: 3}
+  hitSounds:
+  - {fileID: 8300000, guid: d8e8da74e6a3b0142a02d8c26483220d, type: 3}
+  - {fileID: 8300000, guid: e26bb2db7b283ba44a73fc94676127b1, type: 3}
+  - {fileID: 8300000, guid: 480af98cab20b3c488a1819aed2820ea, type: 3}
+  - {fileID: 8300000, guid: 94fc8b80114fba648a930321ca8a7f35, type: 3}
+  hitSoundVolume: 2.83
   invincibilityDuration: 0.2
   flashInterval: 0.1
   flashMaterial: {fileID: 2100000, guid: b28efccbcae6d4342b1d6ebf20794f41, type: 2}

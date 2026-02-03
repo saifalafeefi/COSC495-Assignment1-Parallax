@@ -24,6 +24,9 @@ namespace Platformer.Gameplay
                 player.health.Die();
             }
 
+            // CRITICAL: stop all coroutines to prevent actions interfering with death
+            player.StopAllCoroutines();
+
             // reset sprite color and invincibility state
             player.ResetVisualState();
 

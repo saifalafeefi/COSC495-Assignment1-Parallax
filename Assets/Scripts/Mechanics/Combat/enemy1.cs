@@ -12,7 +12,17 @@ namespace Platformer.Mechanics
     public class enemy1 : AnimationController
     {
         public PatrolPath path;
-        public AudioClip ouch;
+
+        [Header("Audio")]
+        /// <summary>
+        /// array of hit sounds - one will be randomly selected when damaged.
+        /// </summary>
+        public AudioClip[] hitSounds;
+        /// <summary>
+        /// volume multiplier for hit sounds (0 = silent, 1 = normal, 5 = 5x louder).
+        /// </summary>
+        [Range(0f, 5f)]
+        public float hitSoundVolume = 1f;
 
         [Header("Invincibility Settings")]
         public float invincibilityDuration = 0.5f;
@@ -130,11 +140,7 @@ namespace Platformer.Mechanics
                 }
                 else
                 {
-                    if (ouch != null && _audio != null)
-                    {
-                        _audio.PlayOneShot(ouch);
-                    }
-
+                    PlayRandomHitSound();
                     ActivateInvincibility();
                     ApplyKnockback(knockbackDirection, knockbackForce);
                 }
@@ -256,6 +262,27 @@ namespace Platformer.Mechanics
             enemySpriteRenderer.material = flashMaterial;
             yield return new WaitForSeconds(0.15f);
             enemySpriteRenderer.material = originalMaterial;
+        }
+
+        /// <summary>
+        /// plays a random hit sound from the hitSounds array.
+        /// interrupts any currently playing sound and starts from beginning.
+        /// </summary>
+        private void PlayRandomHitSound()
+        {
+            if (hitSounds != null && hitSounds.Length > 0 && _audio != null)
+            {
+                // pick random sound from array
+                AudioClip randomSound = hitSounds[Random.Range(0, hitSounds.Length)];
+                if (randomSound != null)
+                {
+                    // stop current sound and play new one from beginning (allows rapid hits)
+                    _audio.Stop();
+                    _audio.clip = randomSound;
+                    _audio.volume = hitSoundVolume;
+                    _audio.Play();
+                }
+            }
         }
 
         public void ApplyKnockback(Vector2 knockbackDirection, float knockbackForce = 3f)

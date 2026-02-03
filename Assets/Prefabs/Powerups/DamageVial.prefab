@@ -231,4 +231,4 @@ MonoBehaviour:
   warningFlashSpeed: 3
   enableBloomTint: 1
   bloomTintColor: {r: 1, g: 0, b: 0, a: 1}
-  collectSound: {fileID: 0}
+  collectSound: {fileID: 8300000, guid: 538d66ba1cda9e94b92bfff8c3fea4d6, type: 3}

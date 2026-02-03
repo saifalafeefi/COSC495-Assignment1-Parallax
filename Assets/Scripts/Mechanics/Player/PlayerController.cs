@@ -348,14 +348,21 @@ namespace Platformer.Mechanics
 
         protected override void Update()
         {
-            // disable control during respawn and hurt animations
+            // check for critical animation states that MUST block all input
             AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(0);
-            bool isInRespawnState = currentState.IsName("PlayerRespawn");
             bool isInHurtState = currentState.IsName("PlayerHurt");
+            bool isInDeathState = currentState.IsName("PlayerDeath");
+            bool isInRespawnState = currentState.IsName("PlayerRespawn");
 
-            if (isInRespawnState || isInHurtState)
+            // CRITICAL: block all input and force reset flags during death/respawn/hurt
+            if (isInDeathState || isInRespawnState || isInHurtState)
             {
                 controlEnabled = false;
+                isAttacking = false;
+                isRolling = false;
+                isFiringRangedAttack = false;
+                move.x = 0;
+                // NOTE: Don't return early! Timers still need to update!
             }
             else if (!isHurtStunned)
             {
@@ -1114,8 +1121,19 @@ namespace Platformer.Mechanics
             knockbackVelocityX = 0f;
             HasSpeedBoost = false; // clear speed boost on death
 
-            // explicitly reset animator hurt bool (prevents stuck hurt state after respawn)
+            // force reset all action flags to prevent animation interference
+            isAttacking = false;
+            isRolling = false;
+            isFiringRangedAttack = false;
+            comboStep = 0;
+            comboWindowTimer = 0f;
+            attackButtonHeld = false;
+
+            // explicitly reset animator bools (prevents stuck states after respawn)
             animator.SetBool("hurt", false);
+            animator.SetBool("isAttacking", false);
+            animator.SetBool("isRolling", false);
+            animator.SetBool("isFiringRanged", false);
 
             // reset time slow effects if active
             if (HasTimeSlowActive)
