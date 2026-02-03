@@ -1,4 +1,6 @@
 using UnityEngine;
+using Platformer.Core;
+using Platformer.Gameplay;
 
 namespace Platformer.Mechanics
 {
@@ -69,9 +71,26 @@ namespace Platformer.Mechanics
                     {
                         playerHealth.Decrement(damage);
 
-                        // apply knockback
-                        Vector2 knockbackDir = new Vector2(direction.x, 0.3f);
-                        player.ApplyKnockback(knockbackDir, 3f);
+                        // check if player died
+                        if (!playerHealth.IsAlive)
+                        {
+                            Simulation.Schedule<Platformer.Gameplay.PlayerDeath>();
+                        }
+                        else
+                        {
+                            // player survived - play hurt sound
+                            if (player.ouchAudio != null && player.audioSource != null)
+                            {
+                                player.audioSource.PlayOneShot(player.ouchAudio);
+                            }
+
+                            // activate invincibility and hurt animation
+                            player.ActivateInvincibility();
+
+                            // apply knockback
+                            Vector2 knockbackDir = new Vector2(direction.x, 0.3f);
+                            player.ApplyKnockback(knockbackDir, 3f);
+                        }
                     }
                 }
 

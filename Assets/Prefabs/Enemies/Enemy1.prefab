@@ -212,6 +212,18 @@ MonoBehaviour:
   damageNumberPrefab: {fileID: 7226005136005355022, guid: 8d485ecb55a56d34d90792be18b82d01,
     type: 3}
   damageNumberOffset: 0
+  healthVialPrefab: {fileID: 8769834775218147518, guid: 4bf516886f182d847a3e29a405c56e88,
+    type: 3}
+  speedVialPrefab: {fileID: 1459835210037587684, guid: 41cab886cfff51e4fa01aed147ca4461,
+    type: 3}
+  damageVialPrefab: {fileID: 7052666099553717565, guid: fa8ac3fa9cb86764aa94e3e0f81167eb,
+    type: 3}
+  timeVialPrefab: {fileID: 2793612576529147497, guid: 1a33626613781124e89d6ee2e806d537,
+    type: 3}
+  healthDropChance: 50
+  damageDropChance: 50
+  speedDropChance: 0
+  timeDropChance: 0
 --- !u!82 &5843668731025413174
 AudioSource:
   m_ObjectHideFlags: 0

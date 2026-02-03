@@ -1,4 +1,6 @@
 using UnityEngine;
+using Platformer.Core;
+using Platformer.Gameplay;
 
 namespace Platformer.Mechanics
 {
@@ -22,7 +24,6 @@ namespace Platformer.Mechanics
         {
             this.speed = speed;
             this.damage = damage;
-            Debug.Log($"[ENEMY3 PROJECTILE] Initialized at {transform.position}, speed={speed}, damage={damage}");
         }
 
         void Update()
@@ -48,7 +49,6 @@ namespace Platformer.Mechanics
             if (player != null)
             {
                 hasHit = true;
-                Debug.Log($"[ENEMY3 PROJECTILE] Hit player! Invincible: {player.IsInvincible}, Rolling: {player.IsRolling}");
 
                 // check if player is invincible (rolling or i-frames)
                 if (!player.IsInvincible && !player.IsRolling)
@@ -58,20 +58,31 @@ namespace Platformer.Mechanics
                     if (playerHealth != null && playerHealth.IsAlive)
                     {
                         playerHealth.Decrement(damage);
-                        Debug.Log($"[ENEMY3 PROJECTILE] Dealt {damage} damage to player");
 
-                        // apply slight knockback
-                        Vector2 knockbackDir = new Vector2(0f, 0.5f);
-                        player.ApplyKnockback(knockbackDir, 3f);
+                        // check if player died
+                        if (!playerHealth.IsAlive)
+                        {
+                            Simulation.Schedule<Platformer.Gameplay.PlayerDeath>();
+                        }
+                        else
+                        {
+                            // player survived - play hurt sound
+                            if (player.ouchAudio != null && player.audioSource != null)
+                            {
+                                player.audioSource.PlayOneShot(player.ouchAudio);
+                            }
+
+                            // activate invincibility and hurt animation
+                            player.ActivateInvincibility();
+
+                            // apply knockback
+                            Vector2 knockbackDir = new Vector2(0f, 0.5f);
+                            player.ApplyKnockback(knockbackDir, 3f);
+                        }
                     }
-                }
-                else
-                {
-                    Debug.Log("[ENEMY3 PROJECTILE] Player is invincible, no damage dealt");
                 }
 
                 // destroy on player hit (regardless of invincibility)
-                Debug.Log("[ENEMY3 PROJECTILE] Destroying projectile");
                 Destroy(gameObject);
             }
             // ignore everything else (vials, walls, platforms, etc.) - lifetime will destroy it

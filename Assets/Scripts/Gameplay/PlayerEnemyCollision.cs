@@ -71,26 +71,23 @@ namespace Platformer.Gameplay
                 Vector2 knockbackDir = new Vector2(0, -1f);
 
                 // call TakeDamage on the specific enemy type (so all death logic runs!)
+                // bounce is now handled in PlayerController.CheckAttackHit() for air attacks only
                 if (enemy1 != null)
                 {
                     enemy1.TakeDamage(1, knockbackDir, 0f);
-                    player.Bounce(enemyHealth != null && enemyHealth.IsAlive ? 7 : 2);
                 }
                 else if (enemy2 != null)
                 {
                     enemy2.TakeDamage(1, knockbackDir, 0f);
-                    player.Bounce(enemyHealth != null && enemyHealth.IsAlive ? 7 : 2);
                 }
                 else if (enemy3 != null)
                 {
                     enemy3.TakeDamage(1, knockbackDir, 0f);
-                    player.Bounce(enemyHealth != null && enemyHealth.IsAlive ? 7 : 2);
                 }
                 else
                 {
                     // fallback for unknown enemy type
                     Schedule<EnemyDeath>().enemy = enemy;
-                    player.Bounce(2);
                 }
             }
             else

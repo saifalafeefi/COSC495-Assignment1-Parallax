@@ -23,6 +23,17 @@ namespace Platformer.Mechanics
         public GameObject damageNumberPrefab;
         public float damageNumberOffset = 0.5f;
 
+        [Header("Powerup Drops")]
+        public GameObject healthVialPrefab;
+        public GameObject speedVialPrefab;
+        public GameObject damageVialPrefab;
+        public GameObject timeVialPrefab;
+
+        [Range(0, 100)] public float healthDropChance = 20f;
+        [Range(0, 100)] public float damageDropChance = 30f; // higher for enemy1
+        [Range(0, 100)] public float speedDropChance = 10f;
+        [Range(0, 100)] public float timeDropChance = 5f;
+
         internal PatrolPath.Mover mover;
         internal Collider2D _collider;
         internal AudioSource _audio;
@@ -112,6 +123,9 @@ namespace Platformer.Mechanics
                     // death flash effect for visual feedback
                     StartCoroutine(DeathFlash());
 
+                    // try to drop powerup
+                    TryDropPowerup();
+
                     Schedule<EnemyDeath>().enemy = this;
                 }
                 else
@@ -147,6 +161,43 @@ namespace Platformer.Mechanics
             if (damageNumber != null)
             {
                 damageNumber.Initialize(damage, spawnPosition);
+            }
+        }
+
+        private void TryDropPowerup()
+        {
+            float roll = Random.Range(0f, 100f);
+            GameObject powerupToDrop = null;
+
+            // check each powerup in order (cumulative probabilities)
+            if (roll < healthDropChance)
+            {
+                powerupToDrop = healthVialPrefab;
+            }
+            else if (roll < healthDropChance + damageDropChance)
+            {
+                powerupToDrop = damageVialPrefab;
+            }
+            else if (roll < healthDropChance + damageDropChance + speedDropChance)
+            {
+                powerupToDrop = speedVialPrefab;
+            }
+            else if (roll < healthDropChance + damageDropChance + speedDropChance + timeDropChance)
+            {
+                powerupToDrop = timeVialPrefab;
+            }
+
+            // spawn powerup at enemy position if one was rolled
+            if (powerupToDrop != null)
+            {
+                GameObject vial = Instantiate(powerupToDrop, transform.position, Quaternion.identity);
+
+                // set high sorting order so vials render in front of environment
+                SpriteRenderer vialRenderer = vial.GetComponent<SpriteRenderer>();
+                if (vialRenderer != null)
+                {
+                    vialRenderer.sortingOrder = 100;
+                }
             }
         }
 

@@ -27,6 +27,17 @@ namespace Platformer.Mechanics
         public GameObject damageNumberPrefab;
         public float damageNumberOffset = 0.5f;
 
+        [Header("Powerup Drops")]
+        public GameObject healthVialPrefab;
+        public GameObject speedVialPrefab;
+        public GameObject damageVialPrefab;
+        public GameObject timeVialPrefab;
+
+        [Range(0, 100)] public float healthDropChance = 20f;
+        [Range(0, 100)] public float speedDropChance = 30f; // higher for enemy3
+        [Range(0, 100)] public float damageDropChance = 10f;
+        [Range(0, 100)] public float timeDropChance = 5f;
+
         [Header("Projectile Settings")]
         public GameObject projectilePrefab;
         public float dropInterval = 2f; // how often to drop projectiles (seconds)
@@ -161,7 +172,6 @@ namespace Platformer.Mechanics
                 // drop projectile when timer ready
                 if (dropTimer >= dropInterval)
                 {
-                    Debug.LogError($"[ENEMY3] DROPPING! Player Y: {player.transform.position.y}, Enemy Y: {transform.position.y}, X Distance: {horizontalDistance:F2}, Range: {dropRange}");
                     DropProjectile();
                     dropTimer = 0f; // reset timer
                 }
@@ -169,10 +179,6 @@ namespace Platformer.Mechanics
             else
             {
                 // reset timer when conditions not met
-                if (dropTimer > 0f)
-                {
-                    Debug.Log($"[ENEMY3] Conditions not met, resetting. Below: {playerIsBelow}, X Distance: {horizontalDistance:F2}/{dropRange}");
-                }
                 dropTimer = 0f;
             }
         }
@@ -181,11 +187,8 @@ namespace Platformer.Mechanics
         {
             if (projectilePrefab == null)
             {
-                Debug.LogError("[ENEMY3] Projectile prefab is NULL! Assign it in Inspector!");
                 return;
             }
-
-            Debug.Log($"[ENEMY3] Spawning projectile at {transform.position}");
 
             // spawn projectile at enemy position
             GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
@@ -194,11 +197,6 @@ namespace Platformer.Mechanics
             if (projectileScript != null)
             {
                 projectileScript.Initialize(projectileSpeed, projectileDamage);
-                Debug.Log($"[ENEMY3] Projectile initialized: speed={projectileSpeed}, damage={projectileDamage}");
-            }
-            else
-            {
-                Debug.LogError("[ENEMY3] Projectile prefab has no Enemy3Projectile script!");
             }
         }
 
@@ -248,6 +246,9 @@ namespace Platformer.Mechanics
                         rb.constraints = RigidbodyConstraints2D.None;
                     }
 
+                    // try to drop powerup
+                    TryDropPowerup();
+
                     Schedule<EnemyDeath>().enemy = this;
                 }
                 else
@@ -283,6 +284,43 @@ namespace Platformer.Mechanics
             if (damageNumber != null)
             {
                 damageNumber.Initialize(damage, spawnPosition);
+            }
+        }
+
+        private void TryDropPowerup()
+        {
+            float roll = Random.Range(0f, 100f);
+            GameObject powerupToDrop = null;
+
+            // check each powerup in order (cumulative probabilities)
+            if (roll < healthDropChance)
+            {
+                powerupToDrop = healthVialPrefab;
+            }
+            else if (roll < healthDropChance + speedDropChance)
+            {
+                powerupToDrop = speedVialPrefab;
+            }
+            else if (roll < healthDropChance + speedDropChance + damageDropChance)
+            {
+                powerupToDrop = damageVialPrefab;
+            }
+            else if (roll < healthDropChance + speedDropChance + damageDropChance + timeDropChance)
+            {
+                powerupToDrop = timeVialPrefab;
+            }
+
+            // spawn powerup at enemy position if one was rolled
+            if (powerupToDrop != null)
+            {
+                GameObject vial = Instantiate(powerupToDrop, transform.position, Quaternion.identity);
+
+                // set high sorting order so vials render in front of environment
+                SpriteRenderer vialRenderer = vial.GetComponent<SpriteRenderer>();
+                if (vialRenderer != null)
+                {
+                    vialRenderer.sortingOrder = 100;
+                }
             }
         }
 

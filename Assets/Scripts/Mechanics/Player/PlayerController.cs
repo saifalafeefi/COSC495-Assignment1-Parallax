@@ -28,6 +28,14 @@ namespace Platformer.Mechanics
         /// Initial jump velocity at the start of a jump.
         /// </summary>
         public float jumpTakeOffSpeed = 12;
+        /// <summary>
+        /// Additional downward speed when holding down key in air (fast fall).
+        /// </summary>
+        public float fastFallSpeed = 10f;
+        /// <summary>
+        /// Upward bounce force when hitting enemy with air attack while in the air.
+        /// </summary>
+        public float airAttackBounceForce = 12f;
 
         [Header("Invincibility Settings")]
         /// <summary>
@@ -221,6 +229,8 @@ namespace Platformer.Mechanics
         private InputAction m_RangedAttackAction;
         private float rangedAttackCooldownTimer = 0f;
         private bool isFiringRangedAttack = false; // prevent firing again while animation is playing
+
+        private InputAction m_FastFallAction;
         #endregion
 
         /// <summary>
@@ -298,6 +308,7 @@ namespace Platformer.Mechanics
             m_AttackAction = InputSystem.actions.FindAction("Player/Attack");
             m_RollAction = InputSystem.actions.FindAction("Player/Roll");
             m_RangedAttackAction = InputSystem.actions.FindAction("Player/RangedAttack");
+            m_FastFallAction = InputSystem.actions.FindAction("Player/FastFall");
 
             m_MoveAction.Enable();
             m_JumpAction.Enable();
@@ -321,6 +332,11 @@ namespace Platformer.Mechanics
                 m_RangedAttackAction.Enable();
             }
 
+            if (m_FastFallAction != null)
+            {
+                m_FastFallAction.Enable();
+            }
+
 
             if (invincibilityDuration <= 0)
             {
@@ -339,6 +355,21 @@ namespace Platformer.Mechanics
 
         protected override void Update()
         {
+            // disable control during respawn and hurt animations
+            AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(0);
+            bool isInRespawnState = currentState.IsName("PlayerRespawn");
+            bool isInHurtState = currentState.IsName("PlayerHurt");
+
+            if (isInRespawnState || isInHurtState)
+            {
+                controlEnabled = false;
+            }
+            else if (!isHurtStunned)
+            {
+                // only re-enable control if not hurt stunned
+                controlEnabled = true;
+            }
+
             // handle hurt stun timer
             if (isHurtStunned)
             {
@@ -515,6 +546,10 @@ namespace Platformer.Mechanics
 
                     // force material reset when invincibility ends
                     spriteRenderer.material = originalMaterial;
+
+                    // re-enable collision with enemies
+                    Physics2D.IgnoreLayerCollision(gameObject.layer, enemyLayerIndex, false);
+                    RefreshContactFilter();
                 }
             }
 
@@ -589,6 +624,12 @@ namespace Platformer.Mechanics
                 jump = false;
             }
 
+            // fast fall when holding down arrow in air
+            if (!IsGrounded && m_FastFallAction != null && m_FastFallAction.IsPressed())
+            {
+                velocity.y -= fastFallSpeed * DeltaTime;
+            }
+
             if (move.x > 0.01f)
                 spriteRenderer.flipX = false;
             else if (move.x < -0.01f)
@@ -645,6 +686,10 @@ namespace Platformer.Mechanics
                 isHurtStunned = true;
                 controlEnabled = false;
                 hurtStunTimer = hurtDuration;
+
+                // disable collision with enemies during invincibility
+                Physics2D.IgnoreLayerCollision(gameObject.layer, enemyLayerIndex, true);
+                RefreshContactFilter();
             }
             else
             {
@@ -703,10 +748,10 @@ namespace Platformer.Mechanics
             // determine which attack to perform based on combo step AND grounded status
             string attackTrigger;
 
-            // check if player is in the air
-            if (!IsGrounded)
+            // check if holding down arrow (smash attack - works on ground or in air!)
+            if (m_FastFallAction != null && m_FastFallAction.IsPressed())
             {
-                // aerial attack - always use air attack, no combo in air
+                // smash attack - holding down arrow triggers downward strike
                 currentAttackState = attackAirStateName;
                 attackTrigger = "attackAir";
             }
@@ -1066,10 +1111,10 @@ namespace Platformer.Mechanics
                 }
             }
 
-            // if air attacking and hit enemy, bounce!
-            if (isAirAttack && hitEnemy)
+            // if air attacking while IN THE AIR and hit enemy, bounce!
+            if (isAirAttack && hitEnemy && !IsGrounded)
             {
-                Bounce(7); // bounce on successful air attack hit
+                Bounce(airAttackBounceForce); // bounce on successful air attack hit (only in air)
             }
         }
 

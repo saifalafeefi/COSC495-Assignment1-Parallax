@@ -62,6 +62,8 @@ MonoBehaviour:
   landAudio: {fileID: 8300000, guid: dd6057fd464f77942a0bf39c54651b32, type: 3}
   maxSpeed: 7
   jumpTakeOffSpeed: 8
+  fastFallSpeed: 12
+  airAttackBounceForce: 8
   invincibilityDuration: 1.5
   hurtDuration: 0.5
   flashInterval: 0.1
