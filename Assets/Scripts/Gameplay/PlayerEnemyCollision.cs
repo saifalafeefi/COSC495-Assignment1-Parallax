@@ -34,12 +34,6 @@ namespace Platformer.Gameplay
             }
 
             var enemyHealth = enemy.GetComponent<Health>();
-            if (enemyHealth == null)
-            {
-            }
-            else
-            {
-            }
 
             if (enemyHealth != null && !enemyHealth.IsAlive)
             {
@@ -60,7 +54,7 @@ namespace Platformer.Gameplay
             else
                 return; // not a valid enemy
 
-            // player only hurts enemy if ATTACKING (from any angle!)
+            // player only hurts enemy if attacking (from any angle)
             bool playerIsAttacking = player.isAttacking;
             var willHurtEnemy = playerIsAttacking;
 
@@ -130,9 +124,6 @@ namespace Platformer.Gameplay
                         // no health component, instant death (old behavior)
                         Schedule<PlayerDeath>();
                     }
-                }
-                else
-                {
                 }
             }
         }

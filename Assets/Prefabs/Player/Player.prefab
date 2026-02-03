@@ -81,8 +81,8 @@ MonoBehaviour:
   attack3Range: 1
   attack3HitboxSize: {x: 2.5, y: 1.5}
   attack3Damage: 2
-  attackAirRange: 0.5
-  attackAirHitboxSize: {x: 2, y: 3}
+  attackAirRange: 1
+  attackAirHitboxSize: {x: 2, y: 2.5}
   attackAirDamage: 2
   enemyKnockbackForce: 20
   enemyLayer:

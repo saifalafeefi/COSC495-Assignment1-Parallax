@@ -21,121 +21,121 @@ namespace Platformer.Mechanics
         public AudioClip landAudio;
 
         /// <summary>
-        /// Max horizontal speed of the player.
+        /// max horizontal speed of the player.
         /// </summary>
         public float maxSpeed = 7;
         /// <summary>
-        /// Initial jump velocity at the start of a jump.
+        /// initial jump velocity at the start of a jump.
         /// </summary>
         public float jumpTakeOffSpeed = 12;
         /// <summary>
-        /// Additional downward speed when holding down key in air (fast fall).
+        /// additional downward speed when holding down key in air (fast fall).
         /// </summary>
         public float fastFallSpeed = 10f;
         /// <summary>
-        /// Upward bounce force when hitting enemy with air attack while in the air.
+        /// upward bounce force when hitting enemy with air attack while in the air.
         /// </summary>
         public float airAttackBounceForce = 12f;
 
         [Header("Invincibility Settings")]
         /// <summary>
-        /// Duration of invincibility frames after taking damage.
+        /// duration of invincibility frames after taking damage.
         /// </summary>
         public float invincibilityDuration = 1.5f;
         /// <summary>
-        /// Duration of hurt stun (player can't move). Should be less than invincibilityDuration.
+        /// duration of hurt stun (player can't move). should be less than invincibilityDuration.
         /// </summary>
         public float hurtDuration = 0.5f;
         /// <summary>
-        /// How fast the sprite flashes during invincibility.
+        /// how fast the sprite flashes during invincibility.
         /// </summary>
         public float flashInterval = 0.1f;
         /// <summary>
-        /// White material to swap to during flash (drag in Inspector).
+        /// white material to swap to during flash (drag in Inspector).
         /// </summary>
         public Material flashMaterial;
 
         [Header("Knockback Settings")]
         /// <summary>
-        /// Horizontal knockback force when hit by enemy.
+        /// horizontal knockback force when hit by enemy.
         /// </summary>
         public float knockbackHorizontalForce = 8f;
         /// <summary>
-        /// Vertical (upward) knockback force when hit by enemy.
+        /// vertical (upward) knockback force when hit by enemy.
         /// </summary>
         public float knockbackVerticalForce = 10f;
 
         [Header("Attack Settings")]
         /// <summary>
-        /// Name of the first attack animation state in the Animator.
+        /// name of the first attack animation state in the Animator.
         /// </summary>
         public string attackStateName = "PlayerAttack1";
         /// <summary>
-        /// Name of the second attack animation state in the Animator.
+        /// name of the second attack animation state in the Animator.
         /// </summary>
         public string attack2StateName = "PlayerAttack2";
         /// <summary>
-        /// Name of the third attack animation state in the Animator.
+        /// name of the third attack animation state in the Animator.
         /// </summary>
         public string attack3StateName = "PlayerAttack3";
         /// <summary>
-        /// Name of the aerial attack animation state in the Animator.
+        /// name of the aerial attack animation state in the Animator.
         /// </summary>
         public string attackAirStateName = "PlayerAttackAir";
         /// <summary>
-        /// Time window after each attack to input next attack (combo window).
+        /// time window after each attack to input next attack (combo window).
         /// </summary>
         public float comboWindow = 0.8f;
 
         [Header("Attack 1 & 2 Hitbox")]
         /// <summary>
-        /// Attack 1/2 hitbox range (how far forward to detect enemies).
+        /// attack 1/2 hitbox range (how far forward to detect enemies).
         /// </summary>
         public float attack12Range = 1.5f;
         /// <summary>
-        /// Attack 1/2 hitbox size (width/height of the attack area).
+        /// attack 1/2 hitbox size (width/height of the attack area).
         /// </summary>
         public Vector2 attack12HitboxSize = new Vector2(1.5f, 1f);
         /// <summary>
-        /// Damage dealt by attack 1 and 2.
+        /// damage dealt by attack 1 and 2.
         /// </summary>
         public int attack12Damage = 1;
 
         [Header("Attack 3 (Finisher) Hitbox")]
         /// <summary>
-        /// Attack 3 hitbox range (how far forward to detect enemies).
+        /// attack 3 hitbox range (how far forward to detect enemies).
         /// </summary>
         public float attack3Range = 2f;
         /// <summary>
-        /// Attack 3 hitbox size (width/height of the attack area).
+        /// attack 3 hitbox size (width/height of the attack area).
         /// </summary>
         public Vector2 attack3HitboxSize = new Vector2(2f, 1.5f);
         /// <summary>
-        /// Damage dealt by attack 3 finisher.
+        /// damage dealt by attack 3 finisher.
         /// </summary>
         public int attack3Damage = 2;
 
         [Header("Aerial Attack Hitbox")]
         /// <summary>
-        /// Aerial attack hitbox range (how far forward to detect enemies).
+        /// aerial attack hitbox range (how far forward to detect enemies).
         /// </summary>
         public float attackAirRange = 1.2f;
         /// <summary>
-        /// Aerial attack hitbox size (width/height of the attack area).
+        /// aerial attack hitbox size (width/height of the attack area).
         /// </summary>
         public Vector2 attackAirHitboxSize = new Vector2(1.2f, 1.2f);
         /// <summary>
-        /// Damage dealt by aerial attack.
+        /// damage dealt by aerial attack.
         /// </summary>
         public int attackAirDamage = 1;
 
         [Header("Attack Settings")]
         /// <summary>
-        /// Knockback force applied to enemies when hit.
+        /// knockback force applied to enemies when hit.
         /// </summary>
         public float enemyKnockbackForce = 3f;
         /// <summary>
-        /// Layer mask for detecting enemies.
+        /// layer mask for detecting enemies.
         /// </summary>
         public LayerMask enemyLayer;
 
@@ -234,12 +234,12 @@ namespace Platformer.Mechanics
         #endregion
 
         /// <summary>
-        /// Check if player is currently invincible.
+        /// check if player is currently invincible.
         /// </summary>
         public bool IsInvincible => isInvincible;
 
         /// <summary>
-        /// Check if player has speed boost active (set by SpeedPotion).
+        /// check if player has speed boost active (set by SpeedPotion).
         /// </summary>
         public bool HasSpeedBoost { get; set; } = false;
         public bool HasTimeSlowActive { get; set; } = false;
@@ -250,17 +250,17 @@ namespace Platformer.Mechanics
         private float DeltaTime => useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
 
         /// <summary>
-        /// Check if player is currently wall sliding.
+        /// check if player is currently wall sliding.
         /// </summary>
         public bool IsWallSliding => isWallSliding;
 
         /// <summary>
-        /// Check if player is currently rolling.
+        /// check if player is currently rolling.
         /// </summary>
         public bool IsRolling => isRolling;
 
         /// <summary>
-        /// Get the original sprite color before any powerups/effects were applied.
+        /// get the original sprite color before any powerups/effects were applied.
         /// </summary>
         public Color OriginalSpriteColor => originalSpriteColor;
 
@@ -318,9 +318,6 @@ namespace Platformer.Mechanics
             {
                 m_AttackAction.Enable();
             }
-            else
-            {
-            }
 
             if (m_RollAction != null)
             {
@@ -337,10 +334,6 @@ namespace Platformer.Mechanics
                 m_FastFallAction.Enable();
             }
 
-
-            if (invincibilityDuration <= 0)
-            {
-            }
 
             // extract enemy layer index from enemyLayer mask (for roll collision toggling)
             for (int i = 0; i < 32; i++)
@@ -384,7 +377,7 @@ namespace Platformer.Mechanics
 
             if (controlEnabled)
             {
-                // lock movement during attack (but NOT during roll - roll preserves momentum!)
+                // lock movement during attack (roll preserves momentum during roll action)
                 if (!isAttacking)
                 {
                     move.x = m_MoveAction.ReadValue<Vector2>().x;
@@ -405,7 +398,6 @@ namespace Platformer.Mechanics
                     {
                         // wall jump takes priority over double jump
                         PerformWallJump();
-                        Debug.Log("[WALL JUMP] wall jump executed");
                     }
                     else if (allowDoubleJump && hasDoubleJump && !hasUsedDoubleJump && jumpState == JumpState.InFlight)
                     {
@@ -481,7 +473,6 @@ namespace Platformer.Mechanics
                 {
                     if (m_RangedAttackAction.WasPressedThisFrame())
                     {
-                        Debug.Log("[RANGED] ranged attack initiated");
                         StartCoroutine(PerformRangedAttack());
                     }
                 }
@@ -504,14 +495,12 @@ namespace Platformer.Mechanics
                             velocity.y = 0f;
                             isWallSliding = false;
                             canWallJump = true;
-                            Debug.Log("[WALL JUMP] clinging to wall");
                         }
                         else
                         {
                             // slide down wall - reduced gravity
                             isWallSliding = true;
                             canWallJump = true;
-                            Debug.Log("[WALL JUMP] sliding down wall");
                         }
                     }
                     else
@@ -665,7 +654,7 @@ namespace Platformer.Mechanics
         }
 
         /// <summary>
-        /// Activates invincibility frames with white flash effect.
+        /// activates invincibility frames with white flash effect.
         /// </summary>
         public void ActivateInvincibility()
         {
@@ -704,7 +693,7 @@ namespace Platformer.Mechanics
         }
 
         /// <summary>
-        /// Coroutine that makes the sprite flash white during invincibility by swapping materials.
+        /// coroutine that makes the sprite flash white during invincibility by swapping materials.
         /// </summary>
         private IEnumerator FlashSprite()
         {
@@ -733,7 +722,7 @@ namespace Platformer.Mechanics
         }
 
         /// <summary>
-        /// Performs the full attack sequence (animation + dash).
+        /// performs the full attack sequence (animation + dash).
         /// </summary>
         private IEnumerator PerformAttack()
         {
@@ -838,7 +827,7 @@ namespace Platformer.Mechanics
         }
 
         /// <summary>
-        /// Performs the full roll sequence (animation + movement + invincibility).
+        /// performs the full roll sequence (animation + movement + invincibility).
         /// </summary>
         private IEnumerator PerformRoll()
         {
@@ -898,10 +887,6 @@ namespace Platformer.Mechanics
                 yield return null;
             }
 
-            if (waitTime >= timeout)
-            {
-            }
-
             isRolling = false;
             rollCooldownTimer = rollCooldown;
 
@@ -929,7 +914,6 @@ namespace Platformer.Mechanics
 
             // trigger ranged attack animation
             animator.SetTrigger("rangedAttack");
-            Debug.Log("[RANGED] animation triggered");
 
             // wait one frame for animator to transition
             yield return null;
@@ -946,7 +930,6 @@ namespace Platformer.Mechanics
                 {
                     SpawnProjectile();
                     projectileSpawned = true;
-                    Debug.Log($"[RANGED] projectile spawned at animation time {normalizedTime:F2} (target: {projectileSpawnAnimationTime:F2})");
                 }
 
                 yield return null;
@@ -956,15 +939,12 @@ namespace Platformer.Mechanics
             if (!projectileSpawned)
             {
                 SpawnProjectile();
-                Debug.LogWarning($"[RANGED] animation ended before reaching spawn time {projectileSpawnAnimationTime:F2}, spawned at end");
             }
 
             isFiringRangedAttack = false;
 
             // start cooldown
             rangedAttackCooldownTimer = rangedAttackCooldown;
-
-            Debug.Log("[RANGED] attack complete");
         }
 
         /// <summary>
@@ -986,16 +966,11 @@ namespace Platformer.Mechanics
             if (fist != null)
             {
                 fist.Initialize(direction, rangedAttackDamage);
-                Debug.Log($"[RANGED] projectile created at {spawnPosition}, direction: {(direction > 0 ? "right" : "left")}, damage: {rangedAttackDamage}");
-            }
-            else
-            {
-                Debug.LogWarning("[RANGED] projectile prefab missing ProjectileFist component!");
             }
         }
 
         /// <summary>
-        /// Perform a wall jump - jump away from wall in opposite direction.
+        /// perform a wall jump - jump away from wall in opposite direction.
         /// </summary>
         private void PerformWallJump()
         {
@@ -1017,7 +992,6 @@ namespace Platformer.Mechanics
             {
                 hasDoubleJump = true;
                 hasUsedDoubleJump = false;
-                Debug.Log("[WALL JUMP] double jump refreshed");
             }
 
             // set jump state
@@ -1026,20 +1000,13 @@ namespace Platformer.Mechanics
             // play jump sound
             if (audioSource && jumpAudio)
                 audioSource.PlayOneShot(jumpAudio);
-
-            Debug.Log($"[WALL JUMP] jumped {(jumpDirectionX > 0 ? "right" : "left")} away from wall");
         }
 
         /// <summary>
-        /// Reset all wall-related state variables.
+        /// reset all wall-related state variables.
         /// </summary>
         private void ResetWallState()
         {
-            if (isTouchingWall || isWallSliding)
-            {
-                Debug.Log("[WALL JUMP] leaving wall");
-            }
-
             isTouchingWall = false;
             isWallSliding = false;
             canWallJump = false;
@@ -1048,7 +1015,7 @@ namespace Platformer.Mechanics
         }
 
         /// <summary>
-        /// Checks for enemies in attack range and deals damage.
+        /// checks for enemies in attack range and deals damage.
         /// </summary>
         /// <param name="range">how far forward the hitbox extends</param>
         /// <param name="hitboxSize">width/height of the hitbox</param>
@@ -1111,7 +1078,7 @@ namespace Platformer.Mechanics
                 }
             }
 
-            // if air attacking while IN THE AIR and hit enemy, bounce!
+            // if air attacking while in the air and hit enemy, bounce
             if (isAirAttack && hitEnemy && !IsGrounded)
             {
                 Bounce(airAttackBounceForce); // bounce on successful air attack hit (only in air)
@@ -1119,10 +1086,10 @@ namespace Platformer.Mechanics
         }
 
         /// <summary>
-        /// Applies knockback force to the player in a projectile arc.
+        /// applies knockback force to the player in a projectile arc.
         /// </summary>
-        /// <param name="knockbackDirection">Direction of the knockback force (horizontal component determines direction).</param>
-        /// <param name="knockbackForce">Strength of the knockback (UNUSED - uses knockbackHorizontalForce/knockbackVerticalForce instead).</param>
+        /// <param name="knockbackDirection">direction of the knockback force (horizontal component determines direction).</param>
+        /// <param name="knockbackForce">strength of the knockback (unused - uses knockbackHorizontalForce/knockbackVerticalForce instead).</param>
         public void ApplyKnockback(Vector2 knockbackDirection, float knockbackForce = 5f)
         {
             // determine horizontal direction (left or right)
@@ -1146,6 +1113,9 @@ namespace Platformer.Mechanics
             controlEnabled = true;
             knockbackVelocityX = 0f;
             HasSpeedBoost = false; // clear speed boost on death
+
+            // explicitly reset animator hurt bool (prevents stuck hurt state after respawn)
+            animator.SetBool("hurt", false);
 
             // reset time slow effects if active
             if (HasTimeSlowActive)

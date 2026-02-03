@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4419866540496578683}
   - component: {fileID: 1999987106149118952}
   - component: {fileID: 3501362801466793395}
+  - component: {fileID: 111606544307973123}
   m_Layer: 0
   m_Name: Ink
   m_TagString: Untagged
@@ -160,3 +161,22 @@ MonoBehaviour:
   - {fileID: 6064876847595431777, guid: 77f69055b9dbe73489eb0457fbe96fb6, type: 3}
   - {fileID: -9074440452042401156, guid: 77f69055b9dbe73489eb0457fbe96fb6, type: 3}
   - {fileID: -8034043843789426152, guid: 77f69055b9dbe73489eb0457fbe96fb6, type: 3}
+--- !u!114 &111606544307973123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3461093452608052081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55ec781510e2d194b9accea845142758, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.FloatingPowerup
+  floatAmplitude: 0.05
+  floatSpeed: 8
+  randomizeStartOffset: 0
+  enableRotation: 1
+  rotationMaxAngle: 15
+  rotationSpeed: 2
+  randomizeRotationOffset: 0

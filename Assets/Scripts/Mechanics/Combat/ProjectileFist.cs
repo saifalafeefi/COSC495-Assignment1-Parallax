@@ -37,7 +37,6 @@ namespace Platformer.Mechanics
             if (rb != null)
             {
                 rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-                Debug.Log("[PROJECTILE] Rigidbody2D collision detection set to Continuous");
             }
         }
 
@@ -51,17 +50,6 @@ namespace Platformer.Mechanics
             direction = fireDirection;
             damage = damageAmount;
             startPosition = transform.position;
-
-            // diagnostic: check projectile setup
-            Collider2D collider = GetComponent<Collider2D>();
-            if (collider != null)
-            {
-                Debug.Log($"[PROJECTILE DIAGNOSTIC] Layer: {LayerMask.LayerToName(gameObject.layer)}, IsTrigger: {collider.isTrigger}, Rigidbody: {(rb != null ? "YES" : "NO")}, CollisionMode: {(rb != null ? rb.collisionDetectionMode.ToString() : "N/A")}");
-            }
-            else
-            {
-                Debug.LogWarning("[PROJECTILE DIAGNOSTIC] NO COLLIDER FOUND! Projectile won't hit anything!");
-            }
 
             // set velocity based on direction
             rb.linearVelocity = new Vector2(direction * projectileSpeed, 0f);
@@ -83,7 +71,6 @@ namespace Platformer.Mechanics
             float distanceTraveled = Vector3.Distance(startPosition, transform.position);
             if (distanceTraveled >= maxDistance)
             {
-                Debug.Log($"[PROJECTILE] exceeded max distance ({distanceTraveled:F1} units), destroying");
                 Destroy(gameObject);
             }
         }
@@ -98,19 +85,15 @@ namespace Platformer.Mechanics
             // if still alive after max time, destroy
             if (gameObject != null)
             {
-                Debug.Log("[PROJECTILE] lifetime expired, destroying");
                 Destroy(gameObject);
             }
         }
 
         void OnTriggerEnter2D(Collider2D other)
         {
-            Debug.Log($"[PROJECTILE] OnTriggerEnter2D called! hit: {other.gameObject.name}, layer: {LayerMask.LayerToName(other.gameObject.layer)}");
-
             // prevent multiple hits
             if (hasHit)
             {
-                Debug.Log("[PROJECTILE] already hit something, ignoring");
                 return;
             }
 
@@ -124,7 +107,6 @@ namespace Platformer.Mechanics
                 hasHit = true;
                 Vector2 knockbackDir = new Vector2(direction, 0.3f);
                 enemy1.TakeDamage(damage, knockbackDir, 2f, false);
-                Debug.Log($"[PROJECTILE] hit enemy1 '{other.gameObject.name}', dealt {damage} damage");
                 Destroy(gameObject);
             }
             else if (enemy2 != null)
@@ -132,7 +114,6 @@ namespace Platformer.Mechanics
                 hasHit = true;
                 Vector2 knockbackDir = new Vector2(direction, 0.3f);
                 enemy2.TakeDamage(damage, knockbackDir, 2f, false);
-                Debug.Log($"[PROJECTILE] hit enemy2 '{other.gameObject.name}', dealt {damage} damage");
                 Destroy(gameObject);
             }
             else if (enemy3 != null)
@@ -140,12 +121,7 @@ namespace Platformer.Mechanics
                 hasHit = true;
                 Vector2 knockbackDir = new Vector2(direction, 0.3f);
                 enemy3.TakeDamage(damage, knockbackDir, 2f, false);
-                Debug.Log($"[PROJECTILE] hit enemy3 '{other.gameObject.name}', dealt {damage} damage");
                 Destroy(gameObject);
-            }
-            else
-            {
-                Debug.Log($"[PROJECTILE] hit '{other.gameObject.name}' but it's not an enemy");
             }
         }
 

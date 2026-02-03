@@ -44,7 +44,7 @@ namespace Platformer.Mechanics
             // prevent multiple hits
             if (hasHit) return;
 
-            // ONLY collide with player (like Enemy2Projectile)
+            // only collide with player (like Enemy2Projectile)
             var player = other.GetComponent<PlayerController>();
             if (player != null)
             {

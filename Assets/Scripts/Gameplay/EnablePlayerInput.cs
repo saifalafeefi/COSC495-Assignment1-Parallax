@@ -14,6 +14,9 @@ namespace Platformer.Gameplay
         {
             var player = model.player;
             player.controlEnabled = true;
+
+            // reset dead bool after respawn animation has played (prevents stuck hurt state)
+            player.animator.SetBool("dead", false);
         }
     }
 }
