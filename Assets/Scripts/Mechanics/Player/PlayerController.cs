@@ -264,6 +264,16 @@ namespace Platformer.Mechanics
         /// </summary>
         public Color OriginalSpriteColor => originalSpriteColor;
 
+        /// <summary>
+        /// get current roll cooldown timer (0 = ready, rollCooldown = just used).
+        /// </summary>
+        public float RollCooldownTimer => rollCooldownTimer;
+
+        /// <summary>
+        /// get current ranged attack cooldown timer (0 = ready, rangedAttackCooldown = just used).
+        /// </summary>
+        public float RangedCooldownTimer => rangedAttackCooldownTimer;
+
         public JumpState jumpState = JumpState.Grounded;
         /*internal new*/ public Collider2D collider2d;
         /*internal new*/ public AudioSource audioSource;
@@ -1242,6 +1252,20 @@ namespace Platformer.Mechanics
             if (colorManager != null)
             {
                 colorManager.ClearAllColors();
+            }
+
+            // clear camera background tints
+            var cameraBackgroundController = FindFirstObjectByType<CameraBackgroundController>();
+            if (cameraBackgroundController != null)
+            {
+                cameraBackgroundController.ClearAllColors();
+            }
+
+            // reset bloom tint
+            var bloomController = FindFirstObjectByType<BloomTintController>();
+            if (bloomController != null)
+            {
+                bloomController.ResetTint();
             }
         }
 

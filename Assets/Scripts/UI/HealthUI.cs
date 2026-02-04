@@ -59,8 +59,18 @@ namespace Platformer.UI
 
         void SetupCanvas()
         {
-            // find or create Canvas
-            canvas = FindFirstObjectByType<Canvas>();
+            // find existing screen-space overlay canvas (ignore world-space canvases)
+            Canvas[] allCanvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+            foreach (Canvas c in allCanvases)
+            {
+                if (c.renderMode == RenderMode.ScreenSpaceOverlay)
+                {
+                    canvas = c;
+                    break;
+                }
+            }
+
+            // create new canvas if none found
             if (canvas == null)
             {
                 GameObject canvasObj = new GameObject("Canvas");

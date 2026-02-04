@@ -227,7 +227,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55ec781510e2d194b9accea845142758, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.HealthPotion
-  floatAmplitude: 0.3
+  floatAmplitude: 0.15
   floatSpeed: 2
   randomizeStartOffset: 1
   enableRotation: 1

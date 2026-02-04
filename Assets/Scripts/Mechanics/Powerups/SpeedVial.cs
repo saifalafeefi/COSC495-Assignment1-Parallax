@@ -73,13 +73,13 @@ namespace Platformer.Mechanics
                     player.audioSource.PlayOneShot(collectSound);
                 }
 
-                // apply bloom tint effect
+                // apply bloom tint effect (hold for boost duration, then fade)
                 if (enableBloomTint)
                 {
                     var bloomController = FindFirstObjectByType<BloomTintController>();
                     if (bloomController != null)
                     {
-                        bloomController.ApplyTint(bloomTintColor);
+                        bloomController.ApplyTintWithHold(bloomTintColor, boostDuration);
                     }
                 }
 
@@ -101,6 +101,7 @@ namespace Platformer.Mechanics
             float animMult = attackSpeedMultiplier;
             SpriteRenderer spriteRenderer = player.GetComponent<SpriteRenderer>();
             PowerupColorManager colorManager = player.GetComponent<PowerupColorManager>();
+            CameraBackgroundController cameraBackgroundController = FindFirstObjectByType<CameraBackgroundController>();
 
             if (colorManager == null)
             {
@@ -121,7 +122,7 @@ namespace Platformer.Mechanics
             player.animator.speed *= animMult;
             player.HasSpeedBoost = true; // enable i-frame piercing
 
-            // add color to blend
+            // add color to blend (player sprite)
             if (enableSpriteTint)
             {
                 colorManager.AddColor(powerupID, speedTintColor);
@@ -129,6 +130,12 @@ namespace Platformer.Mechanics
             else
             {
                 Debug.LogWarning("[SPEED VIAL] Sprite tint is DISABLED! Check 'Enable Sprite Tint' checkbox on prefab!");
+            }
+
+            // add color to camera background blend
+            if (enableBloomTint && cameraBackgroundController != null)
+            {
+                cameraBackgroundController.AddColor(powerupID, bloomTintColor);
             }
 
             // wait for normal duration (boost time - warning time)
@@ -177,6 +184,12 @@ namespace Platformer.Mechanics
             if (enableSpriteTint)
             {
                 colorManager.RemoveColor(powerupID);
+            }
+
+            // remove color from camera background blend
+            if (enableBloomTint && cameraBackgroundController != null)
+            {
+                cameraBackgroundController.RemoveColor(powerupID);
             }
 
             // destroy particle effect

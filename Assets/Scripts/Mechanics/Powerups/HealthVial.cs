@@ -73,7 +73,7 @@ namespace Platformer.Mechanics
                         player.audioSource.PlayOneShot(collectSound);
                     }
 
-                    // apply bloom tint effect
+                    // apply bloom tint effect (instant fade, no duration)
                     if (enableBloomTint)
                     {
                         var bloomController = FindFirstObjectByType<BloomTintController>();
@@ -83,10 +83,13 @@ namespace Platformer.Mechanics
                         }
                     }
 
+                    // camera background for health vial uses timed coroutine (follows sprite tint duration)
+                    var cameraBackgroundController = FindFirstObjectByType<CameraBackgroundController>();
+
                     // apply green tint effect if enabled
                     if (enableTint)
                     {
-                        player.StartCoroutine(ApplyHealTint(player));
+                        player.StartCoroutine(ApplyHealTint(player, cameraBackgroundController));
                     }
 
                     // destroy the vial
@@ -102,7 +105,7 @@ namespace Platformer.Mechanics
         /// <summary>
         /// apply green tint to player sprite that fades out over time.
         /// </summary>
-        private IEnumerator ApplyHealTint(PlayerController player)
+        private IEnumerator ApplyHealTint(PlayerController player, CameraBackgroundController cameraBackgroundController)
         {
             // generate unique ID for this powerup instance
             string powerupID = "health_" + System.Guid.NewGuid().ToString();
@@ -115,10 +118,16 @@ namespace Platformer.Mechanics
             }
 
 
-            // add green to blend
+            // add green to blend (player sprite)
             if (enableTint)
             {
                 colorManager.AddColor(powerupID, tintColor);
+            }
+
+            // add color to camera background blend (no pulsing for health vial - just fade)
+            if (enableBloomTint && cameraBackgroundController != null)
+            {
+                cameraBackgroundController.AddColor(powerupID, bloomTintColor, shouldPulse: false);
             }
 
             // wait for tint duration (full brightness)
@@ -128,30 +137,39 @@ namespace Platformer.Mechanics
             if (enableTint && fadeOutDuration > 0)
             {
                 float elapsed = 0f;
-                Color startColor = tintColor;
+                Color startSpriteColor = tintColor;
 
                 while (elapsed < fadeOutDuration)
                 {
                     elapsed += Time.deltaTime;
                     float t = elapsed / fadeOutDuration;
 
-                    // lerp alpha from 1 to 0 (fade out contribution)
-                    Color fadedColor = startColor;
-                    fadedColor.r = Mathf.Lerp(startColor.r, 1f, t); // fade to white (neutral)
-                    fadedColor.g = Mathf.Lerp(startColor.g, 1f, t);
-                    fadedColor.b = Mathf.Lerp(startColor.b, 1f, t);
+                    // fade sprite tint to white (neutral)
+                    Color fadedSpriteColor = startSpriteColor;
+                    fadedSpriteColor.r = Mathf.Lerp(startSpriteColor.r, 1f, t);
+                    fadedSpriteColor.g = Mathf.Lerp(startSpriteColor.g, 1f, t);
+                    fadedSpriteColor.b = Mathf.Lerp(startSpriteColor.b, 1f, t);
 
-                    // update the color in the dictionary (other pulses will see this change)
-                    colorManager.UpdateColor(powerupID, fadedColor);
+                    // update the sprite color in the dictionary
+                    colorManager.UpdateColor(powerupID, fadedSpriteColor);
 
                     yield return null;
                 }
             }
 
+            // for camera background, just remove it instantly - no manual fade
+            // (removing triggers automatic FadeToDefault which works correctly)
+
             // remove from blend after fade completes
             if (enableTint)
             {
                 colorManager.RemoveColor(powerupID);
+            }
+
+            // remove color from camera background blend
+            if (enableBloomTint && cameraBackgroundController != null)
+            {
+                cameraBackgroundController.RemoveColor(powerupID);
             }
         }
     }

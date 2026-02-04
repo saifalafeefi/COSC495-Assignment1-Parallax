@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 1824045667}
   - component: {fileID: 829009253661379645}
   - component: {fileID: 2964223675858037092}
+  - component: {fileID: 8963116245387037698}
   m_Layer: 13
   m_Name: Player
   m_TagString: Player
@@ -404,3 +405,25 @@ MonoBehaviour:
   ghostLifetime: 0.3
   ghostStartAlpha: 0.5
   minSpeedThreshold: 2
+--- !u!114 &8963116245387037698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208144871472054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1de46275e2459344d9e643a50ddea57b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Platformer.UI.CooldownUI
+  playerController: {fileID: 0}
+  barWidth: 8
+  barHeight: 40
+  offsetX: 0.8
+  offsetY: 0.5
+  barSpacing: 12
+  rollColor: {r: 0.2, g: 0.6, b: 1, a: 0.9}
+  rangedColor: {r: 1, g: 0.8, b: 0.2, a: 0.9}
+  backgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.6}
+  hideWhenReady: 0

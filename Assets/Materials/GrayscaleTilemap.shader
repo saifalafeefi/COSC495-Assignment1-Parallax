@@ -57,11 +57,14 @@ Shader "Custom/GrayscaleTilemap"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                fixed4 c = tex2D(_MainTex, i.texcoord) * i.color;
+                fixed4 c = tex2D(_MainTex, i.texcoord);
 
                 // convert to grayscale (luminosity method)
                 float gray = dot(c.rgb, float3(0.299, 0.587, 0.114));
-                c.rgb = float3(gray, gray, gray);
+
+                // apply tint color to grayscale (colorize the grayscale)
+                c.rgb = gray * i.color.rgb;
+                c.a *= i.color.a;
 
                 return c;
             }

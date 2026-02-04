@@ -74,13 +74,13 @@ namespace Platformer.Mechanics
                     player.audioSource.PlayOneShot(collectSound);
                 }
 
-                // apply bloom tint effect with hold duration (separate from fade)
+                // apply bloom tint effect (hold for full slow duration, then fade)
                 if (enableBloomTint)
                 {
                     var bloomController = FindFirstObjectByType<BloomTintController>();
                     if (bloomController != null)
                     {
-                        bloomController.ApplyTintWithHold(bloomTintColor, bloomTintDuration);
+                        bloomController.ApplyTintWithHold(bloomTintColor, slowDuration);
                     }
                 }
 
@@ -104,6 +104,7 @@ namespace Platformer.Mechanics
             float originalTimeScale = Time.timeScale;
             PowerupColorManager colorManager = player.GetComponent<PowerupColorManager>();
             GhostTrail ghostTrail = player.GetComponent<GhostTrail>();
+            CameraBackgroundController cameraBackgroundController = FindFirstObjectByType<CameraBackgroundController>();
 
             if (colorManager == null)
             {
@@ -131,10 +132,16 @@ namespace Platformer.Mechanics
                 ghostTrail.EnableTrail();
             }
 
-            // add color to blend
+            // add color to blend (player sprite)
             if (enableTint)
             {
                 colorManager.AddColor(powerupID, tintColor);
+            }
+
+            // add color to camera background blend
+            if (enableBloomTint && cameraBackgroundController != null)
+            {
+                cameraBackgroundController.AddColor(powerupID, bloomTintColor);
             }
 
             // wait for normal duration (slow time - warning time)
@@ -225,6 +232,12 @@ namespace Platformer.Mechanics
             if (enableTint)
             {
                 colorManager.RemoveColor(powerupID);
+            }
+
+            // remove color from camera background blend
+            if (enableBloomTint && cameraBackgroundController != null)
+            {
+                cameraBackgroundController.RemoveColor(powerupID);
             }
         }
     }
