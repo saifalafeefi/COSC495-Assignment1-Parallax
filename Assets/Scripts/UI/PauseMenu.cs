@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 namespace Platformer.UI
 {
@@ -80,19 +81,32 @@ namespace Platformer.UI
         }
 
         /// <summary>
-        /// restart the level (placeholder).
+        /// restart the current scene (fresh start).
         /// </summary>
         public void Restart()
         {
-            // TODO: implement level restart logic
+            // unpause game before reloading
+            Time.timeScale = 1f;
+
+            // reload current scene
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
         /// <summary>
-        /// quit the game (placeholder).
+        /// quit the game.
         /// </summary>
         public void Quit()
         {
-            // TODO: implement quit logic
+            // unpause before quitting
+            Time.timeScale = 1f;
+
+#if UNITY_EDITOR
+            // stop play mode in editor
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            // quit application in build
+            Application.Quit();
+#endif
         }
 
         /// <summary>
