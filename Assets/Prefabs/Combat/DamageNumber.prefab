@@ -195,7 +195,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.DamageNumber
   lifetime: 1
-  floatDistance: 2
+  floatDistance: 0.5
   angleVariation: 30
   popScale: 3
   popDuration: 0

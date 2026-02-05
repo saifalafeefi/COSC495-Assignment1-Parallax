@@ -61,6 +61,9 @@ namespace Platformer.Mechanics
         private Coroutine flashCoroutine = null;
         private Material originalMaterial;
 
+        // damage number merging - tracks currently active damage number
+        private DamageNumber activeDamageNumber = null;
+
         public bool IsInvincible => isInvincible;
         public Bounds Bounds => _collider.bounds;
 
@@ -164,15 +167,25 @@ namespace Platformer.Mechanics
                 return;
             }
 
+            // calculate spawn position above enemy's head
             Vector3 spawnPosition = transform.position;
             spawnPosition.y = _collider.bounds.max.y + damageNumberOffset;
 
+            // if damage number still exists, merge with it (reset to spawn position)
+            if (activeDamageNumber != null)
+            {
+                activeDamageNumber.AddDamage(damage, spawnPosition);
+                return;
+            }
+
+            // spawn new damage number (only if none exists)
             GameObject damageNumberObj = Instantiate(damageNumberPrefab, spawnPosition, Quaternion.identity);
             DamageNumber damageNumber = damageNumberObj.GetComponent<DamageNumber>();
 
             if (damageNumber != null)
             {
                 damageNumber.Initialize(damage, spawnPosition);
+                activeDamageNumber = damageNumber;
             }
         }
 

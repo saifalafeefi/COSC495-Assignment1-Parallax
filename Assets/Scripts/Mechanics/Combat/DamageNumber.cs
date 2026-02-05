@@ -37,6 +37,8 @@ namespace Platformer.Mechanics
         private Vector3 startPosition;
         private Vector3 targetPosition;
         private Color textColor;
+        private int currentDamage;
+        private Coroutine animationCoroutine;
 
         private void Awake()
         {
@@ -51,6 +53,7 @@ namespace Platformer.Mechanics
         public void Initialize(int damage, Vector3 spawnPosition)
         {
             // set damage text
+            currentDamage = damage;
             textMesh.text = damage.ToString();
 
             // pick random color
@@ -67,7 +70,41 @@ namespace Platformer.Mechanics
             targetPosition = startPosition + direction * floatDistance;
 
             // start animation
-            StartCoroutine(AnimateNumber());
+            animationCoroutine = StartCoroutine(AnimateNumber());
+        }
+
+        /// <summary>
+        /// add additional damage to this number (merge system).
+        /// </summary>
+        /// <param name="additionalDamage">damage to add to current total</param>
+        /// <param name="resetPosition">position to reset the number to</param>
+        public void AddDamage(int additionalDamage, Vector3 resetPosition)
+        {
+            // update total damage
+            currentDamage += additionalDamage;
+            textMesh.text = currentDamage.ToString();
+
+            // pick new random color for visual feedback
+            textColor = damageColors[Random.Range(0, damageColors.Length)];
+            textMesh.color = textColor;
+
+            // restart pop animation from reset position
+            if (animationCoroutine != null)
+            {
+                StopCoroutine(animationCoroutine);
+            }
+
+            // reset position back to spawn point
+            transform.position = resetPosition;
+            startPosition = resetPosition;
+
+            // recalculate target with new random angle
+            float randomAngle = Random.Range(-angleVariation, angleVariation);
+            Vector3 direction = Quaternion.Euler(0f, 0f, randomAngle) * Vector3.up;
+            targetPosition = startPosition + direction * floatDistance;
+
+            // restart animation
+            animationCoroutine = StartCoroutine(AnimateNumber());
         }
 
         /// <summary>
