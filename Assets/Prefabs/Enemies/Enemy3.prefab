@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 6491145920249856838}
   - component: {fileID: 5491786696438745814}
   - component: {fileID: 2657789348902721725}
+  - component: {fileID: 3134191950210515621}
   m_Layer: 3
   m_Name: Enemy3
   m_TagString: Player
@@ -204,6 +205,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 480af98cab20b3c488a1819aed2820ea, type: 3}
   - {fileID: 8300000, guid: 94fc8b80114fba648a930321ca8a7f35, type: 3}
   hitSoundVolume: 1
+  scoreValue: 35
   invincibilityDuration: 0.2
   flashInterval: 0.1
   flashMaterial: {fileID: 2100000, guid: b28efccbcae6d4342b1d6ebf20794f41, type: 2}
@@ -338,3 +340,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.Health
   maxHP: 3
+--- !u!114 &3134191950210515621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5564110880376579648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8c521f8dcb72264087577921f49e3d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Platformer.UI.EnemyHealthBar
+  yOffset: 0.8
+  barWidth: 40
+  barHeight: 6
+  outlineThickness: 1
+  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  backgroundColor: {r: 0, g: 0, b: 0, a: 0.8}
+  fillColor: {r: 1, g: 0, b: 0, a: 1}
