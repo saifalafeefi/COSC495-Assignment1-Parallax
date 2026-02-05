@@ -22,6 +22,12 @@ namespace Platformer.Mechanics
         [Range(0f, 5f)]
         public float hitSoundVolume = 1f;
 
+        [Header("Score Settings")]
+        /// <summary>
+        /// points awarded when player kills this enemy.
+        /// </summary>
+        public int scoreValue = 50;
+
         [Header("Invincibility Settings")]
         public float invincibilityDuration = 0.5f;
         public float flashInterval = 0.1f;

@@ -19,6 +19,10 @@ namespace Platformer.Mechanics
         [Tooltip("List of frames that make up the animation.")]
         public Sprite[] idleAnimation, collectedAnimation;
 
+        [Header("Score Settings")]
+        [Tooltip("Points awarded when player collects this ink.")]
+        public int scoreValue = 5;
+
         internal Sprite[] sprites = new Sprite[0];
 
         internal SpriteRenderer _renderer;

@@ -75,7 +75,6 @@ namespace Platformer.Mechanics
 
             if (mainCamera == null)
             {
-                Debug.LogError("[CAMERA BACKGROUND] Main Camera not found!");
                 enabled = false;
                 return;
             }
@@ -84,18 +83,12 @@ namespace Platformer.Mechanics
             if (grayscaleMaterial == null && grayscaleRenderer != null)
             {
                 grayscaleMaterial = grayscaleRenderer.material; // gets instance, not shared
-                Debug.Log($"[CAMERA BACKGROUND] Found grayscale material instance from {grayscaleRenderer.name}");
             }
 
             // set grayscale material to default color at startup
             if (grayscaleMaterial != null)
             {
                 grayscaleMaterial.SetColor("_Color", defaultGrayscaleColor);
-                Debug.Log($"[CAMERA BACKGROUND] Grayscale material setup complete. Default color: {defaultGrayscaleColor}");
-            }
-            else
-            {
-                Debug.LogWarning("[CAMERA BACKGROUND] No grayscale material or renderer assigned - grayscale tinting disabled");
             }
         }
 

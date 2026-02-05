@@ -1,5 +1,6 @@
 using Platformer.Core;
 using Platformer.Mechanics;
+using Platformer.UI;
 using UnityEngine;
 
 namespace Platformer.Gameplay
@@ -14,6 +15,9 @@ namespace Platformer.Gameplay
 
         public override void Execute()
         {
+            // find game HUD for score tracking
+            var gameHUD = Object.FindFirstObjectByType<GameHUD>();
+
             // check enemy type and disable accordingly
             var enemy1 = enemy as enemy1;
             var enemy2 = enemy as enemy2;
@@ -25,6 +29,8 @@ namespace Platformer.Gameplay
                 enemy1.enabled = false;
                 // play random death sound
                 PlayRandomSound(enemy1._audio, enemy1.hitSounds, enemy1.hitSoundVolume);
+                // add score (uses enemy's scoreValue)
+                if (gameHUD != null) gameHUD.AddScore(enemy1.scoreValue);
             }
             else if (enemy2 != null)
             {
@@ -32,6 +38,8 @@ namespace Platformer.Gameplay
                 enemy2.enabled = false;
                 // play random death sound
                 PlayRandomSound(enemy2._audio, enemy2.hitSounds, enemy2.hitSoundVolume);
+                // add score (uses enemy's scoreValue)
+                if (gameHUD != null) gameHUD.AddScore(enemy2.scoreValue);
             }
             else if (enemy3 != null)
             {
@@ -39,6 +47,8 @@ namespace Platformer.Gameplay
                 enemy3.enabled = false;
                 // play random death sound
                 PlayRandomSound(enemy3._audio, enemy3.hitSounds, enemy3.hitSoundVolume);
+                // add score (uses enemy's scoreValue)
+                if (gameHUD != null) gameHUD.AddScore(enemy3.scoreValue);
             }
         }
 

@@ -87,7 +87,6 @@ namespace Platformer.UI
 
             if (playerController == null)
             {
-                Debug.LogError("[CooldownUI] PlayerController not found!");
                 enabled = false;
                 return;
             }
@@ -131,8 +130,6 @@ namespace Platformer.UI
 
             // create ranged attack cooldown bar using direct offset
             rangedBarContainer = CreateBar("RangedBar", rangedBarOffsetX, rangedBarOffsetY, rangedColor, out rangedBarBackground, out rangedBarFill);
-
-            Debug.Log($"[CooldownUI] Roll bar at ({rollBarOffsetX}, {rollBarOffsetY}), Ranged bar at ({rangedBarOffsetX}, {rangedBarOffsetY})");
         }
 
         GameObject CreateBar(string name, float posX, float posY, Color fillColor, out Image bgImage, out Image fillImage)
