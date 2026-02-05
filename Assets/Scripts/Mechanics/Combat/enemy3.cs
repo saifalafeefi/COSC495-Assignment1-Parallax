@@ -165,6 +165,9 @@ namespace Platformer.Mechanics
 
         private void HandleProjectileDropping()
         {
+            // don't drop if dead
+            if (isDead) return;
+
             // find player if we don't have reference
             if (player == null)
             {

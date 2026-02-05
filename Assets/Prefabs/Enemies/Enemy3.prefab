@@ -232,6 +232,8 @@ MonoBehaviour:
   dropRange: 1.5
   projectileSpeed: 5
   projectileDamage: 1
+  telegraphColor: {r: 1, g: 0.93674123, b: 0.5330188, a: 1}
+  telegraphDuration: 0.1
 --- !u!82 &5491786696438745814
 AudioSource:
   m_ObjectHideFlags: 0

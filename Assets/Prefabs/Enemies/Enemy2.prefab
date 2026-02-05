@@ -230,6 +230,8 @@ MonoBehaviour:
   shootRange: 10
   projectileSpeed: 5
   projectileDamage: 1
+  projectileSpawnFrame: 18
+  projectileSpawnOffset: {x: 0, y: 0.25}
 --- !u!82 &6351163702015416077
 AudioSource:
   m_ObjectHideFlags: 0

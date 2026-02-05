@@ -109,67 +109,67 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: enemy2projectile_0
+      name: enemy2_AttackProjectile_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 20
+        x: 3
+        y: 21
+        width: 70
+        height: 25
+      alignment: 9
+      pivot: {x: 0.7908211, y: 0.2295308}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ba81a24a341e1134cb7c906b675bff64
+      internalID: -2036687690
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: enemy2_AttackProjectile_1
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 19
         width: 72
         height: 27
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 9
+      pivot: {x: 0.8039343, y: 0.22625253}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: dfd246133c6bdc1f0800000000000000
-      internalID: -1022960590879707651
+      spriteID: 6e2e1eba5dce9564b9753c5c92875c42
+      internalID: 1767453437
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: enemy2projectile_1
+      name: enemy2_AttackProjectile_2
       rect:
         serializedVersion: 2
-        x: 82
+        x: 163
         y: 18
-        width: 74
-        height: 29
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        width: 77
+        height: 28
+      alignment: 9
+      pivot: {x: 0.7973774, y: 0.2295308}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: cb88767ae25125510800000000000000
-      internalID: 1536313713008019644
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: enemy2projectile_3
-      rect:
-        serializedVersion: 2
-        x: 162
-        y: 17
-        width: 78
-        height: 30
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: a73bcec1d0ee7fc00800000000000000
-      internalID: 934477187789927290
+      spriteID: 3811e5fc28a3e1f42b91fcebb98bfe43
+      internalID: -598013908
       vertices: []
       indices: 
       edges: []
@@ -186,12 +186,13 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":80.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.800000011920929,"y":0.4000000059604645},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":9,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      enemy2projectile_0: -1022960590879707651
-      enemy2projectile_1: 1536313713008019644
-      enemy2projectile_2: -4472580080150202716
-      enemy2projectile_3: 934477187789927290
+      enemy2_AttackProjectile_0: -2036687690
+      enemy2_AttackProjectile_1: 1767453437
+      enemy2_AttackProjectile_2: -598013908
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -56,8 +56,15 @@ namespace Platformer.Mechanics
         public float projectileSpeed = 5f;
         public int projectileDamage = 1;
 
+        [Header("Animation Settings")]
+        [Tooltip("which frame of enemy2_shoot animation to spawn projectile at")]
+        public int projectileSpawnFrame = 5;
+        [Tooltip("offset from enemy position to spawn projectile (x = horizontal, y = vertical)")]
+        public Vector2 projectileSpawnOffset = new Vector2(0f, 0.5f);
+
         private float shootTimer = 0f;
         private PlayerController player;
+        private bool isShooting = false;
 
         internal Collider2D _collider;
         internal AudioSource _audio;
@@ -71,6 +78,7 @@ namespace Platformer.Mechanics
         private Coroutine flashCoroutine = null;
         private Material originalMaterial;
         private bool isDead = false;
+        private Coroutine shootCoroutine = null;
 
         // damage number merging - tracks currently active damage number
         private DamageNumber activeDamageNumber = null;
@@ -130,6 +138,9 @@ namespace Platformer.Mechanics
 
         private void HandleShooting()
         {
+            // don't shoot if dead
+            if (isDead) return;
+
             // find player if we don't have reference
             if (player == null)
             {
@@ -146,17 +157,20 @@ namespace Platformer.Mechanics
             }
 
             // player is in range and not respawning, handle shoot timer
-            shootTimer += Time.deltaTime;
-            if (shootTimer >= shootInterval)
+            if (!isShooting)
             {
-                ShootProjectile();
-                shootTimer = 0f;
+                shootTimer += Time.deltaTime;
+                if (shootTimer >= shootInterval)
+                {
+                    shootCoroutine = StartCoroutine(ShootSequence());
+                    shootTimer = 0f;
+                }
             }
         }
 
-        private void ShootProjectile()
+        private IEnumerator ShootSequence()
         {
-            if (projectilePrefab == null || player == null) return;
+            isShooting = true;
 
             // trigger shoot animation
             if (animator != null)
@@ -164,16 +178,103 @@ namespace Platformer.Mechanics
                 animator.SetTrigger("shoot");
             }
 
+            // wait one frame for animator to process trigger
+            yield return null;
+
+            // wait until we're in the shoot animation
+            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+
+            // try different possible state names
+            bool inShootState = stateInfo.IsName("Enemy2_Shoot") ||
+                                stateInfo.IsName("enemy2_shoot") ||
+                                stateInfo.IsName("shoot") ||
+                                stateInfo.IsName("Shoot") ||
+                                stateInfo.IsName("Base Layer.Enemy2_Shoot");
+
+            int waitCount = 0;
+            while (!inShootState && waitCount < 100)
+            {
+                waitCount++;
+                yield return null;
+                stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+                inShootState = stateInfo.IsName("Enemy2_Shoot") ||
+                               stateInfo.IsName("enemy2_shoot") ||
+                               stateInfo.IsName("shoot") ||
+                               stateInfo.IsName("Shoot") ||
+                               stateInfo.IsName("Base Layer.Enemy2_Shoot");
+            }
+
+            if (!inShootState)
+            {
+                isShooting = false;
+                yield break;
+            }
+
+            // calculate at what normalized time we should spawn projectile
+            float animationLength = stateInfo.length;
+            float fps = 12f;
+            float totalFrames = animationLength * fps;
+            float targetNormalizedTime = projectileSpawnFrame / totalFrames;
+
+            // if frame is beyond animation length, just shoot at end (0.9)
+            if (targetNormalizedTime > 1f)
+            {
+                targetNormalizedTime = 0.9f;
+            }
+
+            // wait until animation reaches spawn frame (or exceeds it)
+            stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            while (stateInfo.normalizedTime < targetNormalizedTime)
+            {
+                yield return null;
+                stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            }
+
+            // don't spawn if died during animation
+            if (isDead)
+            {
+                isShooting = false;
+                yield break;
+            }
+
+            // spawn projectile
+            SpawnProjectile();
+
+            // wait for animation to complete
+            while (stateInfo.normalizedTime < 0.99f)
+            {
+                yield return null;
+                stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            }
+
+            isShooting = false;
+        }
+
+        private void SpawnProjectile()
+        {
+            if (projectilePrefab == null || player == null) return;
+
+            // calculate spawn position with offset
+            Vector3 spawnPosition = transform.position + (Vector3)projectileSpawnOffset;
+
             // calculate direction to player
             Vector2 direction = (player.transform.position - transform.position).normalized;
 
             // spawn projectile
-            GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+            GameObject projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
             Enemy2Projectile projectileScript = projectile.GetComponent<Enemy2Projectile>();
 
             if (projectileScript != null)
             {
                 projectileScript.Initialize(direction, projectileSpeed, projectileDamage);
+            }
+
+            // set projectile to render in front of enemy
+            SpriteRenderer projectileRenderer = projectile.GetComponent<SpriteRenderer>();
+            if (projectileRenderer != null && spriteRenderer != null)
+            {
+                projectileRenderer.sortingLayerName = spriteRenderer.sortingLayerName;
+                projectileRenderer.sortingOrder = spriteRenderer.sortingOrder + 1;
             }
         }
 
@@ -209,6 +310,14 @@ namespace Platformer.Mechanics
                 {
                     isDead = true;
                     _collider.enabled = false;
+
+                    // stop shooting if in progress
+                    if (shootCoroutine != null)
+                    {
+                        StopCoroutine(shootCoroutine);
+                        shootCoroutine = null;
+                        isShooting = false;
+                    }
 
                     // death flash effect for visual feedback
                     StartCoroutine(DeathFlash());

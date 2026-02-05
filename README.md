@@ -25,8 +25,10 @@ You are the last monochrome being in a world overrun by vibrant chaos. Armed wit
 **Powerups:**
 Colored vials grant temporary abilities based on their hue:
 
-- **Green Vial:** Restores health (healing surge)
-- **Yellow Vial:** Speed boost (movement + attack speed, pierce enemy defenses)
+- **Green Vial:** Restores 1 health point
+- **Yellow Vial:** Speed boost
+- **Red Vial:** Damage boost
+- **Purple Vial:** Slow time (oh yeah!)
 
 Colors betray their purpose, use them wisely, then eliminate the source.
 
@@ -35,6 +37,7 @@ Colors betray their purpose, use them wisely, then eliminate the source.
 - **Arrow Keys:** Move
 - **Space:** Jump (hold for higher jumps)
 - **A:** Attack
+- **S:** Special ranged attack
 - **Left Shift:** Roll
 
 ## Features
@@ -44,7 +47,7 @@ Colors betray their purpose, use them wisely, then eliminate the source.
 - Enemy knockback and damage system
 - Smooth camera follow
 - Combo attack chains
-- Advanced movement mechanics (wall jump, double jump, roll)
+- Advanced movement mechanics (wall jump, double jump, roll, air attack bounce)
 
 ## Credits
 
