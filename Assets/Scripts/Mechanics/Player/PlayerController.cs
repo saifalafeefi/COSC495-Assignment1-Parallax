@@ -242,6 +242,11 @@ namespace Platformer.Mechanics
         /// check if player has speed boost active (set by SpeedPotion).
         /// </summary>
         public bool HasSpeedBoost { get; set; } = false;
+
+        /// <summary>
+        /// true when player is in respawn state (enemies can't attack during respawn).
+        /// </summary>
+        public bool IsRespawning { get; private set; } = false;
         public bool HasTimeSlowActive { get; set; } = false;
 
         /// <summary>
@@ -363,16 +368,20 @@ namespace Platformer.Mechanics
             bool isInHurtState = currentState.IsName("PlayerHurt");
             bool isInDeathState = currentState.IsName("PlayerDeath");
             bool isInRespawnState = currentState.IsName("PlayerRespawn");
+            bool isInVictoryState = currentState.IsName("PlayerVictory");
 
-            // CRITICAL: block all input and force reset flags during death/respawn/hurt
-            if (isInDeathState || isInRespawnState || isInHurtState)
+            // expose respawn state for enemies to check (can't be attacked during respawn)
+            IsRespawning = isInRespawnState;
+
+            // block all input and force reset flags during death/respawn/hurt/victory
+            if (isInDeathState || isInRespawnState || isInHurtState || isInVictoryState)
             {
                 controlEnabled = false;
                 isAttacking = false;
                 isRolling = false;
                 isFiringRangedAttack = false;
                 move.x = 0;
-                // NOTE: Don't return early! Timers still need to update!
+                // timers still need to update
             }
             else if (!isHurtStunned)
             {

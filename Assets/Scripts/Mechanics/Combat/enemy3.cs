@@ -178,8 +178,8 @@ namespace Platformer.Mechanics
             float horizontalDistance = Mathf.Abs(player.transform.position.x - transform.position.x);
             bool playerInXRange = horizontalDistance <= dropRange;
 
-            // player must be BOTH below AND within X range
-            bool canDrop = playerIsBelow && playerInXRange;
+            // player must be BOTH below AND within X range AND not respawning
+            bool canDrop = playerIsBelow && playerInXRange && !player.IsRespawning;
 
             // only increment timer when conditions met
             if (canDrop)

@@ -21,8 +21,8 @@ namespace Platformer.Gameplay
         public override void Execute()
         {
 
-            // ignore collision if player is rolling (phasing through enemies)
-            if (player != null && player.IsRolling)
+            // ignore collision if player is rolling or respawning (phasing through enemies)
+            if (player != null && (player.IsRolling || player.IsRespawning))
             {
                 return;
             }
@@ -86,8 +86,8 @@ namespace Platformer.Gameplay
             }
             else
             {
-                // player hit by enemy - take damage if not invincible
-                if (!player.IsInvincible)
+                // player hit by enemy - take damage if not invincible or respawning
+                if (!player.IsInvincible && !player.IsRespawning)
                 {
                     var playerHealth = player.health;
                     if (playerHealth != null)

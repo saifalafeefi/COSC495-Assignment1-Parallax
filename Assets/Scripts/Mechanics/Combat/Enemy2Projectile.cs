@@ -62,8 +62,8 @@ namespace Platformer.Mechanics
             {
                 hasHit = true;
 
-                // check if player is invincible (rolling or i-frames)
-                if (!player.IsInvincible && !player.IsRolling)
+                // check if player is invincible (rolling, i-frames, or respawning)
+                if (!player.IsInvincible && !player.IsRolling && !player.IsRespawning)
                 {
                     // deal damage to player
                     var playerHealth = player.GetComponent<Health>();

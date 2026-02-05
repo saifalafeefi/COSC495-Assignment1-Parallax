@@ -138,13 +138,13 @@ namespace Platformer.Mechanics
 
             // check if player is in range
             float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
-            if (distanceToPlayer > shootRange)
+            if (distanceToPlayer > shootRange || player.IsRespawning)
             {
-                shootTimer = 0f; // reset timer when out of range
+                shootTimer = 0f; // reset timer when out of range or player respawning
                 return;
             }
 
-            // player is in range, handle shoot timer
+            // player is in range and not respawning, handle shoot timer
             shootTimer += Time.deltaTime;
             if (shootTimer >= shootInterval)
             {
