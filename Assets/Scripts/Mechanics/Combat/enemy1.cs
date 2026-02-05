@@ -37,6 +37,7 @@ namespace Platformer.Mechanics
 
         [Header("Damage Feedback")]
         public GameObject damageNumberPrefab;
+        public GameObject scoreNumberPrefab;
         public float damageNumberOffset = 0.5f;
 
         [Header("Powerup Drops")]
@@ -144,6 +145,13 @@ namespace Platformer.Mechanics
 
                     // try to drop powerup
                     TryDropPowerup();
+
+                    // spawn score number immediately
+                    if (scoreNumberPrefab != null)
+                    {
+                        var scoreObj = Instantiate(scoreNumberPrefab, new Vector3(transform.position.x, _collider.bounds.center.y, transform.position.z), Quaternion.identity);
+                        scoreObj.GetComponent<ScoreNumber>()?.Initialize(scoreValue, scoreObj.transform.position);
+                    }
 
                     Schedule<EnemyDeath>().enemy = this;
                 }

@@ -209,6 +209,8 @@ MonoBehaviour:
   flashMaterial: {fileID: 2100000, guid: b28efccbcae6d4342b1d6ebf20794f41, type: 2}
   damageNumberPrefab: {fileID: 7226005136005355022, guid: 8d485ecb55a56d34d90792be18b82d01,
     type: 3}
+  scoreNumberPrefab: {fileID: 2015537479218194605, guid: f6ff34f6df3c63b41b18c41beeff0d93,
+    type: 3}
   damageNumberOffset: 0.5
   healthVialPrefab: {fileID: 8769834775218147518, guid: 4bf516886f182d847a3e29a405c56e88,
     type: 3}

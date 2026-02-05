@@ -69,5 +69,6 @@ namespace Platformer.Gameplay
                 }
             }
         }
+
     }
 }
