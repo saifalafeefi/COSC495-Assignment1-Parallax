@@ -189,7 +189,11 @@ namespace Platformer.Mechanics
                     yield break;
                 }
 
-                timeSlowState.remainingDuration -= Time.unscaledDeltaTime;
+                // only decrement timer when game is NOT paused
+                if (!Platformer.UI.PauseMenu.IsPaused)
+                {
+                    timeSlowState.remainingDuration -= Time.unscaledDeltaTime;
+                }
                 yield return null;
             }
 
@@ -204,7 +208,11 @@ namespace Platformer.Mechanics
                         yield break;
                     }
 
-                    timeSlowState.remainingDuration -= Time.unscaledDeltaTime;
+                    // only decrement timer when game is NOT paused
+                    if (!Platformer.UI.PauseMenu.IsPaused)
+                    {
+                        timeSlowState.remainingDuration -= Time.unscaledDeltaTime;
+                    }
 
                     // recalculate colors every frame (other powerups might finish during our warning!)
                     Color currentBlend = colorManager.GetCurrentBlend();
@@ -236,7 +244,11 @@ namespace Platformer.Mechanics
                         yield break;
                     }
 
-                    timeSlowState.remainingDuration -= Time.unscaledDeltaTime;
+                    // only decrement timer when game is NOT paused
+                    if (!Platformer.UI.PauseMenu.IsPaused)
+                    {
+                        timeSlowState.remainingDuration -= Time.unscaledDeltaTime;
+                    }
                     yield return null;
                 }
             }
@@ -244,15 +256,19 @@ namespace Platformer.Mechanics
             // mark time slow as inactive
             player.HasTimeSlowActive = false;
 
-            // restore original time scale
-            Time.timeScale = originalTimeScale;
-            Time.fixedDeltaTime = 0.02f * Time.timeScale;
-
-            // smoothly transition music pitch back to normal
-            if (musicSource != null)
+            // restore original time scale (but only if game is NOT paused)
+            if (!Platformer.UI.PauseMenu.IsPaused)
             {
-                player.StartCoroutine(TransitionMusicPitch(musicSource, 1f, musicTransitionDuration));
+                Time.timeScale = originalTimeScale;
+                Time.fixedDeltaTime = 0.02f * Time.timeScale;
+
+                // smoothly transition music pitch back to normal
+                if (musicSource != null)
+                {
+                    player.StartCoroutine(TransitionMusicPitch(musicSource, 1f, musicTransitionDuration));
+                }
             }
+            // if paused, Time.timeScale stays at 0 until unpause
 
             // restore player to normal time
             player.useUnscaledTime = false;

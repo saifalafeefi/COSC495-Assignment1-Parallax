@@ -28,11 +28,13 @@ namespace Platformer.UI
 
         bool showMainCanvas = false;
         private InputAction m_MenuAction;
+        private PauseMenu pauseMenu;
 
         void OnEnable()
         {
             _ToggleMainMenu(showMainCanvas);
             m_MenuAction = InputSystem.actions.FindAction("Player/Menu");
+            pauseMenu = FindFirstObjectByType<PauseMenu>();
         }
 
         /// <summary>
@@ -66,6 +68,12 @@ namespace Platformer.UI
 
         void Update()
         {
+            // if a PauseMenu is present in this scene, let it own Escape/Menu input
+            if (pauseMenu != null)
+            {
+                return;
+            }
+
             if (m_MenuAction.WasPressedThisFrame())
             {
                 ToggleMainMenu(show: !showMainCanvas);

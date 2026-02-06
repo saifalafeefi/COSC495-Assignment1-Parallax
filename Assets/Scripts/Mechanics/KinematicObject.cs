@@ -54,6 +54,33 @@ namespace Platformer.Mechanics
         protected const float minMoveDistance = 0.001f;
         protected const float shellRadius = 0.01f;
 
+        private bool isFrozen = false;
+        private Vector2 frozenPosition = Vector2.zero;
+        private Vector2 frozenVelocity = Vector2.zero;
+
+        /// <summary>
+        /// Freeze this kinematic object at its current position/velocity.
+        /// </summary>
+        public void Freeze()
+        {
+            if (body == null) body = GetComponent<Rigidbody2D>();
+            frozenPosition = body.position;
+            frozenVelocity = velocity;
+            isFrozen = true;
+        }
+
+        /// <summary>
+        /// Unfreeze and restore the exact pre-freeze state.
+        /// </summary>
+        public void Unfreeze()
+        {
+            if (!isFrozen) return;
+            if (body == null) body = GetComponent<Rigidbody2D>();
+            body.position = frozenPosition;
+            velocity = frozenVelocity;
+            isFrozen = false;
+        }
+
 
         /// <summary>
         /// Bounce the object's vertical velocity.
@@ -105,6 +132,11 @@ namespace Platformer.Mechanics
 
         protected virtual void Update()
         {
+            if (isFrozen) return;
+
+            // skip input processing while paused
+            if (Platformer.UI.PauseMenu.IsPaused) return;
+
             targetVelocity = Vector2.zero;
             ComputeVelocity();
         }
@@ -132,12 +164,24 @@ namespace Platformer.Mechanics
 
         protected virtual void FixedUpdate()
         {
+            if (isFrozen) return;
+
+            // skip physics while paused
+            if (Platformer.UI.PauseMenu.IsPaused)
+                return;
+
+            // skip catch-up FixedUpdate burst after unpause
+            // Unity's timestep accumulator builds up real time during pause, then fires
+            // hundreds of FixedUpdate calls on the first frame after unpause
+            int framesSinceUnpause = Time.frameCount - Platformer.UI.PauseMenu.LastUnpauseFrame;
+            if (framesSinceUnpause >= 0 && framesSinceUnpause <= Platformer.UI.PauseMenu.FixedUpdateSkipFramesAfterUnpause) return;
+
             // reset wall detection each frame
             IsTouchingWall = false;
             CurrentWallNormal = Vector2.zero;
 
             float currentGravityModifier = GetGravityMultiplier();
-            float deltaTime = useUnscaledTime ? Time.fixedUnscaledDeltaTime : Time.deltaTime;
+            float deltaTime = useUnscaledTime ? Time.fixedUnscaledDeltaTime : Time.fixedDeltaTime;
 
             //if already falling, fall faster than the jump speed, otherwise use normal gravity.
             if (velocity.y < 0)
@@ -225,6 +269,14 @@ namespace Platformer.Mechanics
                 }
             }
             body.position = body.position + move.normalized * distance;
+        }
+
+        protected virtual void LateUpdate()
+        {
+            if (!isFrozen) return;
+            if (body == null) body = GetComponent<Rigidbody2D>();
+            body.position = frozenPosition;
+            velocity = frozenVelocity;
         }
 
     }

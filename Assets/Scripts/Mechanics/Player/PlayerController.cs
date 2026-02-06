@@ -302,6 +302,7 @@ namespace Platformer.Mechanics
 
         public Bounds Bounds => collider2d.bounds;
 
+
         void Awake()
         {
             health = GetComponent<Health>();
@@ -351,7 +352,8 @@ namespace Platformer.Mechanics
 
             if (m_FastFallAction != null)
             {
-                m_FastFallAction.Enable();
+            m_FastFallAction.Enable();
+
             }
 
 
@@ -368,6 +370,9 @@ namespace Platformer.Mechanics
 
         protected override void Update()
         {
+            // skip all processing while paused (timers use unscaledDeltaTime when TimeVial active)
+            if (Platformer.UI.PauseMenu.IsPaused) return;
+
             // check for critical animation states that MUST block all input
             AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(0);
             bool isInHurtState = currentState.IsName("PlayerHurt");
@@ -586,6 +591,7 @@ namespace Platformer.Mechanics
             UpdateJumpState();
             base.Update();
         }
+
 
         void UpdateJumpState()
         {
