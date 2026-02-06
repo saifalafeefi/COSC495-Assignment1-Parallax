@@ -61,6 +61,10 @@ namespace Platformer.Mechanics
         /// sound effect to play when collected.
         /// </summary>
         public AudioClip collectSound;
+        /// <summary>
+        /// how long it takes to transition music pitch (in seconds, real time).
+        /// </summary>
+        public float musicTransitionDuration = 0.5f;
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
@@ -84,8 +88,22 @@ namespace Platformer.Mechanics
                     }
                 }
 
-                // start the time slow coroutine on the PLAYER (not this object!)
-                player.StartCoroutine(ApplyTimeSlow(player));
+                // if time slow already active, reset duration instead of starting new coroutine
+                if (player.HasTimeSlowActive)
+                {
+                    // find the TimeSlowState component
+                    TimeSlowState timeSlowState = player.GetComponent<TimeSlowState>();
+                    if (timeSlowState != null)
+                    {
+                        // reset the duration back to full
+                        timeSlowState.ResetDuration(slowDuration);
+                    }
+                }
+                else
+                {
+                    // start the time slow coroutine on the PLAYER (not this object!)
+                    player.StartCoroutine(ApplyTimeSlow(player));
+                }
 
                 // destroy the vial AFTER starting the coroutine on player
                 Destroy(gameObject);
@@ -100,8 +118,18 @@ namespace Platformer.Mechanics
             // generate unique ID for this powerup instance
             string powerupID = "time_" + System.Guid.NewGuid().ToString();
 
+            // get or create TimeSlowState component
+            TimeSlowState timeSlowState = player.GetComponent<TimeSlowState>();
+            if (timeSlowState == null)
+            {
+                timeSlowState = player.gameObject.AddComponent<TimeSlowState>();
+            }
+
+            // initialize shared duration
+            timeSlowState.remainingDuration = slowDuration;
+
             // store original values
-            float originalTimeScale = Time.timeScale;
+            float originalTimeScale = 1f; // always restore to 1.0, not current timeScale
             PowerupColorManager colorManager = player.GetComponent<PowerupColorManager>();
             GhostTrail ghostTrail = player.GetComponent<GhostTrail>();
             CameraBackgroundController cameraBackgroundController = FindFirstObjectByType<CameraBackgroundController>();
@@ -118,6 +146,13 @@ namespace Platformer.Mechanics
             // apply time slow to world
             Time.timeScale = timeScale;
             Time.fixedDeltaTime = 0.02f * Time.timeScale;
+
+            // smoothly transition music pitch to match time scale
+            AudioSource musicSource = GameObject.Find("Music")?.GetComponent<AudioSource>();
+            if (musicSource != null)
+            {
+                player.StartCoroutine(TransitionMusicPitch(musicSource, timeScale, musicTransitionDuration));
+            }
 
             // make player immune to time slow (use unscaled time for movement)
             player.useUnscaledTime = true;
@@ -144,11 +179,9 @@ namespace Platformer.Mechanics
                 cameraBackgroundController.AddColor(powerupID, bloomTintColor);
             }
 
-            // wait for normal duration (slow time - warning time)
-            // use unscaledDeltaTime since we're slowing time
-            float normalDuration = Mathf.Max(0, slowDuration - warningDuration);
-            float elapsed = 0f;
-            while (elapsed < normalDuration)
+            // wait using SHARED duration (multiple vials can extend this!)
+            // normal phase (no warning yet)
+            while (timeSlowState.remainingDuration > warningDuration)
             {
                 // early exit if player died (ResetVisualState already cleaned up)
                 if (!player.HasTimeSlowActive)
@@ -156,15 +189,14 @@ namespace Platformer.Mechanics
                     yield break;
                 }
 
-                elapsed += Time.unscaledDeltaTime;
+                timeSlowState.remainingDuration -= Time.unscaledDeltaTime;
                 yield return null;
             }
 
             // warning phase - flash the tint to indicate slow ending soon
             if (enableTint && warningDuration > 0)
             {
-                elapsed = 0f;
-                while (elapsed < warningDuration)
+                while (timeSlowState.remainingDuration > 0)
                 {
                     // early exit if player died
                     if (!player.HasTimeSlowActive)
@@ -172,14 +204,15 @@ namespace Platformer.Mechanics
                         yield break;
                     }
 
-                    elapsed += Time.unscaledDeltaTime;
+                    timeSlowState.remainingDuration -= Time.unscaledDeltaTime;
 
                     // recalculate colors every frame (other powerups might finish during our warning!)
                     Color currentBlend = colorManager.GetCurrentBlend();
                     Color blendWithoutThis = colorManager.GetBlendWithout(powerupID);
 
                     // calculate flash using sine wave (smooth fade in/out)
-                    float flashPhase = Mathf.Sin(elapsed * warningFlashSpeed * Mathf.PI * 2f);
+                    // use remaining time for phase calculation so it stays smooth
+                    float flashPhase = Mathf.Sin(timeSlowState.remainingDuration * warningFlashSpeed * Mathf.PI * 2f);
                     // convert from -1...1 to 0...1 range
                     float alpha = (flashPhase + 1f) / 2f;
 
@@ -195,8 +228,7 @@ namespace Platformer.Mechanics
             else
             {
                 // no warning phase, just wait the remaining time
-                elapsed = 0f;
-                while (elapsed < warningDuration)
+                while (timeSlowState.remainingDuration > 0)
                 {
                     // early exit if player died
                     if (!player.HasTimeSlowActive)
@@ -204,7 +236,7 @@ namespace Platformer.Mechanics
                         yield break;
                     }
 
-                    elapsed += Time.unscaledDeltaTime;
+                    timeSlowState.remainingDuration -= Time.unscaledDeltaTime;
                     yield return null;
                 }
             }
@@ -215,6 +247,12 @@ namespace Platformer.Mechanics
             // restore original time scale
             Time.timeScale = originalTimeScale;
             Time.fixedDeltaTime = 0.02f * Time.timeScale;
+
+            // smoothly transition music pitch back to normal
+            if (musicSource != null)
+            {
+                player.StartCoroutine(TransitionMusicPitch(musicSource, 1f, musicTransitionDuration));
+            }
 
             // restore player to normal time
             player.useUnscaledTime = false;
@@ -239,6 +277,32 @@ namespace Platformer.Mechanics
             {
                 cameraBackgroundController.RemoveColor(powerupID);
             }
+        }
+
+        /// <summary>
+        /// smoothly transition music pitch to target value.
+        /// </summary>
+        private IEnumerator TransitionMusicPitch(AudioSource musicSource, float targetPitch, float duration)
+        {
+            float startPitch = musicSource.pitch;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+
+                // ease-in-out cubic for smooth transition
+                float easedT = t < 0.5f
+                    ? 4f * t * t * t
+                    : 1f - Mathf.Pow(-2f * t + 2f, 3f) / 2f;
+
+                musicSource.pitch = Mathf.Lerp(startPitch, targetPitch, easedT);
+                yield return null;
+            }
+
+            // ensure final value is exact
+            musicSource.pitch = targetPitch;
         }
     }
 }

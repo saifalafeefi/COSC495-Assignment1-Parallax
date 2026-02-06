@@ -83,8 +83,22 @@ namespace Platformer.Mechanics
                     }
                 }
 
-                // start the speed boost coroutine on the PLAYER (not this object!)
-                player.StartCoroutine(ApplySpeedBoost(player));
+                // if speed boost already active, reset duration instead of starting new coroutine
+                if (player.HasSpeedBoost)
+                {
+                    // find the SpeedBoostState component
+                    SpeedBoostState speedBoostState = player.GetComponent<SpeedBoostState>();
+                    if (speedBoostState != null)
+                    {
+                        // reset the duration back to full
+                        speedBoostState.ResetDuration(boostDuration);
+                    }
+                }
+                else
+                {
+                    // start the speed boost coroutine on the PLAYER (not this object!)
+                    player.StartCoroutine(ApplySpeedBoost(player));
+                }
 
                 // destroy the vial AFTER starting the coroutine on player
                 Destroy(gameObject);
@@ -95,6 +109,16 @@ namespace Platformer.Mechanics
         {
             // generate unique ID for this powerup instance
             string powerupID = "speed_" + System.Guid.NewGuid().ToString();
+
+            // get or create SpeedBoostState component
+            SpeedBoostState speedBoostState = player.GetComponent<SpeedBoostState>();
+            if (speedBoostState == null)
+            {
+                speedBoostState = player.gameObject.AddComponent<SpeedBoostState>();
+            }
+
+            // initialize shared duration
+            speedBoostState.remainingDuration = boostDuration;
 
             // store multipliers (not snapshots!)
             float speedMult = speedMultiplier;
@@ -138,25 +162,28 @@ namespace Platformer.Mechanics
                 cameraBackgroundController.AddColor(powerupID, bloomTintColor);
             }
 
-            // wait for normal duration (boost time - warning time)
-            float normalDuration = Mathf.Max(0, boostDuration - warningDuration);
-            yield return new WaitForSeconds(normalDuration);
+            // wait using SHARED duration (multiple vials can reset this!)
+            // normal phase (no warning yet)
+            while (speedBoostState.remainingDuration > warningDuration)
+            {
+                speedBoostState.remainingDuration -= Time.deltaTime;
+                yield return null;
+            }
 
             // warning phase - flash the tint to indicate boost ending soon
             if (enableSpriteTint && warningDuration > 0)
             {
-
-                float elapsed = 0f;
-                while (elapsed < warningDuration)
+                while (speedBoostState.remainingDuration > 0)
                 {
-                    elapsed += Time.deltaTime;
+                    speedBoostState.remainingDuration -= Time.deltaTime;
 
                     // recalculate colors every frame (other powerups might finish during our warning!)
                     Color currentBlend = colorManager.GetCurrentBlend();
                     Color blendWithoutThis = colorManager.GetBlendWithout(powerupID);
 
                     // calculate flash using sine wave (smooth fade in/out)
-                    float flashPhase = Mathf.Sin(elapsed * warningFlashSpeed * Mathf.PI * 2f);
+                    // use remaining time for phase calculation so it stays smooth
+                    float flashPhase = Mathf.Sin(speedBoostState.remainingDuration * warningFlashSpeed * Mathf.PI * 2f);
                     // convert from -1...1 to 0...1 range
                     float alpha = (flashPhase + 1f) / 2f;
 
@@ -172,7 +199,11 @@ namespace Platformer.Mechanics
             else
             {
                 // no warning phase, just wait the remaining time
-                yield return new WaitForSeconds(warningDuration);
+                while (speedBoostState.remainingDuration > 0)
+                {
+                    speedBoostState.remainingDuration -= Time.deltaTime;
+                    yield return null;
+                }
             }
 
             // undo multipliers (divide to remove our contribution)

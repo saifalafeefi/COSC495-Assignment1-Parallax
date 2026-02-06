@@ -33,6 +33,13 @@ namespace Platformer.Gameplay
             // clear all active powerups (stats, coroutines, flags)
             player.ClearAllPowerups();
 
+            // smoothly transition music pitch back to normal (MUST be after ClearAllPowerups!)
+            AudioSource musicSource = GameObject.Find("Music")?.GetComponent<AudioSource>();
+            if (musicSource != null && musicSource.pitch != 1f)
+            {
+                player.StartCoroutine(player.TransitionMusicPitchOnDeath(musicSource, 1f, 0.5f));
+            }
+
             model.virtualCamera.Follow = null;
             model.virtualCamera.LookAt = null;
 

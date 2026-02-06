@@ -1,10 +1,12 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Platformer.Mechanics
 {
     /// <summary>
     /// projectile that flies in a straight line and damages enemies on contact.
+    /// pierces through enemies, hitting each one once.
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
     public class ProjectileFist : MonoBehaviour
@@ -27,7 +29,7 @@ namespace Platformer.Mechanics
         private float direction = 1f; // 1 = right, -1 = left
         private Vector3 startPosition;
         private Rigidbody2D rb;
-        private bool hasHit = false;
+        private HashSet<MonoBehaviour> hitEnemies = new HashSet<MonoBehaviour>();
 
         void Awake()
         {
@@ -91,37 +93,39 @@ namespace Platformer.Mechanics
 
         void OnTriggerEnter2D(Collider2D other)
         {
-            // prevent multiple hits
-            if (hasHit)
-            {
-                return;
-            }
-
             // check if hit an enemy
             var enemy1 = other.GetComponent<enemy1>();
             var enemy2 = other.GetComponent<enemy2>();
             var enemy3 = other.GetComponent<enemy3>();
 
-            if (enemy1 != null)
+            MonoBehaviour enemy = null;
+            if (enemy1 != null) enemy = enemy1;
+            else if (enemy2 != null) enemy = enemy2;
+            else if (enemy3 != null) enemy = enemy3;
+
+            // if we hit an enemy we haven't damaged yet
+            if (enemy != null && !hitEnemies.Contains(enemy))
             {
-                hasHit = true;
+                // mark enemy as hit
+                hitEnemies.Add(enemy);
+
+                // deal damage and knockback
                 Vector2 knockbackDir = new Vector2(direction, 0.3f);
-                enemy1.TakeDamage(damage, knockbackDir, 2f, false);
-                Destroy(gameObject);
-            }
-            else if (enemy2 != null)
-            {
-                hasHit = true;
-                Vector2 knockbackDir = new Vector2(direction, 0.3f);
-                enemy2.TakeDamage(damage, knockbackDir, 2f, false);
-                Destroy(gameObject);
-            }
-            else if (enemy3 != null)
-            {
-                hasHit = true;
-                Vector2 knockbackDir = new Vector2(direction, 0.3f);
-                enemy3.TakeDamage(damage, knockbackDir, 2f, false);
-                Destroy(gameObject);
+
+                if (enemy1 != null)
+                {
+                    enemy1.TakeDamage(damage, knockbackDir, 2f, false);
+                }
+                else if (enemy2 != null)
+                {
+                    enemy2.TakeDamage(damage, knockbackDir, 2f, false);
+                }
+                else if (enemy3 != null)
+                {
+                    enemy3.TakeDamage(damage, knockbackDir, 2f, false);
+                }
+
+                // DON'T destroy - keep flying to hit more enemies!
             }
         }
 

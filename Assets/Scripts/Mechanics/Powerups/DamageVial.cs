@@ -74,8 +74,22 @@ namespace Platformer.Mechanics
                     }
                 }
 
-                // start the damage boost coroutine on the PLAYER (not this object!)
-                player.StartCoroutine(ApplyDamageBoost(player));
+                // if damage boost already active, reset duration instead of starting new coroutine
+                if (player.HasDamageBoost)
+                {
+                    // find the DamageBoostState component
+                    DamageBoostState damageBoostState = player.GetComponent<DamageBoostState>();
+                    if (damageBoostState != null)
+                    {
+                        // reset the duration back to full
+                        damageBoostState.ResetDuration(boostDuration);
+                    }
+                }
+                else
+                {
+                    // start the damage boost coroutine on the PLAYER (not this object!)
+                    player.StartCoroutine(ApplyDamageBoost(player));
+                }
 
                 // destroy the vial AFTER starting the coroutine on player
                 Destroy(gameObject);
@@ -89,6 +103,16 @@ namespace Platformer.Mechanics
         {
             // generate unique ID for this powerup instance
             string powerupID = "damage_" + System.Guid.NewGuid().ToString();
+
+            // get or create DamageBoostState component
+            DamageBoostState damageBoostState = player.GetComponent<DamageBoostState>();
+            if (damageBoostState == null)
+            {
+                damageBoostState = player.gameObject.AddComponent<DamageBoostState>();
+            }
+
+            // initialize shared duration
+            damageBoostState.remainingDuration = boostDuration;
 
             // store original values
             int originalAttack12Damage = player.attack12Damage;
@@ -110,6 +134,7 @@ namespace Platformer.Mechanics
             player.attack3Damage = Mathf.RoundToInt(originalAttack3Damage * damageMultiplier);
             player.attackAirDamage = Mathf.RoundToInt(originalAttackAirDamage * damageMultiplier);
             player.rangedAttackDamage = Mathf.RoundToInt(originalRangedAttackDamage * damageMultiplier);
+            player.HasDamageBoost = true; // mark damage boost as active
 
             // add color to blend (player sprite)
             if (enableTint)
@@ -123,24 +148,28 @@ namespace Platformer.Mechanics
                 cameraBackgroundController.AddColor(powerupID, bloomTintColor);
             }
 
-            // wait for normal duration (boost time - warning time)
-            float normalDuration = Mathf.Max(0, boostDuration - warningDuration);
-            yield return new WaitForSeconds(normalDuration);
+            // wait using SHARED duration (multiple vials can reset this!)
+            // normal phase (no warning yet)
+            while (damageBoostState.remainingDuration > warningDuration)
+            {
+                damageBoostState.remainingDuration -= Time.deltaTime;
+                yield return null;
+            }
 
             // warning phase - flash the tint to indicate boost ending soon
             if (enableTint && warningDuration > 0)
             {
-                float elapsed = 0f;
-                while (elapsed < warningDuration)
+                while (damageBoostState.remainingDuration > 0)
                 {
-                    elapsed += Time.deltaTime;
+                    damageBoostState.remainingDuration -= Time.deltaTime;
 
                     // recalculate colors every frame (other powerups might finish during our warning!)
                     Color currentBlend = colorManager.GetCurrentBlend();
                     Color blendWithoutThis = colorManager.GetBlendWithout(powerupID);
 
                     // calculate flash using sine wave (smooth fade in/out)
-                    float flashPhase = Mathf.Sin(elapsed * warningFlashSpeed * Mathf.PI * 2f);
+                    // use remaining time for phase calculation so it stays smooth
+                    float flashPhase = Mathf.Sin(damageBoostState.remainingDuration * warningFlashSpeed * Mathf.PI * 2f);
                     // convert from -1...1 to 0...1 range
                     float alpha = (flashPhase + 1f) / 2f;
 
@@ -156,7 +185,11 @@ namespace Platformer.Mechanics
             else
             {
                 // no warning phase, just wait the remaining time
-                yield return new WaitForSeconds(warningDuration);
+                while (damageBoostState.remainingDuration > 0)
+                {
+                    damageBoostState.remainingDuration -= Time.deltaTime;
+                    yield return null;
+                }
             }
 
             // restore original damage values
@@ -164,6 +197,7 @@ namespace Platformer.Mechanics
             player.attack3Damage = originalAttack3Damage;
             player.attackAirDamage = originalAttackAirDamage;
             player.rangedAttackDamage = originalRangedAttackDamage;
+            player.HasDamageBoost = false; // mark damage boost as inactive
 
             // remove color from blend (manager will auto-update sprite)
             if (enableTint)

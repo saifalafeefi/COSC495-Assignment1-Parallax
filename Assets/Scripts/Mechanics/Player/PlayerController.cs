@@ -244,6 +244,11 @@ namespace Platformer.Mechanics
         public bool HasSpeedBoost { get; set; } = false;
 
         /// <summary>
+        /// check if player has damage boost active (set by DamageVial).
+        /// </summary>
+        public bool HasDamageBoost { get; set; } = false;
+
+        /// <summary>
         /// true when player is in respawn state (enemies can't attack during respawn).
         /// </summary>
         public bool IsRespawning { get; private set; } = false;
@@ -1139,6 +1144,7 @@ namespace Platformer.Mechanics
             controlEnabled = true;
             knockbackVelocityX = 0f;
             HasSpeedBoost = false; // clear speed boost on death
+            HasDamageBoost = false; // clear damage boost on death
 
             // force reset all action flags to prevent animation interference
             isAttacking = false;
@@ -1164,6 +1170,8 @@ namespace Platformer.Mechanics
 
                 // reset animator to 1.0
                 animator.speed = 1f;
+
+                // NOTE: music pitch reset happens in PlayerDeath.cs AFTER StopAllCoroutines()
 
                 // disable ghost trail
                 var ghostTrail = GetComponent<GhostTrail>();
@@ -1239,6 +1247,7 @@ namespace Platformer.Mechanics
 
             // clear powerup flags
             HasSpeedBoost = false;
+            HasDamageBoost = false;
 
             // reset time slow effects if active
             if (HasTimeSlowActive)
@@ -1247,6 +1256,8 @@ namespace Platformer.Mechanics
                 Time.timeScale = 1f;
                 Time.fixedDeltaTime = 0.02f;
                 useUnscaledTime = false;
+
+                // NOTE: music pitch reset happens in PlayerDeath.cs AFTER StopAllCoroutines()
 
                 // disable ghost trail if exists
                 var ghostTrail = GetComponent<GhostTrail>();
@@ -1303,6 +1314,32 @@ namespace Platformer.Mechanics
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawWireCube(hitboxAirCenter, attackAirHitboxSize);
             }
+        }
+
+        /// <summary>
+        /// smoothly transition music pitch to target value with easing (used on death).
+        /// </summary>
+        public IEnumerator TransitionMusicPitchOnDeath(AudioSource musicSource, float targetPitch, float duration)
+        {
+            float startPitch = musicSource.pitch;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+
+                // ease-in-out cubic for smooth transition
+                float easedT = t < 0.5f
+                    ? 4f * t * t * t
+                    : 1f - Mathf.Pow(-2f * t + 2f, 3f) / 2f;
+
+                musicSource.pitch = Mathf.Lerp(startPitch, targetPitch, easedT);
+                yield return null;
+            }
+
+            // ensure final value is exact
+            musicSource.pitch = targetPitch;
         }
 
         public enum JumpState
