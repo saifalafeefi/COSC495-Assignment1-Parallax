@@ -30,7 +30,7 @@ namespace Platformer.Mechanics
         /// <summary>
         /// color tint to apply to player sprite during boost (optional).
         /// </summary>
-        public Color speedTintColor = new Color(0.5f, 0.8f, 1f, 1f); // light blue tint
+        public Color speedTintColor = new Color(1f, 1f, 0f, 1f); // yellow tint
         /// <summary>
         /// enable sprite tint during boost.
         /// </summary>
@@ -52,7 +52,7 @@ namespace Platformer.Mechanics
         /// <summary>
         /// bloom tint color (applied to camera bloom).
         /// </summary>
-        public Color bloomTintColor = new Color(0.5f, 0.8f, 1f, 1f); // light blue
+        public Color bloomTintColor = new Color(1f, 1f, 0f, 1f); // yellow
 
         [Header("Audio")]
         /// <summary>
