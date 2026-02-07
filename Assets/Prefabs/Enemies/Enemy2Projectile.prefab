@@ -192,3 +192,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4494ea9067359b145a156835af8f1500, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.Enemy2Projectile
+  parryExtraRadius: 1
+  parryOverlapBufferSize: 8

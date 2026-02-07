@@ -138,6 +138,10 @@ namespace Platformer.Mechanics
         /// layer mask for detecting enemies.
         /// </summary>
         public LayerMask enemyLayer;
+        /// <summary>
+        /// layer mask for parryable projectiles.
+        /// </summary>
+        public LayerMask parryLayer;
 
         private bool isInvincible = false;
         private float invincibilityTimer = 0f;
@@ -1067,6 +1071,7 @@ namespace Platformer.Mechanics
 
             // find all colliders in the attack hitbox
             Collider2D[] hits = Physics2D.OverlapBoxAll(hitboxCenter, hitboxSize, 0f, enemyLayer);
+            Collider2D[] parryHits = Physics2D.OverlapBoxAll(hitboxCenter, hitboxSize, 0f, parryLayer);
 
             // check if this is an air attack (for bounce mechanic)
             bool isAirAttack = currentAttackState == attackAirStateName;
@@ -1112,6 +1117,21 @@ namespace Platformer.Mechanics
                         enemy3.TakeDamage(damage, knockbackDir, enemyKnockbackForce, HasSpeedBoost || HasTimeSlowActive);
                         hitEnemy = true;
                     }
+                }
+            }
+
+            // parry projectiles in the attack hitbox
+            foreach (var hit in parryHits)
+            {
+                var proj2 = hit.GetComponent<Enemy2Projectile>();
+                if (proj2 != null)
+                {
+                    proj2.Parry();
+                }
+                var proj3 = hit.GetComponent<Enemy3Projectile>();
+                if (proj3 != null)
+                {
+                    proj3.Parry();
                 }
             }
 
