@@ -69,6 +69,8 @@ A few in‑engine moments that capture the tone and flow of the game.
 
 ![Chromatic Cleanse gameplay screenshot 6](Screenshots/image6.png)
 
+![Chromatic Cleanse gameplay screenshot 7](Screenshots/image7.png)
+
 ## Credits
 
 This game is for COSC 495 Introduction to Game Development course based on Unity's 2D Platformer Microgame template
