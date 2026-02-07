@@ -229,6 +229,7 @@ MonoBehaviour:
     type: 3}
   timeVialPrefab: {fileID: 2793612576529147497, guid: 1a33626613781124e89d6ee2e806d537,
     type: 3}
+  overallDropChance: 35
   healthDropChance: 50
   damageDropChance: 50
   speedDropChance: 0

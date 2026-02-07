@@ -46,6 +46,7 @@ namespace Platformer.Mechanics
         public GameObject damageVialPrefab;
         public GameObject timeVialPrefab;
 
+        [Range(0, 100)] public float overallDropChance = 40f;
         [Range(0, 100)] public float healthDropChance = 20f;
         [Range(0, 100)] public float damageDropChance = 30f; // higher for enemy1
         [Range(0, 100)] public float speedDropChance = 10f;
@@ -56,6 +57,14 @@ namespace Platformer.Mechanics
         internal AudioSource _audio;
         internal Health health;
         private SpriteRenderer enemySpriteRenderer; // renamed to avoid conflict with base class
+        private Animator enemyAnimator;
+        private PlayerController player;
+        private bool isIdle = false;
+
+        [Header("Facing (Idle Only)")]
+        public bool facePlayerWhenIdle = true;
+        public string idleStateName = "Enemy1_Idle";
+        public float idleVelocityThreshold = 0.05f;
 
         private bool isInvincible = false;
         private float invincibilityTimer = 0f;
@@ -77,6 +86,7 @@ namespace Platformer.Mechanics
 
             // get enemySpriteRenderer from base class (AnimationController already got it)
             enemySpriteRenderer = GetComponent<SpriteRenderer>();
+            enemyAnimator = GetComponent<Animator>();
             originalMaterial = enemySpriteRenderer.material;
         }
 
@@ -105,6 +115,25 @@ namespace Platformer.Mechanics
             {
                 if (mover == null) mover = path.CreateMover(maxSpeed * 0.5f);
                 move.x = Mathf.Clamp(mover.Position.x - transform.position.x, -1, 1);
+            }
+
+            // only flip while idle; allow run state to use base movement flipping
+            if (facePlayerWhenIdle && enemyAnimator != null)
+            {
+                isIdle = enemyAnimator.GetCurrentAnimatorStateInfo(0).IsName(idleStateName)
+                    || Mathf.Abs(velocity.x) <= idleVelocityThreshold;
+                if (isIdle)
+                {
+                    if (player == null)
+                    {
+                        player = FindFirstObjectByType<PlayerController>();
+                    }
+                    if (player != null && enemySpriteRenderer != null)
+                    {
+                        bool playerIsRight = player.transform.position.x > transform.position.x;
+                        enemySpriteRenderer.flipX = playerIsRight;
+                    }
+                }
             }
         }
 
@@ -199,6 +228,12 @@ namespace Platformer.Mechanics
 
         private void TryDropPowerup()
         {
+            float overallRoll = Random.Range(0f, 100f);
+            if (overallRoll > overallDropChance)
+            {
+                return;
+            }
+
             float roll = Random.Range(0f, 100f);
             GameObject powerupToDrop = null;
 

@@ -44,6 +44,7 @@ namespace Platformer.Mechanics
         public GameObject damageVialPrefab;
         public GameObject timeVialPrefab;
 
+        [Range(0, 100)] public float overallDropChance = 40f;
         [Range(0, 100)] public float healthDropChance = 20f;
         [Range(0, 100)] public float timeDropChance = 30f; // higher for enemy2
         [Range(0, 100)] public float speedDropChance = 10f;
@@ -388,6 +389,12 @@ namespace Platformer.Mechanics
 
         private void TryDropPowerup()
         {
+            float overallRoll = Random.Range(0f, 100f);
+            if (overallRoll > overallDropChance)
+            {
+                return;
+            }
+
             float roll = Random.Range(0f, 100f);
             GameObject powerupToDrop = null;
 

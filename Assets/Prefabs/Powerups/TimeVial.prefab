@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 7882147030403614629}
   - component: {fileID: 3561598170172697708}
   - component: {fileID: 1176255968416038290}
-  - component: {fileID: 7015803879930578046}
   - component: {fileID: 1905259281503947657}
+  - component: {fileID: 7015803879930578046}
   m_Layer: 0
   m_Name: TimeVial
   m_TagString: Untagged
@@ -192,6 +192,25 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1905259281503947657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2793612576529147497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55ec781510e2d194b9accea845142758, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.HealthPotion
+  floatAmplitude: 0.15
+  floatSpeed: 2
+  randomizeStartOffset: 0
+  enableRotation: 1
+  rotationMaxAngle: 15
+  rotationSpeed: 5
+  randomizeRotationOffset: 0
 --- !u!114 &7015803879930578046
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -216,22 +235,3 @@ MonoBehaviour:
   enableGhostTrail: 1
   collectSound: {fileID: 8300000, guid: 538d66ba1cda9e94b92bfff8c3fea4d6, type: 3}
   musicTransitionDuration: 1
---- !u!114 &1905259281503947657
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2793612576529147497}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55ec781510e2d194b9accea845142758, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.HealthPotion
-  floatAmplitude: 0.3
-  floatSpeed: 2
-  randomizeStartOffset: 1
-  enableRotation: 1
-  rotationMaxAngle: 15
-  rotationSpeed: 5
-  randomizeRotationOffset: 1

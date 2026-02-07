@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 3951680836310481292}
   - component: {fileID: 17430658019036922}
   - component: {fileID: 6643694763244894844}
-  - component: {fileID: 1760807212505003005}
   - component: {fileID: 2969130265503670695}
+  - component: {fileID: 1760807212505003005}
   m_Layer: 0
   m_Name: SpeedVial
   m_TagString: Untagged
@@ -192,6 +192,25 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &2969130265503670695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1459835210037587684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55ec781510e2d194b9accea845142758, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.HealthPotion
+  floatAmplitude: 0.15
+  floatSpeed: 2
+  randomizeStartOffset: 0
+  enableRotation: 1
+  rotationMaxAngle: 15
+  rotationSpeed: 5
+  randomizeRotationOffset: 0
 --- !u!114 &1760807212505003005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -215,22 +234,3 @@ MonoBehaviour:
   enableBloomTint: 1
   bloomTintColor: {r: 1, g: 0.882353, b: 0, a: 1}
   collectSound: {fileID: 8300000, guid: 538d66ba1cda9e94b92bfff8c3fea4d6, type: 3}
---- !u!114 &2969130265503670695
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1459835210037587684}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55ec781510e2d194b9accea845142758, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.HealthPotion
-  floatAmplitude: 0.15
-  floatSpeed: 2
-  randomizeStartOffset: 1
-  enableRotation: 1
-  rotationMaxAngle: 15
-  rotationSpeed: 5
-  randomizeRotationOffset: 1

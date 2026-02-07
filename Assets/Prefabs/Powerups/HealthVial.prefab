@@ -206,11 +206,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.HealthPotion
   floatAmplitude: 0.15
   floatSpeed: 2
-  randomizeStartOffset: 1
+  randomizeStartOffset: 0
   enableRotation: 1
   rotationMaxAngle: 15
   rotationSpeed: 5
-  randomizeRotationOffset: 1
+  randomizeRotationOffset: 0
 --- !u!114 &3473771207762758083
 MonoBehaviour:
   m_ObjectHideFlags: 0
