@@ -27,6 +27,56 @@ namespace Platformer.UI
         /// </summary>
         public float fontSize = 24f;
 
+        /// <summary>
+        /// optional template for timer entries (assign a TextMeshProUGUI from the scene/prefab).
+        /// when set, styling/layout is controlled by the template.
+        /// </summary>
+        public TextMeshProUGUI entryTemplate;
+
+        /// <summary>
+        /// use template's anchored position as base (otherwise uses baseOffset).
+        /// </summary>
+        public bool useTemplatePosition = true;
+
+        /// <summary>
+        /// when using a template, do not override its RectTransform/layout.
+        /// </summary>
+        public bool respectTemplateLayout = true;
+
+        /// <summary>
+        /// stack entries using entrySpacing (prevents overlap).
+        /// </summary>
+        public bool stackEntries = true;
+
+        /// <summary>
+        /// base anchored position offset applied to all entries.
+        /// </summary>
+        public Vector2 baseOffset = Vector2.zero;
+
+        /// <summary>
+        /// apply powerup color to template text (otherwise keeps template color).
+        /// </summary>
+        public bool applyColorToTemplate = true;
+
+        /// <summary>
+        /// override font settings even when using a template.
+        /// </summary>
+        public bool overrideFont = false;
+        public TMP_FontAsset overrideFontAsset;
+        public bool overrideFontSize = false;
+
+        /// <summary>
+        /// format for timer text.
+        /// </summary>
+        public string timerFormat = "{0}: {1:F1}s";
+
+        /// <summary>
+        /// display labels (editable in inspector).
+        /// </summary>
+        public string timeLabel = "Time Vial";
+        public string speedLabel = "Speed Vial";
+        public string damageLabel = "Damage Vial";
+
         [Header("Colors")]
         /// <summary>
         /// color for Time Vial text.
@@ -81,15 +131,15 @@ namespace Platformer.UI
             // check each powerup type
             UpdatePowerupDisplay("time", player.HasTimeSlowActive,
                 () => player.GetComponent<TimeSlowState>()?.remainingDuration ?? 0f,
-                "Time Vial", timeVialColor);
+                timeLabel, timeVialColor);
 
             UpdatePowerupDisplay("speed", player.HasSpeedBoost,
                 () => player.GetComponent<SpeedBoostState>()?.remainingDuration ?? 0f,
-                "Speed Vial", speedVialColor);
+                speedLabel, speedVialColor);
 
             UpdatePowerupDisplay("damage", player.HasDamageBoost,
                 () => player.GetComponent<DamageBoostState>()?.remainingDuration ?? 0f,
-                "Damage Vial", damageVialColor);
+                damageLabel, damageVialColor);
         }
 
         /// <summary>
@@ -111,7 +161,7 @@ namespace Platformer.UI
                 var entry = activeTimers[key];
                 if (entry.textObject != null)
                 {
-                    entry.textObject.text = $"{displayName}: {remainingTime:F1}s";
+                    entry.textObject.text = string.Format(timerFormat, displayName, remainingTime);
                 }
             }
             else
@@ -129,24 +179,58 @@ namespace Platformer.UI
         /// </summary>
         void CreateTimerEntry(string key, string displayName, Color color)
         {
-            // create text object
-            GameObject textObj = new GameObject($"PowerupTimer_{key}");
-            textObj.transform.SetParent(transform, false);
+            TextMeshProUGUI tmp;
+            RectTransform rectTransform;
 
-            TextMeshProUGUI tmp = textObj.AddComponent<TextMeshProUGUI>();
-            tmp.fontSize = fontSize;
-            tmp.color = color;
-            tmp.alignment = TextAlignmentOptions.TopLeft;
-            tmp.textWrappingMode = TextWrappingModes.NoWrap; // prevent text from wrapping to multiple lines
-            tmp.overflowMode = TextOverflowModes.Overflow; // allow text to overflow instead of wrap
-            tmp.text = $"{displayName}: 0.0s";
+            if (entryTemplate != null)
+            {
+                // use template for styling/layout
+                tmp = Instantiate(entryTemplate, transform);
+                tmp.gameObject.name = $"PowerupTimer_{key}";
+                if (applyColorToTemplate)
+                {
+                    tmp.color = color;
+                }
+                if (overrideFont && overrideFontAsset != null)
+                {
+                    tmp.font = overrideFontAsset;
+                }
+                if (overrideFontSize)
+                {
+                    tmp.fontSize = fontSize;
+                }
+                tmp.text = string.Format(timerFormat, displayName, 0f);
+                rectTransform = tmp.GetComponent<RectTransform>();
+            }
+            else
+            {
+                // create text object
+                GameObject textObj = new GameObject($"PowerupTimer_{key}");
+                textObj.transform.SetParent(transform, false);
 
-            // configure rect transform
-            RectTransform rectTransform = textObj.GetComponent<RectTransform>();
-            rectTransform.anchorMin = new Vector2(0, 1); // top-left anchor
-            rectTransform.anchorMax = new Vector2(0, 1);
-            rectTransform.pivot = new Vector2(0, 1);
-            rectTransform.sizeDelta = new Vector2(400, 50); // wide enough for text at any reasonable font size
+                tmp = textObj.AddComponent<TextMeshProUGUI>();
+                tmp.fontSize = fontSize;
+                tmp.color = color;
+                tmp.alignment = TextAlignmentOptions.TopLeft;
+                tmp.textWrappingMode = TextWrappingModes.NoWrap; // prevent text from wrapping to multiple lines
+                tmp.overflowMode = TextOverflowModes.Overflow; // allow text to overflow instead of wrap
+                if (overrideFont && overrideFontAsset != null)
+                {
+                    tmp.font = overrideFontAsset;
+                }
+                if (overrideFontSize)
+                {
+                    tmp.fontSize = fontSize;
+                }
+                tmp.text = string.Format(timerFormat, displayName, 0f);
+
+                // configure rect transform
+                rectTransform = textObj.GetComponent<RectTransform>();
+                rectTransform.anchorMin = new Vector2(0, 1); // top-left anchor
+                rectTransform.anchorMax = new Vector2(0, 1);
+                rectTransform.pivot = new Vector2(0, 1);
+                rectTransform.sizeDelta = new Vector2(400, 50); // wide enough for text at any reasonable font size
+            }
 
             // determine position based on collection order
             int orderIndex;
@@ -163,8 +247,17 @@ namespace Platformer.UI
             }
 
             // position based on order index
-            float yOffset = -orderIndex * entrySpacing;
-            rectTransform.anchoredPosition = new Vector2(0, yOffset);
+            if (stackEntries)
+            {
+                float yOffset = -orderIndex * entrySpacing;
+                Vector2 basePos = Vector2.zero;
+                if (entryTemplate != null && useTemplatePosition)
+                {
+                    basePos = rectTransform.anchoredPosition;
+                }
+                basePos += baseOffset;
+                rectTransform.anchoredPosition = new Vector2(basePos.x, basePos.y + yOffset);
+            }
 
             // create entry
             var entry = new PowerupTimerEntry

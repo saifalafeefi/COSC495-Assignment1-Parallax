@@ -234,6 +234,9 @@ MonoBehaviour:
   damageDropChance: 50
   speedDropChance: 0
   timeDropChance: 0
+  facePlayerWhenIdle: 1
+  idleStateName: Enemy1_Idle
+  idleVelocityThreshold: 0.05
 --- !u!82 &5843668731025413174
 AudioSource:
   m_ObjectHideFlags: 0

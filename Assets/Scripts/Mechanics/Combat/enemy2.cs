@@ -84,7 +84,7 @@ namespace Platformer.Mechanics
         // damage number merging - tracks currently active damage number
         private DamageNumber activeDamageNumber = null;
 
-        public bool IsInvincible => isInvincible;
+        public bool IsInvincible => false;
         public Bounds Bounds => _collider.bounds;
 
         void Awake()
@@ -104,24 +104,7 @@ namespace Platformer.Mechanics
 
         void Update()
         {
-            // handle invincibility timer
-            if (isInvincible)
-            {
-                invincibilityTimer -= Time.deltaTime;
-                if (invincibilityTimer <= 0)
-                {
-                    isInvincible = false;
-                    if (flashCoroutine != null)
-                    {
-                        StopCoroutine(flashCoroutine);
-                        flashCoroutine = null;
-                    }
-                    if (spriteRenderer != null)
-                    {
-                        spriteRenderer.material = originalMaterial;
-                    }
-                }
-            }
+            // no invincibility gating; flash is handled independently on hit
 
             // shooting logic and sprite flip (only when alive)
             if (!isDead)
@@ -297,11 +280,6 @@ namespace Platformer.Mechanics
 
         public void TakeDamage(int damage, Vector2 knockbackDirection, float knockbackForce = 3f, bool pierceInvincibility = false)
         {
-            if (isInvincible && !pierceInvincibility)
-            {
-                return;
-            }
-
             if (health != null)
             {
                 health.Decrement(damage);
@@ -459,17 +437,8 @@ namespace Platformer.Mechanics
                 flashCoroutine = null;
             }
 
-            if (!isInvincible)
-            {
-                isInvincible = true;
-                invincibilityTimer = invincibilityDuration;
-                flashCoroutine = StartCoroutine(FlashSprite());
-            }
-            else
-            {
-                invincibilityTimer = invincibilityDuration;
-                flashCoroutine = StartCoroutine(FlashSprite());
-            }
+            invincibilityTimer = invincibilityDuration;
+            flashCoroutine = StartCoroutine(FlashSprite());
         }
 
         private IEnumerator FlashSprite()
@@ -479,16 +448,18 @@ namespace Platformer.Mechanics
                 yield break;
             }
 
-            while (isInvincible)
+            float elapsed = 0f;
+            while (elapsed < invincibilityTimer)
             {
                 spriteRenderer.material = flashMaterial;
                 yield return new WaitForSeconds(flashInterval);
+                elapsed += flashInterval;
 
-                if (isInvincible)
-                {
-                    spriteRenderer.material = originalMaterial;
-                    yield return new WaitForSeconds(flashInterval);
-                }
+                if (elapsed >= invincibilityTimer) break;
+
+                spriteRenderer.material = originalMaterial;
+                yield return new WaitForSeconds(flashInterval);
+                elapsed += flashInterval;
             }
 
             spriteRenderer.material = originalMaterial;
