@@ -19,6 +19,12 @@ namespace Platformer.Gameplay
         {
             model.player.animator.SetTrigger("victory");
             model.player.controlEnabled = false;
+
+            var hud = UnityEngine.Object.FindFirstObjectByType<Platformer.UI.GameHUD>();
+            if (hud != null)
+            {
+                hud.StopTimer();
+            }
         }
     }
 }

@@ -205,4 +205,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Platformer.Mechanics.ProjectileFist
   projectileSpeed: 18
   maxLifetime: 3
-  maxDistance: 30
+  maxDistance: 5

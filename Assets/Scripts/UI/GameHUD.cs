@@ -39,6 +39,7 @@ namespace Platformer.UI
         [Header("Game State")]
         private int currentScore = 0;
         private float elapsedTime = 0f;
+        private bool isTimerRunning = true;
 
         void Awake()
         {
@@ -61,7 +62,7 @@ namespace Platformer.UI
         void Update()
         {
             // only count time when game is not paused
-            if (Time.timeScale > 0)
+            if (isTimerRunning && Time.timeScale > 0)
             {
                 elapsedTime += Time.deltaTime;
                 UpdateTimerDisplay();
@@ -93,6 +94,16 @@ namespace Platformer.UI
         public void ResetTimer()
         {
             elapsedTime = 0f;
+            isTimerRunning = true;
+            UpdateTimerDisplay();
+        }
+
+        /// <summary>
+        /// stop the timer (e.g., on victory).
+        /// </summary>
+        public void StopTimer()
+        {
+            isTimerRunning = false;
             UpdateTimerDisplay();
         }
 
