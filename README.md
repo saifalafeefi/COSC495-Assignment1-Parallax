@@ -2,9 +2,11 @@
 
 A 2D action platformer where color is the enemy.
 
+![Chromatic Cleanse gameplay screenshot 1](Screenshots/image1.png)
+
 ## Concept
 
-You are the last monochrome being in a world overrun by vibrant chaos. Armed with precision combat skills and advanced movement abilities, your mission is to eliminate all traces of color and restore balance.
+You are the last monochrome being in a world overrun by vibrant chaos. Armed with a comically large glove and advanced movement abilities, your mission is to eliminate all traces of color and... return home?
 
 ## Gameplay
 
@@ -48,6 +50,24 @@ Colors betray their purpose, use them wisely, then eliminate the source.
 - Smooth camera follow
 - Combo attack chains
 - Advanced movement mechanics (wall jump, double jump, roll, air attack bounce)
+- Parry to reflect enemy projectiles back at them
+- Powerup timers and cooldown UI for key abilities
+- Floating damage + score numbers and enemy health bars
+- Time‑slow powerup visuals (ghost trail + screen tint)
+
+## Screenshots
+
+A few in‑engine moments that capture the tone and flow of the game.
+
+![Chromatic Cleanse gameplay screenshot 2](Screenshots/image2.png)
+
+![Chromatic Cleanse gameplay screenshot 3](Screenshots/image3.png)
+
+![Chromatic Cleanse gameplay screenshot 4](Screenshots/image4.png)
+
+![Chromatic Cleanse gameplay screenshot 5](Screenshots/image5.png)
+
+![Chromatic Cleanse gameplay screenshot 6](Screenshots/image6.png)
 
 ## Credits
 
