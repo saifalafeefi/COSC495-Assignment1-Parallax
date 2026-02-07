@@ -64,6 +64,26 @@ namespace Platformer.UI
         public bool overrideFont = false;
         public TMP_FontAsset overrideFontAsset;
         public bool overrideFontSize = false;
+        /// <summary>
+        /// override material preset (use this to apply outlines/shaders).
+        /// </summary>
+        public bool overrideMaterial = false;
+        public Material overrideMaterialPreset;
+
+        [Header("Outline (Code)")]
+        /// <summary>
+        /// enable outline via code (creates a material instance per entry).
+        /// </summary>
+        public bool outlineEnabled = true;
+        /// <summary>
+        /// outline width for timer text.
+        /// </summary>
+        [Range(0f, 1f)]
+        public float outlineWidth = 0.2f;
+        /// <summary>
+        /// outline color for timer text.
+        /// </summary>
+        public Color outlineColor = Color.black;
 
         /// <summary>
         /// format for timer text.
@@ -191,6 +211,12 @@ namespace Platformer.UI
                 {
                     tmp.color = color;
                 }
+                // keep template material unless override is requested
+                if (overrideMaterial && overrideMaterialPreset != null)
+                {
+                    tmp.fontSharedMaterial = overrideMaterialPreset;
+                }
+                ApplyOutlineIfNeeded(tmp);
                 if (overrideFont && overrideFontAsset != null)
                 {
                     tmp.font = overrideFontAsset;
@@ -214,6 +240,11 @@ namespace Platformer.UI
                 tmp.alignment = TextAlignmentOptions.TopLeft;
                 tmp.textWrappingMode = TextWrappingModes.NoWrap; // prevent text from wrapping to multiple lines
                 tmp.overflowMode = TextOverflowModes.Overflow; // allow text to overflow instead of wrap
+                if (overrideMaterial && overrideMaterialPreset != null)
+                {
+                    tmp.fontSharedMaterial = overrideMaterialPreset;
+                }
+                ApplyOutlineIfNeeded(tmp);
                 if (overrideFont && overrideFontAsset != null)
                 {
                     tmp.font = overrideFontAsset;
@@ -299,6 +330,21 @@ namespace Platformer.UI
             }
             activeTimers.Clear();
             collectionOrder.Clear();
+        }
+
+        private void ApplyOutlineIfNeeded(TextMeshProUGUI tmp)
+        {
+            if (!outlineEnabled || tmp == null) return;
+
+            // create a unique material instance so we can tweak outline without affecting shared assets
+            var baseMat = tmp.fontSharedMaterial;
+            if (baseMat == null) return;
+
+            var matInstance = new Material(baseMat);
+            matInstance.EnableKeyword("OUTLINE_ON");
+            matInstance.SetFloat(ShaderUtilities.ID_OutlineWidth, outlineWidth);
+            matInstance.SetColor(ShaderUtilities.ID_OutlineColor, outlineColor);
+            tmp.fontMaterial = matInstance;
         }
     }
 }
