@@ -141,7 +141,6 @@ namespace Platformer.Mechanics
             {
                 hasHit = true;
                 Vector2 knockbackDir = new Vector2(direction.x, 0.3f);
-                Debug.Log($"[Enemy3Projectile] Parried hit. enemy1={enemy1 != null}, enemy2={enemy2 != null}, enemy3={enemy3 != null}, damage={damage}");
                 if (enemy1 != null) enemy1.TakeDamage(damage, knockbackDir, 2f);
                 if (enemy2 != null) enemy2.TakeDamage(damage, knockbackDir, 2f);
                 if (enemy3 != null) enemy3.TakeDamage(damage, knockbackDir, 2f);
@@ -188,7 +187,6 @@ namespace Platformer.Mechanics
             isParried = true;
             direction = -direction;
             transform.rotation = Quaternion.Euler(0f, 0f, transform.rotation.eulerAngles.z + 180f);
-            Debug.Log($"[Enemy3Projectile] Parried. New direction={direction}");
         }
     }
 }

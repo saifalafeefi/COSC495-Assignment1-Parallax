@@ -118,7 +118,6 @@ namespace Platformer.Core
                 }
                 else
                 {
-                    // Debug.Log($"<color=green>{ev.tick} {ev.GetType().Name}</color>");
                     ev.Cleanup();
                     try
                     {
@@ -127,7 +126,6 @@ namespace Platformer.Core
                     catch (KeyNotFoundException)
                     {
                         //This really should never happen inside a production build.
-                        Debug.LogError($"No Pool for: {ev.GetType()}");
                     }
                 }
                 executedEventCount++;

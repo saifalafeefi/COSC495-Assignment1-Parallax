@@ -16,12 +16,10 @@ namespace Platformer.Mechanics
             health = GetComponent<Health>();
             if (health != null)
             {
-                Debug.Log($"[HealthDebugger] Health component found! Max HP: {health.maxHP}, Current HP: {health.CurrentHP}");
                 lastHP = health.CurrentHP;
             }
             else
             {
-                Debug.LogError("[HealthDebugger] No Health component found on this GameObject!");
             }
         }
 
@@ -29,7 +27,6 @@ namespace Platformer.Mechanics
         {
             if (health != null && health.CurrentHP != lastHP)
             {
-                Debug.Log($"[HealthDebugger] HP Changed: {lastHP} -> {health.CurrentHP}");
                 lastHP = health.CurrentHP;
             }
         }

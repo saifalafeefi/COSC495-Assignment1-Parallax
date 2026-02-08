@@ -113,7 +113,6 @@ namespace Platformer.Mechanics
             PowerupColorManager colorManager = player.GetComponent<PowerupColorManager>();
             if (colorManager == null)
             {
-                Debug.LogError("[HEALTH VIAL] No PowerupColorManager on player!");
                 yield break;
             }
 

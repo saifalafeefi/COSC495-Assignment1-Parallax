@@ -133,7 +133,6 @@ namespace Platformer.UI
             player = FindFirstObjectByType<PlayerController>();
             if (player == null)
             {
-                Debug.LogError("[POWERUP TIMER UI] No PlayerController found!");
                 return;
             }
 

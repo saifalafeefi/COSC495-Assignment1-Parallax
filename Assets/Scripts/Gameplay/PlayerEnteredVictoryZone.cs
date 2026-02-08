@@ -25,6 +25,12 @@ namespace Platformer.Gameplay
             {
                 hud.StopTimer();
             }
+
+            var zoom = UnityEngine.Object.FindFirstObjectByType<Platformer.Mechanics.VictoryCameraZoom>();
+            if (zoom != null)
+            {
+                zoom.StartVictoryZoom(model.player.transform);
+            }
         }
     }
 }

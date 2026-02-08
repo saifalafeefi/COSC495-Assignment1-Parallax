@@ -740,7 +740,6 @@ namespace Platformer.Mechanics
         {
             if (flashMaterial == null)
             {
-                UnityEngine.Debug.LogWarning("[FLASH] no flash material assigned!");
                 yield break;
             }
 
@@ -947,7 +946,6 @@ namespace Platformer.Mechanics
         {
             if (rangedProjectilePrefab == null)
             {
-                Debug.LogWarning("[RANGED] no projectile prefab assigned!");
                 yield break;
             }
 

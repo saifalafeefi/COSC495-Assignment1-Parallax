@@ -37,7 +37,6 @@ namespace Platformer.Mechanics
             }
             else
             {
-                Debug.LogError("[BLOOM TINT] No Bloom effect found in Volume profile!");
             }
         }
 
@@ -50,7 +49,6 @@ namespace Platformer.Mechanics
         {
             if (bloom == null)
             {
-                Debug.LogWarning("[BLOOM TINT] Bloom effect not available!");
                 return;
             }
 
@@ -76,7 +74,6 @@ namespace Platformer.Mechanics
         {
             if (bloom == null)
             {
-                Debug.LogWarning("[BLOOM TINT] Bloom effect not available!");
                 return;
             }
 

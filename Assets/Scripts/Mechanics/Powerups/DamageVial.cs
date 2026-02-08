@@ -124,7 +124,6 @@ namespace Platformer.Mechanics
 
             if (colorManager == null)
             {
-                Debug.LogError("[DAMAGE VIAL] No PowerupColorManager on player!");
                 yield break;
             }
 

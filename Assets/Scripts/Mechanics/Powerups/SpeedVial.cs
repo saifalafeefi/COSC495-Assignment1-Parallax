@@ -129,7 +129,6 @@ namespace Platformer.Mechanics
 
             if (colorManager == null)
             {
-                Debug.LogError("[SPEED VIAL] No PowerupColorManager on player!");
                 yield break;
             }
 
@@ -153,7 +152,6 @@ namespace Platformer.Mechanics
             }
             else
             {
-                Debug.LogWarning("[SPEED VIAL] Sprite tint is DISABLED! Check 'Enable Sprite Tint' checkbox on prefab!");
             }
 
             // add color to camera background blend

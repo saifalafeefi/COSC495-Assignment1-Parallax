@@ -148,7 +148,6 @@ namespace Platformer.Mechanics
             }
             else
             {
-                Debug.LogError("[COLORMANAGER] SpriteRenderer is NULL!");
             }
         }
 
