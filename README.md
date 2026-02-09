@@ -39,6 +39,7 @@ Colors betray their purpose, use them wisely, then eliminate the source.
 - **Arrow Keys:** Move
 - **Space:** Jump (hold for higher jumps)
 - **A:** Attack
+- **Down key + A:** Air attack
 - **S:** Special ranged attack
 - **Left Shift:** Roll
 

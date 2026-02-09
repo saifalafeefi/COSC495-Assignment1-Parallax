@@ -89,6 +89,10 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 8
+  parryLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  logAnimatorStateChanges: 1
   isAttacking: 0
   allowDoubleJump: 1
   rollStateName: PlayerRoll
@@ -420,10 +424,10 @@ MonoBehaviour:
   playerController: {fileID: 0}
   barWidth: 8
   barHeight: 40
-  offsetX: 0.8
-  offsetY: 0.5
-  barSpacing: 12
+  rollBarOffsetX: 0.6
+  rollBarOffsetY: 0.5
+  rangedBarOffsetX: 0.8
+  rangedBarOffsetY: 0.5
   rollColor: {r: 0.2, g: 0.6, b: 1, a: 0.9}
   rangedColor: {r: 1, g: 0.8, b: 0.2, a: 0.9}
   backgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.6}
-  hideWhenReady: 0
