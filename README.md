@@ -1,6 +1,7 @@
 # Chromatic Cleanse
 
 A 2D action platformer where color is the enemy.
+Game link: https://saifalafeefi.itch.io/chromatic-cleanse
 
 ![Chromatic Cleanse gameplay screenshot 1](Screenshots/image1.png)
 
