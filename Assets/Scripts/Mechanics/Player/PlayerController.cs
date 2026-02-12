@@ -129,6 +129,24 @@ namespace Platformer.Mechanics
         /// </summary>
         public int attackAirDamage = 1;
 
+        [Header("Animator State Names")]
+        /// <summary>
+        /// name of the hurt animation state in the Animator.
+        /// </summary>
+        public string hurtStateName = "PlayerHurt";
+        /// <summary>
+        /// name of the death animation state in the Animator.
+        /// </summary>
+        public string deathStateName = "PlayerDeath";
+        /// <summary>
+        /// name of the respawn animation state in the Animator.
+        /// </summary>
+        public string respawnStateName = "PlayerRespawn";
+        /// <summary>
+        /// name of the victory animation state in the Animator.
+        /// </summary>
+        public string victoryStateName = "PlayerVictory";
+
         [Header("Attack Settings")]
         /// <summary>
         /// knockback force applied to enemies when hit.
@@ -146,6 +164,9 @@ namespace Platformer.Mechanics
         private bool isInvincible = false;
         private float invincibilityTimer = 0f;
         private bool isHurtStunned = false;
+        private bool lockAnimatorParameters = false;
+        private bool wasDead = false;
+        private bool wasHurt = false;
         private float hurtStunTimer = 0f;
         private Coroutine flashCoroutine = null;
         private Color originalSpriteColor;
@@ -379,16 +400,42 @@ namespace Platformer.Mechanics
 
             // check for critical animation states that MUST block all input
             AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(0);
-            bool isInHurtState = currentState.IsName("PlayerHurt");
-            bool isInDeathState = currentState.IsName("PlayerDeath");
-            bool isInRespawnState = currentState.IsName("PlayerRespawn");
-            bool isInVictoryState = currentState.IsName("PlayerVictory");
+            bool isInVictoryState = IsInAnimatorState(currentState, victoryStateName);
+            bool isDeadBool = animator.GetBool("dead");
+            bool isHurtBool = animator.GetBool("hurt");
 
-            // expose respawn state for enemies to check (can't be attacked during respawn)
-            IsRespawning = isInRespawnState;
+            if (isDeadBool && !wasDead)
+            {
+                ResetAnimatorTriggers();
+                if (!string.IsNullOrEmpty(deathStateName))
+                {
+                    animator.Play(deathStateName, 0, 0f);
+                }
+                wasDead = true;
+            }
+            else if (!isDeadBool)
+            {
+                wasDead = false;
+            }
+
+            if (isHurtBool && !wasHurt)
+            {
+                ResetAnimatorTriggers();
+                if (!string.IsNullOrEmpty(hurtStateName))
+                {
+                    animator.Play(hurtStateName, 0, 0f);
+                }
+                wasHurt = true;
+            }
+            else if (!isHurtBool)
+            {
+                wasHurt = false;
+            }
+
+            lockAnimatorParameters = isDeadBool || isHurtBool || IsRespawning || isInVictoryState || isHurtStunned;
 
             // block all input and force reset flags during death/respawn/hurt/victory
-            if (isInDeathState || isInRespawnState || isInHurtState || isInVictoryState)
+            if (isDeadBool || IsRespawning || isHurtBool || isInVictoryState)
             {
                 controlEnabled = false;
                 isAttacking = false;
@@ -596,6 +643,30 @@ namespace Platformer.Mechanics
             base.Update();
         }
 
+        bool IsInAnimatorState(AnimatorStateInfo state, string stateName)
+        {
+            if (string.IsNullOrEmpty(stateName)) return false;
+            if (state.IsName(stateName)) return true;
+            return state.IsName($"Base Layer.{stateName}");
+        }
+
+        void ResetAnimatorTriggers()
+        {
+            animator.ResetTrigger("attack1");
+            animator.ResetTrigger("attack2");
+            animator.ResetTrigger("attack3");
+            animator.ResetTrigger("attackAir");
+            animator.ResetTrigger("roll");
+            animator.ResetTrigger("rangedAttack");
+            animator.ResetTrigger("respawn");
+            animator.ResetTrigger("victory");
+        }
+
+        public void SetRespawning(bool value)
+        {
+            IsRespawning = value;
+        }
+
 
         void UpdateJumpState()
         {
@@ -660,19 +731,33 @@ namespace Platformer.Mechanics
                 velocity.y -= fastFallSpeed * DeltaTime;
             }
 
-            if (move.x > 0.01f)
-                spriteRenderer.flipX = false;
-            else if (move.x < -0.01f)
-                spriteRenderer.flipX = true;
+            if (!lockAnimatorParameters)
+            {
+                if (move.x > 0.01f)
+                {
+                    spriteRenderer.flipX = false;
+                }
+                else if (move.x < -0.01f)
+                {
+                    spriteRenderer.flipX = true;
+                }
 
-            animator.SetBool("grounded", IsGrounded);
-            animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
-            animator.SetFloat("velocityY", velocity.y);
-            animator.SetBool("isAttacking", isAttacking);
-            animator.SetBool("hurt", isHurtStunned);
-            animator.SetBool("isRolling", isRolling);
-            animator.SetBool("isWallSliding", isWallSliding);
-            animator.SetBool("isFiringRanged", isFiringRangedAttack);
+                animator.SetBool("grounded", IsGrounded);
+                animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
+                animator.SetFloat("velocityY", velocity.y);
+                animator.SetBool("isAttacking", isAttacking);
+                animator.SetBool("hurt", isHurtStunned);
+                animator.SetBool("isRolling", isRolling);
+                animator.SetBool("isWallSliding", isWallSliding);
+                animator.SetBool("isFiringRanged", isFiringRangedAttack);
+            }
+            else
+            {
+                animator.SetBool("hurt", isHurtStunned);
+                animator.SetBool("isAttacking", false);
+                animator.SetBool("isRolling", false);
+                animator.SetBool("isFiringRanged", false);
+            }
 
             // apply normal movement + knockback + roll boost
             targetVelocity = move * maxSpeed;
